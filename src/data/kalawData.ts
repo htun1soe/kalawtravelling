@@ -3,6 +3,7 @@ import type {
   Destination,
   Experience,
   JournalArticle,
+  MediaItem,
   PropertyListing,
   Rental,
   Restaurant,
@@ -34,6 +35,22 @@ export const IMG_RIDGE_LAND = '/src/assets/images/kalaw_ridge_land_1794831886368
 export const IMG_HOSPITALITY_CORNER = '/src/assets/images/kalaw_hospitality_corner_1794831888087.jpg';
 export const IMG_SUV_4X4 = '/src/assets/images/kalaw_4x4_suv_1794831887812.jpg';
 
+export const VID_RIDGE_TOUR = '/src/assets/videos/kalaw_ridge_tour.mp4';
+export const VID_HERITAGE_WALK = '/src/assets/videos/kalaw_heritage_walk.mp4';
+export const VID_LODGES_TOUR = '/src/assets/videos/kalaw_lodges_tour.mp4';
+export const VID_ESTATE_TOUR = '/src/assets/videos/kalaw_estate_tour.mp4';
+export const VID_CULINARY_REEL = '/src/assets/videos/kalaw_culinary_reel.mp4';
+export const VID_PLATEAU_DRIVE = '/src/assets/videos/kalaw_plateau_drive.mp4';
+
+export function buildFallbackMedia(primaryImage: string, title: string): MediaItem[] {
+  return [
+    { type: 'image', src: primaryImage, caption: `${title} — Primary View` },
+    { type: 'image', src: IMG_HERO_MOUNTAINS, caption: `${title} — Highland Surroundings` },
+    { type: 'image', src: IMG_PINE_TRAIL, caption: `${title} — Pine Ridge Setting` },
+    { type: 'video', src: VID_RIDGE_TOUR, poster: primaryImage, caption: `${title} — Scenic Video Tour` },
+  ];
+}
+
 export const INITIAL_DESTINATIONS: Destination[] = [
   {
     id: 'dest-1',
@@ -54,6 +71,12 @@ export const INITIAL_DESTINATIONS: Destination[] = [
       'Direct footpath connecting toward the old Pine View ridge trail',
     ],
     image: IMG_PAGODA_VIEWPOINT,
+    media: [
+      { type: 'image', src: IMG_PAGODA_VIEWPOINT, caption: 'Terraced brick stupas emerging through dawn pine mist' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Sweeping western Shan plateau horizon at sunrise' },
+      { type: 'image', src: IMG_PINE_TRAIL, caption: 'Old footpath linking Thein Taung toward the pine ridge' },
+      { type: 'video', src: VID_RIDGE_TOUR, poster: IMG_PAGODA_VIEWPOINT, caption: 'Morning Mist & Ridge Panorama Tour' },
+    ],
     featured: true,
   },
   {
@@ -75,6 +98,12 @@ export const INITIAL_DESTINATIONS: Destination[] = [
       'Natural limestone cavern sanctuary at the eastern saddle',
     ],
     image: IMG_PINE_TRAIL,
+    media: [
+      { type: 'image', src: IMG_PINE_TRAIL, caption: 'Red-earth trail beneath tall Khasi pines' },
+      { type: 'image', src: IMG_FOREST_RESERVE, caption: 'Shaded highland oak and pine canopy' },
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Smallholder tea slopes along the eastern ridge' },
+      { type: 'video', src: VID_RIDGE_TOUR, poster: IMG_PINE_TRAIL, caption: 'Myin Ma Hti Pine Corridor Walk' },
+    ],
     featured: true,
   },
   {
@@ -96,6 +125,12 @@ export const INITIAL_DESTINATIONS: Destination[] = [
       'Historic brick bungalows tucked inside cedar and eucalyptus gardens',
     ],
     image: IMG_HERITAGE_STATION,
+    media: [
+      { type: 'image', src: IMG_HERITAGE_STATION, caption: '1914 stone-and-teak railway station facade' },
+      { type: 'image', src: IMG_HOSPITALITY_CORNER, caption: 'Heritage brick and timber corner streets' },
+      { type: 'image', src: IMG_COFFEE_ROASTERY, caption: 'Morning espresso & bakery along Station Road' },
+      { type: 'video', src: VID_HERITAGE_WALK, poster: IMG_HERITAGE_STATION, caption: 'Station Quarter & Market Walk Reel' },
+    ],
     featured: true,
   },
   {
@@ -117,6 +152,12 @@ export const INITIAL_DESTINATIONS: Destination[] = [
       'Adjacent roadside teashop serving roasted Shan sesame biscuits',
     ],
     image: IMG_HNEE_PAYA,
+    media: [
+      { type: 'image', src: IMG_HNEE_PAYA, caption: 'Woven bamboo Buddha sanctuary in warm Shan lacquer' },
+      { type: 'image', src: IMG_PAGODA_VIEWPOINT, caption: 'Surrounding brick stupas and hillside pines' },
+      { type: 'image', src: IMG_VILLAGE_HOMESTAY, caption: 'Adjacent Myin Ka village timber dwellings' },
+      { type: 'video', src: VID_HERITAGE_WALK, poster: IMG_HNEE_PAYA, caption: 'Sacred Heritage & Village Lane Clip' },
+    ],
     featured: true,
   },
   {
@@ -138,6 +179,12 @@ export const INITIAL_DESTINATIONS: Destination[] = [
       'Clear stargazing horizon on crisp winter evenings',
     ],
     image: IMG_TEA_TERRACES,
+    media: [
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Organic green tea slopes along the western escarpment' },
+      { type: 'image', src: IMG_RIDGE_LAND, caption: 'Sunset ridge contours looking west across Shan State' },
+      { type: 'image', src: IMG_VILLAGE_HOMESTAY, caption: 'Local tea drying courtyard in Ywa Pu hamlet' },
+      { type: 'video', src: VID_HERITAGE_WALK, poster: IMG_TEA_TERRACES, caption: 'Ywa Pu Tea Escarpment Reel' },
+    ],
     featured: true,
   },
   {
@@ -159,6 +206,12 @@ export const INITIAL_DESTINATIONS: Destination[] = [
       'Traditional wood-fired lunch hosted in a Palaung mountain hamlet',
     ],
     image: IMG_FOREST_RESERVE,
+    media: [
+      { type: 'image', src: IMG_FOREST_RESERVE, caption: 'Protected oak, chestnut, and pine watershed' },
+      { type: 'image', src: IMG_PINE_TRAIL, caption: 'High-elevation woodland footpath' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Northern highland mist over the reserve' },
+      { type: 'video', src: VID_PLATEAU_DRIVE, poster: IMG_FOREST_RESERVE, caption: 'Forest Canopy & Ridge Video Tour' },
+    ],
     featured: true,
   },
 ];
@@ -181,7 +234,13 @@ export const INITIAL_STAYS: Stay[] = [
     amenities: ['Wood-burning fireplace', 'Shan breakfast included', 'Private garden veranda', 'High-speed Wi-Fi', 'Trekking concierge'],
     availableFrom: '2026-11-18',
     availableTo: '2027-04-30',
-    images: [IMG_BOUTIQUE_VILLA, IMG_VERANDA_DINING],
+    images: [IMG_BOUTIQUE_VILLA, IMG_VERANDA_DINING, IMG_GARDEN_GUESTHOUSE],
+    media: [
+      { type: 'image', src: IMG_BOUTIQUE_VILLA, caption: 'Restored 1928 Burmese teak-and-stone facade' },
+      { type: 'image', src: IMG_VERANDA_DINING, caption: 'Candlelit pine veranda & hearth dining' },
+      { type: 'image', src: IMG_GARDEN_GUESTHOUSE, caption: 'Blue hydrangea courtyard & stone steps' },
+      { type: 'video', src: VID_LODGES_TOUR, poster: IMG_BOUTIQUE_VILLA, caption: 'Lodge Grounds & Veranda Tour' },
+    ],
     featured: true,
   },
   {
@@ -201,7 +260,13 @@ export const INITIAL_STAYS: Stay[] = [
     amenities: ['Panoramic valley deck', 'Full mountain kitchen', 'Private chef option', 'Heated floors', 'Secure parking'],
     availableFrom: '2026-11-20',
     availableTo: '2027-05-15',
-    images: [IMG_ESTATE_HOUSE, IMG_HERO_MOUNTAINS],
+    images: [IMG_ESTATE_HOUSE, IMG_HERO_MOUNTAINS, IMG_RIDGE_LAND],
+    media: [
+      { type: 'image', src: IMG_ESTATE_HOUSE, caption: 'Timber-and-limestone pavilion facade' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Unobstructed valley panorama from the terrace' },
+      { type: 'image', src: IMG_RIDGE_LAND, caption: 'Western escarpment pine slope vistas' },
+      { type: 'video', src: VID_ESTATE_TOUR, poster: IMG_ESTATE_HOUSE, caption: 'Pavilion & Escarpment Video Walkthrough' },
+    ],
     featured: true,
   },
   {
@@ -221,7 +286,13 @@ export const INITIAL_STAYS: Stay[] = [
     amenities: ['Complimentary Shan breakfast', 'Gear storage', 'Hot rainfall showers', 'Garden courtyard', 'Bicycle loan'],
     availableFrom: '2026-11-17',
     availableTo: '2027-06-01',
-    images: [IMG_GARDEN_GUESTHOUSE, IMG_SHAN_NOODLES],
+    images: [IMG_GARDEN_GUESTHOUSE, IMG_SHAN_NOODLES, IMG_HERITAGE_STATION],
+    media: [
+      { type: 'image', src: IMG_GARDEN_GUESTHOUSE, caption: 'Sunlit conservatory & brick courtyard' },
+      { type: 'image', src: IMG_SHAN_NOODLES, caption: 'Complimentary morning Shan noodle breakfast' },
+      { type: 'image', src: IMG_HERITAGE_STATION, caption: 'Two minutes on foot from Kalaw Station' },
+      { type: 'video', src: VID_LODGES_TOUR, poster: IMG_GARDEN_GUESTHOUSE, caption: 'Guesthouse & Station Quarter Tour' },
+    ],
     featured: true,
   },
   {
@@ -241,7 +312,13 @@ export const INITIAL_STAYS: Stay[] = [
     amenities: ['Herbal steam pavilion', 'Farm-to-table dining', 'Guided dawn walks', 'Airport transfers', 'Tea tasting lounge'],
     availableFrom: '2026-11-22',
     availableTo: '2027-04-20',
-    images: [IMG_CEDAR_CABINS, IMG_TEA_TERRACES],
+    images: [IMG_CEDAR_CABINS, IMG_TEA_TERRACES, IMG_FOREST_RESERVE],
+    media: [
+      { type: 'image', src: IMG_CEDAR_CABINS, caption: 'Low-impact cedar cabins elevated on stone piers' },
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Adjacent organic tea orchard' },
+      { type: 'image', src: IMG_FOREST_RESERVE, caption: 'Private morning woodland trail' },
+      { type: 'video', src: VID_LODGES_TOUR, poster: IMG_CEDAR_CABINS, caption: 'Ywa Pu Cedar Sanctuary Video' },
+    ],
     featured: false,
   },
   {
@@ -261,7 +338,13 @@ export const INITIAL_STAYS: Stay[] = [
     amenities: ['Three home-cooked meals', 'Tea harvesting walk', 'Warm blankets', 'Local guide host'],
     availableFrom: '2026-11-18',
     availableTo: '2027-03-31',
-    images: [IMG_VILLAGE_HOMESTAY, IMG_COOKING_WORKSHOP],
+    images: [IMG_VILLAGE_HOMESTAY, IMG_COOKING_WORKSHOP, IMG_TEA_TERRACES],
+    media: [
+      { type: 'image', src: IMG_VILLAGE_HOMESTAY, caption: 'Upper-floor teak farmstead rooms in Myin Ka' },
+      { type: 'image', src: IMG_COOKING_WORKSHOP, caption: 'Home-cooked Danu highland kitchen dinner' },
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Morning walks through family tea plots' },
+      { type: 'video', src: VID_HERITAGE_WALK, poster: IMG_VILLAGE_HOMESTAY, caption: 'Village Homestay & Tea Hamlet Tour' },
+    ],
     featured: false,
   },
 ];
@@ -281,6 +364,12 @@ export const INITIAL_EXPERIENCES: Experience[] = [
     shortDescription: 'Traverse pine crests, red-earth farmlands, and Danu & Pa-O villages with homestay meals along the way.',
     included: ['Licensed local mountain guide', 'Two village homestay nights', 'Freshly prepared trail lunches', 'Luggage forwarding to Inle'],
     image: IMG_PINE_TRAIL,
+    media: [
+      { type: 'image', src: IMG_PINE_TRAIL, caption: 'Khasi pine ridge corridor heading toward Inle' },
+      { type: 'image', src: IMG_VILLAGE_HOMESTAY, caption: 'Evening stop in a traditional Danu village home' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Highland plateau vistas along Day 2 ridge' },
+      { type: 'video', src: VID_RIDGE_TOUR, poster: IMG_PINE_TRAIL, caption: 'Kalaw to Inle Trek Preview Reel' },
+    ],
     featured: true,
   },
   {
@@ -297,6 +386,12 @@ export const INITIAL_EXPERIENCES: Experience[] = [
     shortDescription: 'Capture first light breaking across misty Shan stupas, pine silhouettes, and morning market portraits.',
     included: ['Sunrise ridge access', 'Hot mountain tea & sesame snacks', 'Field composition coaching'],
     image: IMG_PAGODA_VIEWPOINT,
+    media: [
+      { type: 'image', src: IMG_PAGODA_VIEWPOINT, caption: 'First light across Thein Taung brick stupas' },
+      { type: 'image', src: IMG_HERITAGE_STATION, caption: 'Morning mist along the historic rail corridor' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Golden hour mountain layers from North Ridge' },
+      { type: 'video', src: VID_RIDGE_TOUR, poster: IMG_PAGODA_VIEWPOINT, caption: 'Dawn Mist Photo Walk Reel' },
+    ],
     featured: true,
   },
   {
@@ -313,6 +408,12 @@ export const INITIAL_EXPERIENCES: Experience[] = [
     shortDescription: 'Shop the five-day market for heirloom herbs, then cook Shan noodles, tofu nway, and tea leaf salad.',
     included: ['Guided morning market tour', 'All organic ingredients', 'Full four-course lunch & tea pairing'],
     image: IMG_COOKING_WORKSHOP,
+    media: [
+      { type: 'image', src: IMG_COOKING_WORKSHOP, caption: 'Highland kitchen counter with fresh Shan herbs' },
+      { type: 'image', src: IMG_SHAN_NOODLES, caption: 'Hand-pulled Shan khao swe & roasted chili oil' },
+      { type: 'image', src: IMG_NEPALI_THALI, caption: 'Regional spices and mountain produce from market' },
+      { type: 'video', src: VID_CULINARY_REEL, poster: IMG_COOKING_WORKSHOP, caption: 'Market & Shan Kitchen Preview' },
+    ],
     featured: true,
   },
   {
@@ -329,6 +430,12 @@ export const INITIAL_EXPERIENCES: Experience[] = [
     shortDescription: 'Spend a day with hillside tea growers learning pan-firing techniques and natural backstrap weaving.',
     included: ['4x4 ridge transport', 'Traditional village lunch', 'Hand-roasted tea pouch to take home'],
     image: IMG_TEA_TERRACES,
+    media: [
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Hand-picking fresh highland tea leaves' },
+      { type: 'image', src: IMG_FOREST_RESERVE, caption: 'Northern watershed forest trail to hamlet' },
+      { type: 'image', src: IMG_VILLAGE_HOMESTAY, caption: 'Traditional backstrap loom & courtyard hospitality' },
+      { type: 'video', src: VID_HERITAGE_WALK, poster: IMG_TEA_TERRACES, caption: 'Tea Harvest & Weaving Reel' },
+    ],
     featured: false,
   },
 ];
@@ -347,6 +454,12 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
     description:
       'Every morning from half past six, locals and trekkers gather around weathered teak tables for bowls of golden turmeric-broth Shan noodles topped with crushed peanuts and house-pickled greens.',
     image: IMG_SHAN_NOODLES,
+    media: [
+      { type: 'image', src: IMG_SHAN_NOODLES, caption: 'Steaming ceramic bowls of golden turmeric Shan noodles' },
+      { type: 'image', src: IMG_COOKING_WORKSHOP, caption: 'Morning prep of crushed peanuts and pickled greens' },
+      { type: 'image', src: IMG_HERITAGE_STATION, caption: 'Union Highway timber dining terrace' },
+      { type: 'video', src: VID_CULINARY_REEL, poster: IMG_SHAN_NOODLES, caption: 'Morning Teahouse & Shan Table Reel' },
+    ],
     featured: true,
   },
   {
@@ -362,6 +475,12 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
     description:
       'Set beneath old pine rafters with an open stone hearth, The Pine Veranda Table sources ninety percent of its seasonal menu within twelve kilometers of Kalaw.',
     image: IMG_VERANDA_DINING,
+    media: [
+      { type: 'image', src: IMG_VERANDA_DINING, caption: 'Candlelit wooden veranda under the pines' },
+      { type: 'image', src: IMG_BOUTIQUE_VILLA, caption: 'Stone courtyard entrance at Upper Pine Ridge' },
+      { type: 'image', src: IMG_SHAN_NOODLES, caption: 'Organic valley ingredients & slow-simmered broths' },
+      { type: 'video', src: VID_CULINARY_REEL, poster: IMG_VERANDA_DINING, caption: 'Evening Veranda Dining Preview' },
+    ],
     featured: true,
   },
   {
@@ -377,6 +496,12 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
     description:
       'Partnering directly with smallholder coffee growers in neighboring Ywangan and Pindaya, this quiet brick storefront pours washed and natural highland coffees in a serene reading room.',
     image: IMG_COFFEE_ROASTERY,
+    media: [
+      { type: 'image', src: IMG_COFFEE_ROASTERY, caption: 'Small-batch Ywangan pour-over bar & sourdough' },
+      { type: 'image', src: IMG_HERITAGE_STATION, caption: 'Calm brick storefront along Station Road' },
+      { type: 'image', src: IMG_HOSPITALITY_CORNER, caption: 'Warm reading nook & outdoor courtyard tables' },
+      { type: 'video', src: VID_CULINARY_REEL, poster: IMG_COFFEE_ROASTERY, caption: 'Roastery & Bakery Atmosphere Clip' },
+    ],
     featured: true,
   },
   {
@@ -392,6 +517,12 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
     description:
       'Warm clay bowls of lentil dhal, crisp papadum, and steamed momos make Everest Kitchen a comforting evening stop after cool ridge walks.',
     image: IMG_NEPALI_THALI,
+    media: [
+      { type: 'image', src: IMG_NEPALI_THALI, caption: 'Clay-pot mutton thali with crisp papadum & dhal' },
+      { type: 'image', src: IMG_COOKING_WORKSHOP, caption: 'Handmade mountain momos & ginger spice blends' },
+      { type: 'image', src: IMG_VERANDA_DINING, caption: 'Cozy evening dining room off Market Lane' },
+      { type: 'video', src: VID_CULINARY_REEL, poster: IMG_NEPALI_THALI, caption: 'Everest Nepali Kitchen Reel' },
+    ],
     featured: false,
   },
 ];
@@ -410,6 +541,12 @@ export const INITIAL_RENTALS: Rental[] = [
     shortDescription: 'Well-maintained dual-sport motorbike suited for paved ridge roads and rural village lanes toward Pindaya.',
     terms: ['2 helmets & rain ponchos included', 'Valid motorcycle license required', 'Full tank provided at pickup'],
     image: IMG_TRAIL_MOTORBIKE,
+    media: [
+      { type: 'image', src: IMG_TRAIL_MOTORBIKE, caption: '250cc dual-sport ready for Shan ridge roads' },
+      { type: 'image', src: IMG_PINE_TRAIL, caption: 'Scenic rural lanes toward Pindaya plateau' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Highland switchbacks above Kalaw' },
+      { type: 'video', src: VID_PLATEAU_DRIVE, poster: IMG_TRAIL_MOTORBIKE, caption: 'Trail Bike & Highland Route Reel' },
+    ],
     available: true,
   },
   {
@@ -425,6 +562,12 @@ export const INITIAL_RENTALS: Rental[] = [
     shortDescription: 'Nimble automatic scooter ideal for visiting Hnee Paya, Viewpoint ridges, and morning coffee runs.',
     terms: ['Two certified helmets included', 'Roadside assistance within 25 km', 'No off-road singletrack'],
     image: IMG_TOWN_SCOOTER,
+    media: [
+      { type: 'image', src: IMG_TOWN_SCOOTER, caption: 'Nimble 125cc automatic scooter with helmets' },
+      { type: 'image', src: IMG_HNEE_PAYA, caption: 'Ideal loop out to Hnee Paya bamboo shrine' },
+      { type: 'image', src: IMG_COFFEE_ROASTERY, caption: 'Easy parking along Station Road cafés' },
+      { type: 'video', src: VID_PLATEAU_DRIVE, poster: IMG_TOWN_SCOOTER, caption: 'Town Scooter Loop Preview' },
+    ],
     available: true,
   },
   {
@@ -440,6 +583,12 @@ export const INITIAL_RENTALS: Rental[] = [
     shortDescription: 'Comfortable air-conditioned 4x4 with an experienced mountain driver for custom day loops or airport transfers.',
     terms: ['Fuel and driver meals included', 'Flexible sunrise & sunset stops', 'Direct pickup from any Kalaw stay'],
     image: IMG_SUV_4X4,
+    media: [
+      { type: 'image', src: IMG_SUV_4X4, caption: 'Air-conditioned 4x4 SUV prepared for plateau loops' },
+      { type: 'image', src: IMG_RIDGE_LAND, caption: 'Private sunset ridge viewpoints along the western rim' },
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Custom stops at highland tea villages & Pindaya' },
+      { type: 'video', src: VID_PLATEAU_DRIVE, poster: IMG_SUV_4X4, caption: 'Private 4x4 Mountain Touring Reel' },
+    ],
     available: true,
   },
   {
@@ -455,6 +604,12 @@ export const INITIAL_RENTALS: Rental[] = [
     shortDescription: 'Punctual 50-minute scenic transfer along pine-lined mountain switchbacks directly to your lodge.',
     terms: ['Flight delay monitoring included', 'Bottled highland water onboard', 'Luggage handling'],
     image: IMG_HERITAGE_STATION,
+    media: [
+      { type: 'image', src: IMG_HERITAGE_STATION, caption: 'Punctual arrival pickup to central Kalaw lodges' },
+      { type: 'image', src: IMG_SUV_4X4, caption: 'Private luggage-friendly highland transfer vehicle' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: '50-minute scenic ascent from Heho Airport' },
+      { type: 'video', src: VID_PLATEAU_DRIVE, poster: IMG_HERITAGE_STATION, caption: 'Heho – Kalaw Transfer Corridor Reel' },
+    ],
     available: true,
   },
 ];
@@ -478,7 +633,13 @@ export const INITIAL_PROPERTIES: PropertyListing[] = [
     description:
       'Set on a quiet wooded cul-de-sac ten minutes from Kalaw clock tower, this newly crafted timber-and-stone residence features double-glazed valley windows, an outdoor stone terrace, solar hot water, and mature Burmese pine canopy.',
     features: ['Panoramic mist-valley deck', 'Two stone fireplaces', 'Deep spring well + filtration', 'Caretaker cottage on plot'],
-    images: [IMG_ESTATE_HOUSE, IMG_CEDAR_CABINS],
+    images: [IMG_ESTATE_HOUSE, IMG_CEDAR_CABINS, IMG_HERO_MOUNTAINS],
+    media: [
+      { type: 'image', src: IMG_ESTATE_HOUSE, caption: 'Architect-built Burmese teak & limestone residence' },
+      { type: 'image', src: IMG_CEDAR_CABINS, caption: 'Quiet caretaker cottage & mature pine grounds' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Unobstructed western mist-valley terrace view' },
+      { type: 'video', src: VID_ESTATE_TOUR, poster: IMG_ESTATE_HOUSE, caption: 'Pine Ridge Residence Video Walkthrough' },
+    ],
     featured: true,
     status: 'Active',
   },
@@ -500,7 +661,13 @@ export const INITIAL_PROPERTIES: PropertyListing[] = [
     description:
       'Ideal for writers, remote founders, or families seeking cool mountain living. Includes high-speed fiber internet, restored wood floors, a sunny breakfast conservatory, and weekly garden upkeep.',
     features: ['Fully furnished in Burmese teak', 'Fiber internet installed', 'Wood stove heating', 'Private gated driveway'],
-    images: [IMG_BOUTIQUE_VILLA, IMG_GARDEN_GUESTHOUSE],
+    images: [IMG_BOUTIQUE_VILLA, IMG_GARDEN_GUESTHOUSE, IMG_VERANDA_DINING],
+    media: [
+      { type: 'image', src: IMG_BOUTIQUE_VILLA, caption: 'Restored 1930s brick-and-teak veranda facade' },
+      { type: 'image', src: IMG_GARDEN_GUESTHOUSE, caption: 'Hydrangea courtyard & gated private driveway' },
+      { type: 'image', src: IMG_VERANDA_DINING, caption: 'Furnished sunlit conservatory & teak dining area' },
+      { type: 'video', src: VID_LODGES_TOUR, poster: IMG_BOUTIQUE_VILLA, caption: 'Heritage Bungalow Property Reel' },
+    ],
     featured: true,
     status: 'Active',
   },
@@ -520,7 +687,13 @@ export const INITIAL_PROPERTIES: PropertyListing[] = [
     description:
       'Connected by an all-weather gravel lane with municipal power poles at the northern boundary, this gently sloped plot enjoys 270-degree mountain views and mature pine shelter.',
     features: ['270° unobstructed valley horizon', 'Road frontage & power access', 'Mature pine & wild cherry trees'],
-    images: [IMG_RIDGE_LAND, IMG_HERO_MOUNTAINS],
+    images: [IMG_RIDGE_LAND, IMG_HERO_MOUNTAINS, IMG_TEA_TERRACES],
+    media: [
+      { type: 'image', src: IMG_RIDGE_LAND, caption: '1.85-acre south-facing pine ridge elevation' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: '270-degree mountain horizon vistas' },
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Surrounding organic tea slopes & wild cherry trees' },
+      { type: 'video', src: VID_ESTATE_TOUR, poster: IMG_RIDGE_LAND, caption: 'Ywa Pu Ridge Land Survey Tour' },
+    ],
     featured: true,
     status: 'Active',
   },
@@ -542,7 +715,13 @@ export const INITIAL_PROPERTIES: PropertyListing[] = [
     description:
       'Positioned steps from Kalaw’s historic railway corridor, featuring ground-floor courtyard dining capacity for forty guests and six sunlit upper suites.',
     features: ['High foot-traffic heritage corner', 'Commercial kitchen plumbing', 'Courtyard garden seating'],
-    images: [IMG_HOSPITALITY_CORNER, IMG_COFFEE_ROASTERY],
+    images: [IMG_HOSPITALITY_CORNER, IMG_COFFEE_ROASTERY, IMG_HERITAGE_STATION],
+    media: [
+      { type: 'image', src: IMG_HOSPITALITY_CORNER, caption: 'Two-story Station Road brick-and-timber corner' },
+      { type: 'image', src: IMG_COFFEE_ROASTERY, caption: 'Ground-floor roastery & courtyard cafe layout' },
+      { type: 'image', src: IMG_HERITAGE_STATION, caption: 'High foot-traffic heritage railway corridor' },
+      { type: 'video', src: VID_ESTATE_TOUR, poster: IMG_HOSPITALITY_CORNER, caption: 'Hospitality Corner Walkthrough Video' },
+    ],
     featured: false,
     status: 'Active',
   },
@@ -559,6 +738,12 @@ export const INITIAL_ARTICLES: JournalArticle[] = [
     publishedAt: 'November 2026',
     readTime: '6 min read',
     coverImage: IMG_HERO_MOUNTAINS,
+    media: [
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Sunrise cloud layer settling across Kalaw plateau' },
+      { type: 'image', src: IMG_PAGODA_VIEWPOINT, caption: 'Early dawn walks at Thein Taung ridge' },
+      { type: 'image', src: IMG_SHAN_NOODLES, caption: 'Morning market bowl of Shan khao swe' },
+      { type: 'video', src: VID_RIDGE_TOUR, poster: IMG_HERO_MOUNTAINS, caption: 'Kalaw Field Guide Film Reel' },
+    ],
     excerpt:
       'At 1,320 meters above sea level, Kalaw moves to an older clock—one governed by morning valley fog, woodsmoke, and the rhythm of mountain footpaths.',
     marginNote: 'Elevation: 1,320m · Average November dawn temperature: 11°C. Pack a merino layer for sunrise ridge walks.',
@@ -579,6 +764,12 @@ export const INITIAL_ARTICLES: JournalArticle[] = [
     publishedAt: 'October 2026',
     readTime: '5 min read',
     coverImage: IMG_PAGODA_VIEWPOINT,
+    media: [
+      { type: 'image', src: IMG_PAGODA_VIEWPOINT, caption: 'Brick stupas rising beside pine silhouettes' },
+      { type: 'image', src: IMG_HNEE_PAYA, caption: 'Ancient woven-bamboo lacquer sanctuary' },
+      { type: 'image', src: IMG_PINE_TRAIL, caption: 'Terracotta footpaths through Myin Ma Hti' },
+      { type: 'video', src: VID_HERITAGE_WALK, poster: IMG_PAGODA_VIEWPOINT, caption: 'Quiet Landmarks Visual Essay' },
+    ],
     excerpt:
       'From the five-hundred-year-old woven Buddha of Hnee Paya to cedar-shaded monastery steps, Kalaw rewards travelers who wander on foot.',
     marginNote: 'Walking distances from the Clock Tower range from 1.2 km (Thein Taung) to 9 km (Ywa Pu ridge).',
@@ -599,6 +790,12 @@ export const INITIAL_ARTICLES: JournalArticle[] = [
     publishedAt: 'October 2026',
     readTime: '4 min read',
     coverImage: IMG_SHAN_NOODLES,
+    media: [
+      { type: 'image', src: IMG_SHAN_NOODLES, caption: 'Turmeric broth rice noodles & mustard greens' },
+      { type: 'image', src: IMG_NEPALI_THALI, caption: 'Historic Gurkha clay-pot thali along Market Lane' },
+      { type: 'image', src: IMG_COFFEE_ROASTERY, caption: 'Freshly brewed single-origin Shan Arabica' },
+      { type: 'video', src: VID_CULINARY_REEL, poster: IMG_SHAN_NOODLES, caption: 'Highland Table Culinary Reel' },
+    ],
     excerpt:
       'Because Kalaw sits at the crossroads of Shan villages and historic hill-station communities, its kitchens serve some of Myanmar’s most comforting cold-weather food.',
     marginNote: 'Don’t miss the five-day market mornings for fresh avocado, macadamia nuts, and wild mountain honey.',
@@ -619,6 +816,12 @@ export const INITIAL_ARTICLES: JournalArticle[] = [
     publishedAt: 'September 2026',
     readTime: '4 min read',
     coverImage: IMG_FOREST_RESERVE,
+    media: [
+      { type: 'image', src: IMG_FOREST_RESERVE, caption: 'Northern watershed forest in cool winter light' },
+      { type: 'image', src: IMG_TEA_TERRACES, caption: 'Emerald monsoon greenery across Ywa Pu tea slopes' },
+      { type: 'image', src: IMG_HERO_MOUNTAINS, caption: 'Clear November trekking horizon' },
+      { type: 'video', src: VID_RIDGE_TOUR, poster: IMG_FOREST_RESERVE, caption: 'Seasonal Weather & Ridges Reel' },
+    ],
     excerpt:
       'Every season paints Kalaw differently—from clear November skies ideal for trekking to lush August valleys draped in dramatic cloud.',
     marginNote: 'Peak trekking clarity: November–February. Quietest boutique stay rates: May–September.',

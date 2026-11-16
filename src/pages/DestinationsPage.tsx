@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowRight, Search } from 'lucide-react';
-import { EditorialImage } from '../components/EditorialImage';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { FavoriteButton } from '../components/FavoriteButton';
 import { useApp } from '../context/AppContext';
 import type { DestinationCategory } from '../types/kalaw';
@@ -17,7 +16,7 @@ const CATEGORIES: Array<'All' | DestinationCategory> = [
 ];
 
 export const DestinationsPage: React.FC = () => {
-  const { destinations, catalogLoading, t } = useApp();
+  const { destinations, catalogLoading, openItemModal, t } = useApp();
   const [selectedCategory, setSelectedCategory] = useState<'All' | DestinationCategory>('All');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<'featured' | 'name'>('featured');
@@ -116,31 +115,39 @@ export const DestinationsPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 pt-10">
           {filtered.map((dest) => (
             <article key={dest.id} className="group flex flex-col">
-              <div className="relative">
-                <Link to={`/destinations/${dest.slug}`}>
-                  <EditorialImage src={dest.image} alt={dest.name} aspectClass="aspect-[4/3]" />
-                </Link>
-                <div className="absolute top-3 right-3">
-                  <FavoriteButton itemId={dest.id} compact />
-                </div>
-              </div>
+              <CardMediaCarousel
+                title={dest.name}
+                subtitle={`${t.categories[dest.category] || dest.category} · ${dest.location}`}
+                media={resolveMediaList(dest.media, [dest.image], dest.name)}
+                aspectClass="aspect-[4/3]"
+                onOpenInfo={() => openItemModal({ kind: 'destination', data: dest })}
+                modalItem={{ kind: 'destination', data: dest }}
+                topRightOverlay={<FavoriteButton itemId={dest.id} compact />}
+              />
               <div className="pt-4 space-y-2 flex-1 flex flex-col">
                 <p className="text-xs text-[#52634A]">
                   {t.categories[dest.category] || dest.category} · {dest.location} · <span className="tabular-nums">{dest.elevation}</span>
                 </p>
-                <h2 className="font-serif text-2xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
-                  <Link to={`/destinations/${dest.slug}`}>{dest.name}</Link>
+                <h2 className="font-serif text-2xl text-[#243D32]">
+                  <button
+                    type="button"
+                    onClick={() => openItemModal({ kind: 'destination', data: dest })}
+                    className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                  >
+                    {dest.name}
+                  </button>
                 </h2>
                 <p className="text-sm text-[#292B27]/80 leading-relaxed flex-1">
                   {dest.shortDescription}
                 </p>
-                <Link
-                  to={`/destinations/${dest.slug}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52]"
+                <button
+                  type="button"
+                  onClick={() => openItemModal({ kind: 'destination', data: dest })}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52] cursor-pointer self-start"
                 >
                   <span>{t.home.readGuide}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                </button>
               </div>
             </article>
           ))}

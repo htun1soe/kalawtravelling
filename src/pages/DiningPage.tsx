@@ -1,14 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Clock, MapPin, X } from 'lucide-react';
-import { BookingRequestPanel } from '../components/BookingRequestPanel';
-import { EditorialImage } from '../components/EditorialImage';
+import { Clock, MapPin } from 'lucide-react';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { useApp } from '../context/AppContext';
-import type { Restaurant } from '../types/kalaw';
 
 export const DiningPage: React.FC = () => {
-  const { restaurants, t } = useApp();
+  const { restaurants, openItemModal, t } = useApp();
   const [priceFilter, setPriceFilter] = useState<'All' | '$' | '$$' | '$$$'>('All');
-  const [selectedTable, setSelectedTable] = useState<Restaurant | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -38,7 +35,7 @@ export const DiningPage: React.FC = () => {
             key={tier}
             type="button"
             onClick={() => setPriceFilter(tier)}
-            className={`px-3.5 py-2 text-xs font-medium rounded-sm transition-colors cursor-pointer ${
+            className={`px-3.5 py-2 text-xs font-medium rounded-sm transition-colors cursor-pointer whitespace-nowrap ${
               priceFilter === tier
                 ? 'bg-[#243D32] text-[#F4F0E6]'
                 : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
@@ -51,14 +48,29 @@ export const DiningPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10">
         {filtered.map((rest) => (
-          <article key={rest.id} className="border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
-            <EditorialImage src={rest.image} alt={rest.name} aspectClass="aspect-[16/10]" />
+          <article key={rest.id} className="group border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
+            <CardMediaCarousel
+              title={rest.name}
+              subtitle={`${rest.cuisine} · ${rest.location}`}
+              media={resolveMediaList(rest.media, [rest.image], rest.name)}
+              aspectClass="aspect-[16/10]"
+              onOpenInfo={() => openItemModal({ kind: 'restaurant', data: rest })}
+              modalItem={{ kind: 'restaurant', data: rest }}
+            />
             <div className="p-6 md:p-8 flex-1 flex flex-col space-y-4">
               <div className="flex items-center justify-between text-xs text-[#52634A]">
                 <span>{rest.cuisine}</span>
                 <span className="font-medium text-[#243D32]">{rest.priceRange}</span>
               </div>
-              <h2 className="font-serif text-3xl text-[#243D32]">{rest.name}</h2>
+              <h2 className="font-serif text-3xl text-[#243D32]">
+                <button
+                  type="button"
+                  onClick={() => openItemModal({ kind: 'restaurant', data: rest })}
+                  className="text-left hover:text-[#B66F52] transition-colors cursor-pointer"
+                >
+                  {rest.name}
+                </button>
+              </h2>
               <p className="text-sm text-[#292B27]/85 leading-relaxed">{rest.shortDescription}</p>
               <div className="space-y-1.5 text-xs text-[#52634A] pt-1">
                 <p className="flex items-center gap-2">
@@ -78,11 +90,11 @@ export const DiningPage: React.FC = () => {
                   {rest.signatureDishes.join(' · ')}
                 </p>
               </div>
-              <div className="pt-2 mt-auto">
+              <div className="pt-2 mt-auto flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setSelectedTable(rest)}
-                  className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
+                  onClick={() => openItemModal({ kind: 'restaurant', data: rest })}
+                  className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   {t.actions.requestTable}
                 </button>
@@ -91,38 +103,6 @@ export const DiningPage: React.FC = () => {
           </article>
         ))}
       </div>
-
-      {selectedTable && (
-        <div
-          className="fixed inset-0 z-50 bg-[#292B27]/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-[#F4F0E6] border border-[#D9CCB8] max-w-lg w-full p-6 md:p-8 relative space-y-4 my-8">
-            <button
-              type="button"
-              onClick={() => setSelectedTable(null)}
-              aria-label="Close table reservation dialog"
-              className="absolute top-4 right-4 p-2 text-[#52634A] hover:text-[#243D32] cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <div>
-              <p className="text-xs uppercase tracking-widest text-[#B66F52]">{selectedTable.cuisine}</p>
-              <h2 className="font-serif text-2xl text-[#243D32] mt-1">{selectedTable.name}</h2>
-            </div>
-            <BookingRequestPanel
-              itemType="restaurant"
-              itemId={selectedTable.id}
-              itemTitle={selectedTable.name}
-              unitPrice={0}
-              priceLabel={selectedTable.openingHours}
-              maxGuests={10}
-              ctaLabel={t.actions.requestTable}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

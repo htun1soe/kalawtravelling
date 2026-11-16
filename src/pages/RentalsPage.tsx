@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { X } from 'lucide-react';
-import { BookingRequestPanel } from '../components/BookingRequestPanel';
-import { EditorialImage } from '../components/EditorialImage';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { useApp } from '../context/AppContext';
-import type { Rental, RentalCategory } from '../types/kalaw';
+import type { RentalCategory } from '../types/kalaw';
 
 const CATEGORIES: Array<'All' | RentalCategory> = [
   'All',
@@ -14,9 +12,8 @@ const CATEGORIES: Array<'All' | RentalCategory> = [
 ];
 
 export const RentalsPage: React.FC = () => {
-  const { rentals, t } = useApp();
+  const { rentals, openItemModal, t } = useApp();
   const [cat, setCat] = useState<'All' | RentalCategory>('All');
-  const [selectedRental, setSelectedRental] = useState<Rental | null>(null);
 
   const filtered = useMemo(
     () => (cat === 'All' ? rentals : rentals.filter((r) => r.category === cat)),
@@ -56,14 +53,29 @@ export const RentalsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10">
         {filtered.map((rental) => (
-          <article key={rental.id} className="border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
-            <EditorialImage src={rental.image} alt={rental.name} aspectClass="aspect-[16/10]" />
+          <article key={rental.id} className="group border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
+            <CardMediaCarousel
+              title={rental.name}
+              subtitle={`${t.categories[rental.category] || rental.category} · ${rental.location}`}
+              media={resolveMediaList(rental.media, [rental.image], rental.name)}
+              aspectClass="aspect-[16/10]"
+              onOpenInfo={() => openItemModal({ kind: 'rental', data: rental })}
+              modalItem={{ kind: 'rental', data: rental }}
+            />
             <div className="p-6 md:p-8 flex-1 flex flex-col space-y-4">
               <div className="flex items-center justify-between text-xs text-[#52634A]">
                 <span>{t.categories[rental.category] || rental.category} · {rental.location}</span>
                 <span>{rental.includesDriver ? 'Driver Included' : 'Self-Drive'}</span>
               </div>
-              <h2 className="font-serif text-3xl text-[#243D32]">{rental.name}</h2>
+              <h2 className="font-serif text-3xl text-[#243D32]">
+                <button
+                  type="button"
+                  onClick={() => openItemModal({ kind: 'rental', data: rental })}
+                  className="text-left hover:text-[#B66F52] transition-colors cursor-pointer"
+                >
+                  {rental.name}
+                </button>
+              </h2>
               <p className="text-sm text-[#292B27]/85 leading-relaxed">{rental.shortDescription}</p>
               <p className="text-xs text-[#52634A]">
                 {rental.transmissionOrService} · {rental.capacity}
@@ -73,7 +85,7 @@ export const RentalsPage: React.FC = () => {
                   <li key={term}>— {term}</li>
                 ))}
               </ul>
-              <div className="pt-4 mt-auto border-t border-[#D9CCB8] flex items-center justify-between">
+              <div className="pt-4 mt-auto border-t border-[#D9CCB8] flex items-center justify-between gap-3">
                 <div>
                   <span className="font-serif text-2xl text-[#243D32] tabular-nums">
                     ${rental.pricePerDay}
@@ -82,8 +94,8 @@ export const RentalsPage: React.FC = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setSelectedRental(rental)}
-                  className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
+                  onClick={() => openItemModal({ kind: 'rental', data: rental })}
+                  className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   {t.actions.requestVehicle}
                 </button>
@@ -92,41 +104,6 @@ export const RentalsPage: React.FC = () => {
           </article>
         ))}
       </div>
-
-      {selectedRental && (
-        <div
-          className="fixed inset-0 z-50 bg-[#292B27]/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-[#F4F0E6] border border-[#D9CCB8] max-w-lg w-full p-6 md:p-8 relative space-y-4 my-8">
-            <button
-              type="button"
-              onClick={() => setSelectedRental(null)}
-              aria-label="Close vehicle request dialog"
-              className="absolute top-4 right-4 p-2 text-[#52634A] hover:text-[#243D32] cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <div>
-              <p className="text-xs uppercase tracking-widest text-[#B66F52]">
-                {t.categories[selectedRental.category] || selectedRental.category}
-              </p>
-              <h2 className="font-serif text-2xl text-[#243D32] mt-1">{selectedRental.name}</h2>
-            </div>
-            <BookingRequestPanel
-              itemType="rental"
-              itemId={selectedRental.id}
-              itemTitle={selectedRental.name}
-              unitPrice={selectedRental.pricePerDay}
-              priceLabel={t.home.perDay}
-              requireCheckOut={!selectedRental.includesDriver}
-              maxGuests={6}
-              ctaLabel={t.actions.requestVehicle}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

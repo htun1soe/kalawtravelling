@@ -7,14 +7,14 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { MotionConfig } from 'motion/react';
 import { Footer } from './components/Footer';
+import { GalleryLightboxModal } from './components/GalleryLightboxModal';
+import { ItemDetailModal } from './components/ItemDetailModal';
 import { Navbar } from './components/Navbar';
 import { ScrollProgressBar } from './components/ScrollReveal';
 import { AppProvider } from './context/AppContext';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { ArticleDetailPage } from './pages/ArticleDetailPage';
 import { AuthPage } from './pages/AuthPage';
 import { BookingsPage } from './pages/BookingsPage';
-import { DestinationDetailPage } from './pages/DestinationDetailPage';
 import { DestinationsPage } from './pages/DestinationsPage';
 import { DiningPage } from './pages/DiningPage';
 import { ExperiencesPage } from './pages/ExperiencesPage';
@@ -22,10 +22,8 @@ import { ExplorePage } from './pages/ExplorePage';
 import { HomePage } from './pages/HomePage';
 import { JournalPage } from './pages/JournalPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { PropertyDetailPage } from './pages/PropertyDetailPage';
 import { RealEstatePage } from './pages/RealEstatePage';
 import { RentalsPage } from './pages/RentalsPage';
-import { StayDetailPage } from './pages/StayDetailPage';
 import { StaysPage } from './pages/StaysPage';
 import { TripPlannerPage } from './pages/TripPlannerPage';
 
@@ -51,16 +49,12 @@ export default function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/explore" element={<ExplorePage />} />
                 <Route path="/destinations" element={<DestinationsPage />} />
-                <Route path="/destinations/:slug" element={<DestinationDetailPage />} />
                 <Route path="/stays" element={<StaysPage />} />
-                <Route path="/stays/:slug" element={<StayDetailPage />} />
                 <Route path="/experiences" element={<ExperiencesPage />} />
                 <Route path="/dining" element={<DiningPage />} />
                 <Route path="/rentals" element={<RentalsPage />} />
                 <Route path="/real-estate" element={<RealEstatePage />} />
-                <Route path="/real-estate/:slug" element={<PropertyDetailPage />} />
                 <Route path="/journal" element={<JournalPage />} />
-                <Route path="/journal/:slug" element={<ArticleDetailPage />} />
                 <Route path="/plan-trip" element={<TripPlannerPage />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
@@ -70,6 +64,8 @@ export default function App() {
               </Routes>
             </main>
             <Footer />
+            <ItemDetailModal />
+            <GalleryLightboxModal />
           </div>
         </BrowserRouter>
       </AppProvider>

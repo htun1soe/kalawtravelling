@@ -20,6 +20,8 @@ import type {
   Destination,
   Experience,
   JournalArticle,
+  MediaItem,
+  ModalItem,
   PropertyListing,
   Rental,
   Restaurant,
@@ -27,6 +29,14 @@ import type {
   TripPlanItem,
   UserAccount,
 } from '../types/kalaw';
+
+export interface GalleryState {
+  title: string;
+  subtitle?: string;
+  media: MediaItem[];
+  initialIndex: number;
+  item?: ModalItem;
+}
 
 interface AppContextValue {
   lang: Language;
@@ -55,6 +65,18 @@ interface AppContextValue {
   addToTripPlan: (item: Omit<TripPlanItem, 'id'>) => void;
   removeFromTripPlan: (id: string) => void;
   clearTripPlan: () => void;
+  activeModal: ModalItem | null;
+  openItemModal: (item: ModalItem) => void;
+  closeItemModal: () => void;
+  galleryState: GalleryState | null;
+  openGallery: (
+    title: string,
+    media: MediaItem[],
+    initialIndex?: number,
+    subtitle?: string,
+    item?: ModalItem
+  ) => void;
+  closeGallery: () => void;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -282,6 +304,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTripPlan([]);
   };
 
+  const [activeModal, setActiveModal] = useState<ModalItem | null>(null);
+  const [galleryState, setGalleryState] = useState<GalleryState | null>(null);
+
+  const openItemModal = useCallback((item: ModalItem) => {
+    setGalleryState(null);
+    setActiveModal(item);
+  }, []);
+
+  const closeItemModal = useCallback(() => {
+    setActiveModal(null);
+  }, []);
+
+  const openGallery = useCallback(
+    (
+      title: string,
+      media: MediaItem[],
+      initialIndex = 0,
+      subtitle?: string,
+      item?: ModalItem
+    ) => {
+      setGalleryState({ title, media, initialIndex, subtitle, item });
+    },
+    []
+  );
+
+  const closeGallery = useCallback(() => {
+    setGalleryState(null);
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -311,6 +362,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addToTripPlan,
         removeFromTripPlan,
         clearTripPlan,
+        activeModal,
+        openItemModal,
+        closeItemModal,
+        galleryState,
+        openGallery,
+        closeGallery,
       }}
     >
       {children}

@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Plus, X } from 'lucide-react';
-import { EditorialImage } from '../components/EditorialImage';
-import { FavoriteButton } from '../components/FavoriteButton';
+import { useSearchParams } from 'react-router-dom';
+import { Plus, X } from 'lucide-react';
+import { PropertyCard } from '../components/PropertyCard';
 import { useApp } from '../context/AppContext';
 import {
   IMG_BOUTIQUE_VILLA,
@@ -131,49 +130,7 @@ export const RealEstatePage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10">
         {filtered.map((prop) => (
-          <article key={prop.id} className="group border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
-            <div className="relative">
-              <Link to={`/real-estate/${prop.slug}`}>
-                <EditorialImage src={prop.images[0]} alt={prop.title} aspectClass="aspect-[16/10]" />
-              </Link>
-              <div className="absolute top-3 right-3">
-                <FavoriteButton itemId={prop.id} compact />
-              </div>
-            </div>
-            <div className="p-6 md:p-8 flex-1 flex flex-col space-y-3">
-              <div className="flex items-center justify-between text-xs text-[#52634A]">
-                <span>{t.categories[prop.category] || prop.category} · {prop.location}</span>
-                <span className="text-[#243D32] font-medium">{prop.status}</span>
-              </div>
-              <h2 className="font-serif text-3xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
-                <Link to={`/real-estate/${prop.slug}`}>{prop.title}</Link>
-              </h2>
-              <p className="text-sm text-[#292B27]/85 leading-relaxed flex-1">
-                {prop.shortDescription}
-              </p>
-              <p className="text-xs text-[#52634A] tabular-nums">
-                {prop.areaSize}
-                {prop.bedrooms ? ` · ${prop.bedrooms} Bedrooms` : ''} · {prop.titleStatus}
-              </p>
-              <div className="pt-4 border-t border-[#D9CCB8] flex items-center justify-between">
-                <div>
-                  <span className="font-serif text-3xl text-[#243D32] tabular-nums">
-                    ${prop.price.toLocaleString()}
-                  </span>
-                  {prop.priceUnit === 'per month' && (
-                    <span className="text-xs text-[#52634A]"> {t.home.perMonth}</span>
-                  )}
-                </div>
-                <Link
-                  to={`/real-estate/${prop.slug}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] hover:text-[#B66F52]"
-                >
-                  <span>{t.actions.inspectDossier}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </article>
+          <PropertyCard key={prop.id} prop={prop} variant="light" />
         ))}
       </div>
 

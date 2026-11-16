@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
+  buildFallbackMedia,
   INITIAL_ARTICLES,
   INITIAL_BOOKINGS,
   INITIAL_DESTINATIONS,
@@ -102,6 +103,10 @@ app.post('/api/destinations', (req, res) => {
     editorialOverview: payload.editorialOverview || payload.shortDescription || '',
     highlights: payload.highlights || ['Scenic highland viewpoint'],
     image: payload.image || store.destinations[0].image,
+    media:
+      payload.media && payload.media.length >= 3
+        ? payload.media
+        : buildFallbackMedia(payload.image || store.destinations[0].image, payload.name),
     featured: Boolean(payload.featured),
   };
   store.destinations.unshift(created);
@@ -139,6 +144,13 @@ app.post('/api/stays', (req, res) => {
     availableFrom: payload.availableFrom || '2026-11-18',
     availableTo: payload.availableTo || '2027-05-01',
     images: payload.images && payload.images.length ? payload.images : [store.stays[0].images[0]],
+    media:
+      payload.media && payload.media.length >= 3
+        ? payload.media
+        : buildFallbackMedia(
+            (payload.images && payload.images[0]) || store.stays[0].images[0],
+            payload.name
+          ),
     featured: Boolean(payload.featured),
   };
   store.stays.unshift(created);
@@ -168,6 +180,10 @@ app.post('/api/experiences', (req, res) => {
     shortDescription: payload.shortDescription || '',
     included: payload.included || ['Local guide', 'Tea break'],
     image: payload.image || store.experiences[0].image,
+    media:
+      payload.media && payload.media.length >= 3
+        ? payload.media
+        : buildFallbackMedia(payload.image || store.experiences[0].image, payload.title),
     featured: Boolean(payload.featured),
   };
   store.experiences.unshift(created);
@@ -195,6 +211,10 @@ app.post('/api/restaurants', (req, res) => {
     shortDescription: payload.shortDescription || '',
     description: payload.description || payload.shortDescription || '',
     image: payload.image || store.restaurants[0].image,
+    media:
+      payload.media && payload.media.length >= 3
+        ? payload.media
+        : buildFallbackMedia(payload.image || store.restaurants[0].image, payload.name),
     featured: Boolean(payload.featured),
   };
   store.restaurants.unshift(created);
@@ -223,6 +243,10 @@ app.post('/api/rentals', (req, res) => {
     shortDescription: payload.shortDescription || '',
     terms: payload.terms || ['Helmet & basic insurance included'],
     image: payload.image || store.rentals[0].image,
+    media:
+      payload.media && payload.media.length >= 3
+        ? payload.media
+        : buildFallbackMedia(payload.image || store.rentals[0].image, payload.name),
     available: payload.available !== false,
   };
   store.rentals.unshift(created);
@@ -261,6 +285,13 @@ app.post('/api/properties', (req, res) => {
     description: payload.description || payload.shortDescription || '',
     features: payload.features && payload.features.length ? payload.features : ['Mountain view', 'Road access'],
     images: payload.images && payload.images.length ? payload.images : [store.properties[0].images[0]],
+    media:
+      payload.media && payload.media.length >= 3
+        ? payload.media
+        : buildFallbackMedia(
+            (payload.images && payload.images[0]) || store.properties[0].images[0],
+            payload.title
+          ),
     featured: Boolean(payload.featured),
     status: payload.status || 'Active',
   };
@@ -298,6 +329,10 @@ app.post('/api/articles', (req, res) => {
     publishedAt: payload.publishedAt || 'November 2026',
     readTime: payload.readTime || '4 min read',
     coverImage: payload.coverImage || store.articles[0].coverImage,
+    media:
+      payload.media && payload.media.length >= 3
+        ? payload.media
+        : buildFallbackMedia(payload.coverImage || store.articles[0].coverImage, payload.title),
     excerpt: payload.excerpt || payload.subtitle || '',
     paragraphs: payload.paragraphs && payload.paragraphs.length ? payload.paragraphs : [payload.excerpt || ''],
     marginNote: payload.marginNote || 'Recorded in Kalaw, Shan State.',

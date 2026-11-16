@@ -1,13 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, Search } from 'lucide-react';
-import { EditorialImage } from '../components/EditorialImage';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
+import { FavoriteButton } from '../components/FavoriteButton';
+import { PropertyCard } from '../components/PropertyCard';
 import { useApp } from '../context/AppContext';
 
 type ExploreTab = 'all' | 'destinations' | 'stays' | 'experiences' | 'dining' | 'rentals' | 'properties';
 
 export const ExplorePage: React.FC = () => {
-  const { destinations, stays, experiences, restaurants, rentals, properties, t } = useApp();
+  const { destinations, stays, experiences, restaurants, rentals, properties, openItemModal, t } = useApp();
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [tab, setTab] = useState<ExploreTab>('all');
@@ -35,7 +37,7 @@ export const ExplorePage: React.FC = () => {
         matchText([r.name, r.location, r.category, r.shortDescription])
       ),
       properties: properties.filter((p) =>
-        matchText([p.title, p.location, p.category, p.shortDescription])
+        matchText([p.title, p.location, p.category, p.shortDescription, p.areaSize, p.agentName])
       ),
     };
   }, [destinations, stays, experiences, restaurants, rentals, properties, q]);
@@ -116,11 +118,29 @@ export const ExplorePage: React.FC = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.destinations.map((d) => (
-                  <Link key={d.id} to={`/destinations/${d.slug}`} className="group space-y-3">
-                    <EditorialImage src={d.image} alt={d.name} aspectClass="aspect-[4/3]" />
-                    <p className="text-xs text-[#52634A]">{t.categories[d.category] || d.category} · {d.location}</p>
-                    <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52]">{d.name}</h3>
-                  </Link>
+                  <article key={d.id} className="group space-y-3 flex flex-col">
+                    <CardMediaCarousel
+                      title={d.name}
+                      subtitle={`${t.categories[d.category] || d.category} · ${d.location}`}
+                      media={resolveMediaList(d.media, [d.image], d.name)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'destination', data: d })}
+                      modalItem={{ kind: 'destination', data: d }}
+                      topRightOverlay={<FavoriteButton itemId={d.id} compact />}
+                    />
+                    <p className="text-xs text-[#52634A]">
+                      {t.categories[d.category] || d.category} · {d.location}
+                    </p>
+                    <h3 className="font-serif text-xl text-[#243D32]">
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'destination', data: d })}
+                        className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                      >
+                        {d.name}
+                      </button>
+                    </h3>
+                  </article>
                 ))}
               </div>
             </section>
@@ -133,13 +153,29 @@ export const ExplorePage: React.FC = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.stays.map((s) => (
-                  <Link key={s.id} to={`/stays/${s.slug}`} className="group space-y-3">
-                    <EditorialImage src={s.images[0]} alt={s.name} aspectClass="aspect-[4/3]" />
+                  <article key={s.id} className="group space-y-3 flex flex-col">
+                    <CardMediaCarousel
+                      title={s.name}
+                      subtitle={`${t.categories[s.category] || s.category} · ${s.location}`}
+                      media={resolveMediaList(s.media, s.images, s.name)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'stay', data: s })}
+                      modalItem={{ kind: 'stay', data: s }}
+                      topRightOverlay={<FavoriteButton itemId={s.id} compact />}
+                    />
                     <p className="text-xs text-[#52634A] tabular-nums">
                       {t.categories[s.category] || s.category} · ${s.pricePerNight} {t.home.perNight}
                     </p>
-                    <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52]">{s.name}</h3>
-                  </Link>
+                    <h3 className="font-serif text-xl text-[#243D32]">
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'stay', data: s })}
+                        className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                      >
+                        {s.name}
+                      </button>
+                    </h3>
+                  </article>
                 ))}
               </div>
             </section>
@@ -150,19 +186,44 @@ export const ExplorePage: React.FC = () => {
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
                 {t.nav.experiences}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.experiences.map((e) => (
-                  <Link
-                    key={e.id}
-                    to="/experiences"
-                    className="p-5 border border-[#D9CCB8] hover:border-[#243D32] transition-colors flex items-center justify-between gap-4"
-                  >
-                    <div>
-                      <p className="text-xs text-[#52634A]">{t.categories[e.category] || e.category} · {e.duration}</p>
-                      <h3 className="font-serif text-xl text-[#243D32] mt-1">{e.title}</h3>
+                  <article key={e.id} className="group space-y-3 flex flex-col border border-[#D9CCB8] bg-[#F4F0E6]">
+                    <CardMediaCarousel
+                      title={e.title}
+                      subtitle={`${t.categories[e.category] || e.category} · ${e.duration}`}
+                      media={resolveMediaList(e.media, [e.image], e.title)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'experience', data: e })}
+                      modalItem={{ kind: 'experience', data: e }}
+                      topRightOverlay={<FavoriteButton itemId={e.id} compact />}
+                    />
+                    <div className="px-5 pb-5 space-y-2 flex-1 flex flex-col">
+                      <p className="text-xs text-[#52634A]">
+                        {t.categories[e.category] || e.category} · {e.duration}
+                      </p>
+                      <h3 className="font-serif text-xl text-[#243D32]">
+                        <button
+                          type="button"
+                          onClick={() => openItemModal({ kind: 'experience', data: e })}
+                          className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                        >
+                          {e.title}
+                        </button>
+                      </h3>
+                      <div className="pt-2 mt-auto flex items-center justify-between text-xs text-[#243D32] font-medium tabular-nums">
+                        <span>${e.pricePerGuest} {t.home.perGuest}</span>
+                        <button
+                          type="button"
+                          onClick={() => openItemModal({ kind: 'experience', data: e })}
+                          className="inline-flex items-center gap-1 hover:text-[#B66F52] cursor-pointer"
+                        >
+                          <span>{t.home.viewDetails}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium text-[#243D32] tabular-nums shrink-0">${e.pricePerGuest}</span>
-                  </Link>
+                  </article>
                 ))}
               </div>
             </section>
@@ -173,19 +234,40 @@ export const ExplorePage: React.FC = () => {
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
                 {t.nav.dining}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.restaurants.map((r) => (
-                  <Link
-                    key={r.id}
-                    to="/dining"
-                    className="p-5 border border-[#D9CCB8] hover:border-[#243D32] transition-colors flex items-center justify-between gap-4"
-                  >
-                    <div>
-                      <p className="text-xs text-[#52634A]">{r.cuisine} · {r.openingHours}</p>
-                      <h3 className="font-serif text-xl text-[#243D32] mt-1">{r.name}</h3>
+                  <article key={r.id} className="group space-y-3 flex flex-col border border-[#D9CCB8] bg-[#F4F0E6]">
+                    <CardMediaCarousel
+                      title={r.name}
+                      subtitle={`${r.cuisine} · ${r.location}`}
+                      media={resolveMediaList(r.media, [r.image], r.name)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'restaurant', data: r })}
+                      modalItem={{ kind: 'restaurant', data: r }}
+                    />
+                    <div className="px-5 pb-5 space-y-2 flex-1 flex flex-col">
+                      <p className="text-xs text-[#52634A]">
+                        {r.cuisine} · {r.openingHours}
+                      </p>
+                      <h3 className="font-serif text-xl text-[#243D32]">
+                        <button
+                          type="button"
+                          onClick={() => openItemModal({ kind: 'restaurant', data: r })}
+                          className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                        >
+                          {r.name}
+                        </button>
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'restaurant', data: r })}
+                        className="mt-auto pt-2 inline-flex items-center gap-1 text-xs font-medium text-[#243D32] hover:text-[#B66F52] cursor-pointer self-start"
+                      >
+                        <span>{t.home.viewDetails}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-[#52634A] shrink-0" />
-                  </Link>
+                  </article>
                 ))}
               </div>
             </section>
@@ -196,21 +278,43 @@ export const ExplorePage: React.FC = () => {
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
                 {t.nav.rentals}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.rentals.map((r) => (
-                  <Link
-                    key={r.id}
-                    to="/rentals"
-                    className="p-5 border border-[#D9CCB8] hover:border-[#243D32] transition-colors flex items-center justify-between gap-4"
-                  >
-                    <div>
-                      <p className="text-xs text-[#52634A]">{t.categories[r.category] || r.category} · {r.capacity}</p>
-                      <h3 className="font-serif text-xl text-[#243D32] mt-1">{r.name}</h3>
+                  <article key={r.id} className="group space-y-3 flex flex-col border border-[#D9CCB8] bg-[#F4F0E6]">
+                    <CardMediaCarousel
+                      title={r.name}
+                      subtitle={`${t.categories[r.category] || r.category} · ${r.capacity}`}
+                      media={resolveMediaList(r.media, [r.image], r.name)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'rental', data: r })}
+                      modalItem={{ kind: 'rental', data: r }}
+                    />
+                    <div className="px-5 pb-5 space-y-2 flex-1 flex flex-col">
+                      <p className="text-xs text-[#52634A]">
+                        {t.categories[r.category] || r.category} · {r.capacity}
+                      </p>
+                      <h3 className="font-serif text-xl text-[#243D32]">
+                        <button
+                          type="button"
+                          onClick={() => openItemModal({ kind: 'rental', data: r })}
+                          className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                        >
+                          {r.name}
+                        </button>
+                      </h3>
+                      <div className="pt-2 mt-auto flex items-center justify-between text-xs text-[#243D32] font-medium tabular-nums">
+                        <span>${r.pricePerDay} {t.home.perDay}</span>
+                        <button
+                          type="button"
+                          onClick={() => openItemModal({ kind: 'rental', data: r })}
+                          className="inline-flex items-center gap-1 hover:text-[#B66F52] cursor-pointer"
+                        >
+                          <span>{t.home.viewDetails}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium text-[#243D32] tabular-nums shrink-0">
-                      ${r.pricePerDay} {t.home.perDay}
-                    </span>
-                  </Link>
+                  </article>
                 ))}
               </div>
             </section>
@@ -221,15 +325,9 @@ export const ExplorePage: React.FC = () => {
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
                 {t.nav.realEstate}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {results.properties.map((p) => (
-                  <Link key={p.id} to={`/real-estate/${p.slug}`} className="group space-y-3">
-                    <EditorialImage src={p.images[0]} alt={p.title} aspectClass="aspect-[4/3]" />
-                    <p className="text-xs text-[#52634A] tabular-nums">
-                      {t.categories[p.category] || p.category} · ${p.price.toLocaleString()}
-                    </p>
-                    <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52]">{p.title}</h3>
-                  </Link>
+                  <PropertyCard key={p.id} prop={p} variant="light" />
                 ))}
               </div>
             </section>

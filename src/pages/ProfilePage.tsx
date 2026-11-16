@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, ShieldCheck } from 'lucide-react';
-import { EditorialImage } from '../components/EditorialImage';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { FavoriteButton } from '../components/FavoriteButton';
 import { useApp } from '../context/AppContext';
+import type { MediaItem, ModalItem } from '../types/kalaw';
 
 export const ProfilePage: React.FC = () => {
   const {
@@ -15,6 +16,7 @@ export const ProfilePage: React.FC = () => {
     experiences,
     properties,
     localFavorites,
+    openItemModal,
     t,
   } = useApp();
   const navigate = useNavigate();
@@ -28,25 +30,55 @@ export const ProfilePage: React.FC = () => {
   const favIds = user ? user.favorites : localFavorites;
 
   const savedItems = useMemo(() => {
-    const items: Array<{ id: string; title: string; subtitle: string; to: string; image: string }> = [];
+    const items: Array<{
+      id: string;
+      title: string;
+      subtitle: string;
+      media: MediaItem[];
+      modalItem: ModalItem;
+    }> = [];
     destinations.forEach((d) => {
       if (favIds.includes(d.id)) {
-        items.push({ id: d.id, title: d.name, subtitle: `Destination · ${d.location}`, to: `/destinations/${d.slug}`, image: d.image });
+        items.push({
+          id: d.id,
+          title: d.name,
+          subtitle: `Destination · ${d.location}`,
+          media: resolveMediaList(d.media, [d.image], d.name),
+          modalItem: { kind: 'destination', data: d },
+        });
       }
     });
     stays.forEach((s) => {
       if (favIds.includes(s.id)) {
-        items.push({ id: s.id, title: s.name, subtitle: `Stay · $${s.pricePerNight}/night`, to: `/stays/${s.slug}`, image: s.images[0] });
+        items.push({
+          id: s.id,
+          title: s.name,
+          subtitle: `Stay · $${s.pricePerNight}/night`,
+          media: resolveMediaList(s.media, s.images, s.name),
+          modalItem: { kind: 'stay', data: s },
+        });
       }
     });
     experiences.forEach((e) => {
       if (favIds.includes(e.id)) {
-        items.push({ id: e.id, title: e.title, subtitle: `Experience · ${e.duration}`, to: '/experiences', image: e.image });
+        items.push({
+          id: e.id,
+          title: e.title,
+          subtitle: `Experience · ${e.duration}`,
+          media: resolveMediaList(e.media, [e.image], e.title),
+          modalItem: { kind: 'experience', data: e },
+        });
       }
     });
     properties.forEach((p) => {
       if (favIds.includes(p.id)) {
-        items.push({ id: p.id, title: p.title, subtitle: `Real Estate · $${p.price.toLocaleString()}`, to: `/real-estate/${p.slug}`, image: p.images[0] });
+        items.push({
+          id: p.id,
+          title: p.title,
+          subtitle: `Real Estate · $${p.price.toLocaleString()}`,
+          media: resolveMediaList(p.media, p.images, p.title),
+          modalItem: { kind: 'property', data: p },
+        });
       }
     });
     return items;
@@ -75,11 +107,29 @@ export const ProfilePage: React.FC = () => {
             <h2 className="font-serif text-2xl text-[#243D32]">Saved Places (Guest Session)</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {savedItems.map((item) => (
-                <Link key={item.id} to={item.to} className="group border border-[#D9CCB8] p-4 space-y-3">
-                  <EditorialImage src={item.image} alt={item.title} aspectClass="aspect-[4/3]" />
-                  <p className="text-xs text-[#52634A]">{item.subtitle}</p>
-                  <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52]">{item.title}</h3>
-                </Link>
+                <article key={item.id} className="group border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
+                  <CardMediaCarousel
+                    title={item.title}
+                    subtitle={item.subtitle}
+                    media={item.media}
+                    aspectClass="aspect-[4/3]"
+                    onOpenInfo={() => openItemModal(item.modalItem)}
+                    modalItem={item.modalItem}
+                    topRightOverlay={<FavoriteButton itemId={item.id} compact />}
+                  />
+                  <div className="p-4 space-y-1">
+                    <p className="text-xs text-[#52634A]">{item.subtitle}</p>
+                    <h3 className="font-serif text-xl text-[#243D32]">
+                      <button
+                        type="button"
+                        onClick={() => openItemModal(item.modalItem)}
+                        className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                      >
+                        {item.title}
+                      </button>
+                    </h3>
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -194,22 +244,29 @@ export const ProfilePage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {savedItems.map((item) => (
-                <div key={item.id} className="border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
-                  <div className="relative">
-                    <Link to={item.to}>
-                      <EditorialImage src={item.image} alt={item.title} aspectClass="aspect-[4/3]" />
-                    </Link>
-                    <div className="absolute top-3 right-3">
-                      <FavoriteButton itemId={item.id} compact />
-                    </div>
-                  </div>
+                <article key={item.id} className="group border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col">
+                  <CardMediaCarousel
+                    title={item.title}
+                    subtitle={item.subtitle}
+                    media={item.media}
+                    aspectClass="aspect-[4/3]"
+                    onOpenInfo={() => openItemModal(item.modalItem)}
+                    modalItem={item.modalItem}
+                    topRightOverlay={<FavoriteButton itemId={item.id} compact />}
+                  />
                   <div className="p-4 space-y-1">
                     <p className="text-xs text-[#52634A]">{item.subtitle}</p>
                     <h3 className="font-serif text-xl text-[#243D32]">
-                      <Link to={item.to} className="hover:text-[#B66F52]">{item.title}</Link>
+                      <button
+                        type="button"
+                        onClick={() => openItemModal(item.modalItem)}
+                        className="text-left hover:text-[#B66F52] transition-colors cursor-pointer"
+                      >
+                        {item.title}
+                      </button>
                     </h3>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           )}

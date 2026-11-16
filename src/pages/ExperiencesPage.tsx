@@ -1,10 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { X } from 'lucide-react';
-import { BookingRequestPanel } from '../components/BookingRequestPanel';
-import { EditorialImage } from '../components/EditorialImage';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { FavoriteButton } from '../components/FavoriteButton';
 import { useApp } from '../context/AppContext';
-import type { Experience, ExperienceCategory } from '../types/kalaw';
+import type { ExperienceCategory } from '../types/kalaw';
 
 const CATEGORIES: Array<'All' | ExperienceCategory> = [
   'All',
@@ -16,9 +14,8 @@ const CATEGORIES: Array<'All' | ExperienceCategory> = [
 ];
 
 export const ExperiencesPage: React.FC = () => {
-  const { experiences, addToTripPlan, t } = useApp();
+  const { experiences, addToTripPlan, openItemModal, t } = useApp();
   const [selectedCat, setSelectedCat] = useState<'All' | ExperienceCategory>('All');
-  const [bookingExp, setBookingExp] = useState<Experience | null>(null);
   const [plannedId, setPlannedId] = useState<string | null>(null);
 
   const filtered = useMemo(
@@ -66,18 +63,29 @@ export const ExperiencesPage: React.FC = () => {
             key={exp.id}
             className="group border border-[#D9CCB8] bg-[#F4F0E6] flex flex-col"
           >
-            <div className="relative">
-              <EditorialImage src={exp.image} alt={exp.title} aspectClass="aspect-[16/10]" />
-              <div className="absolute top-3 right-3">
-                <FavoriteButton itemId={exp.id} compact />
-              </div>
-            </div>
+            <CardMediaCarousel
+              title={exp.title}
+              subtitle={`${t.categories[exp.category] || exp.category} · ${exp.location}`}
+              media={resolveMediaList(exp.media, [exp.image], exp.title)}
+              aspectClass="aspect-[16/10]"
+              onOpenInfo={() => openItemModal({ kind: 'experience', data: exp })}
+              modalItem={{ kind: 'experience', data: exp }}
+              topRightOverlay={<FavoriteButton itemId={exp.id} compact />}
+            />
             <div className="p-6 md:p-8 flex-1 flex flex-col space-y-4">
               <div className="flex items-center justify-between text-xs text-[#52634A]">
                 <span>{t.categories[exp.category] || exp.category} · {exp.duration}</span>
                 <span>{exp.difficulty}</span>
               </div>
-              <h2 className="font-serif text-3xl text-[#243D32]">{exp.title}</h2>
+              <h2 className="font-serif text-3xl text-[#243D32]">
+                <button
+                  type="button"
+                  onClick={() => openItemModal({ kind: 'experience', data: exp })}
+                  className="text-left hover:text-[#B66F52] transition-colors cursor-pointer"
+                >
+                  {exp.title}
+                </button>
+              </h2>
               <p className="text-sm text-[#292B27]/85 leading-relaxed">{exp.shortDescription}</p>
               <div className="text-xs text-[#52634A] space-y-1">
                 <p>Guide: <span className="text-[#292B27] font-medium">{exp.guideName}</span></p>
@@ -104,14 +112,14 @@ export const ExperiencesPage: React.FC = () => {
                       });
                       setPlannedId(exp.id);
                     }}
-                    className="px-3.5 py-2 border border-[#243D32]/30 text-xs font-medium text-[#243D32] rounded-sm hover:border-[#243D32] cursor-pointer"
+                    className="px-3.5 py-2 border border-[#243D32]/30 text-xs font-medium text-[#243D32] rounded-sm hover:border-[#243D32] cursor-pointer whitespace-nowrap"
                   >
                     {plannedId === exp.id ? t.actions.addedToPlan : `+ ${t.actions.addToTripPlan}`}
                   </button>
                   <button
                     type="button"
-                    onClick={() => setBookingExp(exp)}
-                    className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
+                    onClick={() => openItemModal({ kind: 'experience', data: exp })}
+                    className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     {t.actions.requestDate}
                   </button>
@@ -121,42 +129,6 @@ export const ExperiencesPage: React.FC = () => {
           </article>
         ))}
       </div>
-
-      {/* Booking Drawer Modal */}
-      {bookingExp && (
-        <div
-          className="fixed inset-0 z-50 bg-[#292B27]/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Request ${bookingExp.title}`}
-        >
-          <div className="bg-[#F4F0E6] border border-[#D9CCB8] max-w-lg w-full p-6 md:p-8 relative space-y-4 my-8">
-            <button
-              type="button"
-              onClick={() => setBookingExp(null)}
-              aria-label="Close booking dialog"
-              className="absolute top-4 right-4 p-2 text-[#52634A] hover:text-[#243D32] cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <div>
-              <p className="text-xs uppercase tracking-widest text-[#B66F52]">
-                {t.categories[bookingExp.category] || bookingExp.category}
-              </p>
-              <h2 className="font-serif text-2xl text-[#243D32] mt-1">{bookingExp.title}</h2>
-            </div>
-            <BookingRequestPanel
-              itemType="experience"
-              itemId={bookingExp.id}
-              itemTitle={bookingExp.title}
-              unitPrice={bookingExp.pricePerGuest}
-              priceLabel={t.home.perGuest}
-              maxGuests={bookingExp.maxGroupSize}
-              ctaLabel={t.actions.requestDate}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

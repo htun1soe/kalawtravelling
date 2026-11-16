@@ -122,6 +122,17 @@ export interface UIStrings {
     submitBooking: string;
     submitting: string;
     noChargeNote: string;
+    viewInGallery: string;
+    previousPhoto: string;
+    nextPhoto: string;
+    videoClip: string;
+    landTypeLabel: string;
+    areaLabel: string;
+    priceLabel: string;
+    contactLabel: string;
+    locationLabel: string;
+    descriptionLabel: string;
+    closeModal: string;
   };
   bookingStatus: {
     pending_verification: string;
@@ -315,7 +326,7 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       requestDate: 'Request Date',
       requestTable: 'Request Table Reservation',
       requestVehicle: 'Request Vehicle',
-      inspectDossier: 'Inspect Dossier',
+      inspectDossier: 'View Details',
       addToTripPlan: 'Add to Trip Planner',
       addedToPlan: 'Added to Plan',
       resetFilters: 'Reset Filters',
@@ -323,6 +334,17 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       submitBooking: 'Submit Booking Request',
       submitting: 'Submitting Request...',
       noChargeNote: 'No charge yet. Requests are verified directly by Kalaw hosts.',
+      viewInGallery: 'View in Gallery',
+      previousPhoto: 'Previous photo or video',
+      nextPhoto: 'Next photo or video',
+      videoClip: 'Video Tour',
+      landTypeLabel: 'Land / Property Type',
+      areaLabel: 'Area',
+      priceLabel: 'Price',
+      contactLabel: 'Contact',
+      locationLabel: 'Location',
+      descriptionLabel: 'Description',
+      closeModal: 'Close',
     },
     bookingStatus: {
       pending_verification: 'Pending Host Verification',
@@ -515,7 +537,7 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       requestDate: 'ရက်စွဲတောင်းရန်',
       requestTable: 'စားပွဲကြိုမှာရန်',
       requestVehicle: 'ယာဉ်ငှားမည်',
-      inspectDossier: 'အသေးစိတ်',
+      inspectDossier: 'အသေးစိတ်ကြည့်ရန်',
       addToTripPlan: 'ခရီးစဉ်ထဲထည့်',
       addedToPlan: 'ထည့်ပြီး',
       resetFilters: 'ပြန်စမည်',
@@ -523,6 +545,17 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       submitBooking: 'ဘွတ်ကင်တင်မည်',
       submitting: 'ပေးပို့နေသည်...',
       noChargeNote: 'ငွေကြိုပေးရန် မလိုသေးပါ။ အိမ်ရှင်မှ စိစစ်အတည်ပြုပေးပါမည်။',
+      viewInGallery: 'ပြခန်းတွင်ကြည့်ရန်',
+      previousPhoto: 'ရှေ့ပုံ',
+      nextPhoto: 'နောက်ပုံ',
+      videoClip: 'ဗီဒီယို',
+      landTypeLabel: 'မြေ/အိမ် အမျိုးအစား',
+      areaLabel: 'အကျယ်အဝန်း',
+      priceLabel: 'ဈေးနှုန်း',
+      contactLabel: 'ဆက်သွယ်ရန်',
+      locationLabel: 'တည်နေရာ',
+      descriptionLabel: 'အသေးစိတ်ဖော်ပြချက်',
+      closeModal: 'ပိတ်မည်',
     },
     bookingStatus: {
       pending_verification: 'စိစစ်နေဆဲ',

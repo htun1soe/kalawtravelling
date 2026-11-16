@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Star } from 'lucide-react';
-import { EditorialImage } from '../components/EditorialImage';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { FavoriteButton } from '../components/FavoriteButton';
 import { useApp } from '../context/AppContext';
 import type { StayCategory } from '../types/kalaw';
@@ -16,7 +16,7 @@ const STAY_CATEGORIES: Array<'All' | StayCategory> = [
 ];
 
 export const StaysPage: React.FC = () => {
-  const { stays, catalogLoading, t } = useApp();
+  const { stays, catalogLoading, openItemModal, t } = useApp();
   const [searchParams] = useSearchParams();
   const initialQ = searchParams.get('q') || '';
   const initialGuests = Number(searchParams.get('guests') || '1');
@@ -152,14 +152,15 @@ export const StaysPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-10">
           {filtered.map((stay) => (
             <article key={stay.id} className="group bg-[#F4F0E6] border border-[#D9CCB8] flex flex-col">
-              <div className="relative">
-                <Link to={`/stays/${stay.slug}`}>
-                  <EditorialImage src={stay.images[0]} alt={stay.name} aspectClass="aspect-[4/3]" />
-                </Link>
-                <div className="absolute top-3 right-3">
-                  <FavoriteButton itemId={stay.id} compact />
-                </div>
-              </div>
+              <CardMediaCarousel
+                title={stay.name}
+                subtitle={`${t.categories[stay.category] || stay.category} · ${stay.location}`}
+                media={resolveMediaList(stay.media, stay.images, stay.name)}
+                aspectClass="aspect-[4/3]"
+                onOpenInfo={() => openItemModal({ kind: 'stay', data: stay })}
+                modalItem={{ kind: 'stay', data: stay }}
+                topRightOverlay={<FavoriteButton itemId={stay.id} compact />}
+              />
               <div className="p-6 flex-1 flex flex-col space-y-3">
                 <div className="flex items-center justify-between text-xs text-[#52634A]">
                   <span>{t.categories[stay.category] || stay.category} · {stay.location}</span>
@@ -169,9 +170,13 @@ export const StaysPage: React.FC = () => {
                   </span>
                 </div>
                 <h2 className="font-serif text-2xl text-[#243D32]">
-                  <Link to={`/stays/${stay.slug}`} className="hover:text-[#B66F52] transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => openItemModal({ kind: 'stay', data: stay })}
+                    className="text-left hover:text-[#B66F52] transition-colors cursor-pointer"
+                  >
                     {stay.name}
-                  </Link>
+                  </button>
                 </h2>
                 <p className="text-sm text-[#292B27]/80 leading-relaxed flex-1">
                   {stay.shortDescription}
@@ -186,12 +191,13 @@ export const StaysPage: React.FC = () => {
                     </span>
                     <span className="text-xs text-[#52634A]"> {t.home.perNight}</span>
                   </div>
-                  <Link
-                    to={`/stays/${stay.slug}`}
-                    className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => openItemModal({ kind: 'stay', data: stay })}
+                    className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
                   >
                     {t.home.viewDetails}
-                  </Link>
+                  </button>
                 </div>
               </div>
             </article>

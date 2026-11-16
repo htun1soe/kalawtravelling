@@ -1,9 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Calendar, Compass, MapPin, Search, Star, Users } from 'lucide-react';
+import { ArrowRight, Calendar, Compass, Images, MapPin, Search, Star, Users } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { EditorialImage } from '../components/EditorialImage';
 import { FavoriteButton } from '../components/FavoriteButton';
+import { PropertyCard } from '../components/PropertyCard';
 import { ScrollReveal, ScrollStaggerItem } from '../components/ScrollReveal';
 import { useApp } from '../context/AppContext';
 import {
@@ -15,6 +17,7 @@ import {
   IMG_PINE_TRAIL,
   IMG_SHAN_NOODLES,
   IMG_TEA_TERRACES,
+  VID_RIDGE_TOUR,
 } from '../data/kalawData';
 import type { DestinationCategory, StayCategory } from '../types/kalaw';
 
@@ -23,7 +26,6 @@ interface HeroHighlight {
   index: string;
   backdrop: string;
   featureImage: string;
-  to: string;
 }
 
 const HERO_HIGHLIGHTS: HeroHighlight[] = [
@@ -32,28 +34,24 @@ const HERO_HIGHLIGHTS: HeroHighlight[] = [
     index: '01',
     backdrop: IMG_HERO_MOUNTAINS,
     featureImage: IMG_PAGODA_VIEWPOINT,
-    to: '/destinations',
   },
   {
     id: 'heritage',
     index: '02',
     backdrop: IMG_HERITAGE_STATION,
     featureImage: IMG_HERITAGE_STATION,
-    to: '/destinations/kalaw-heritage-railway-quarter',
   },
   {
     id: 'lodges',
     index: '03',
     backdrop: IMG_CEDAR_CABINS,
     featureImage: IMG_BOUTIQUE_VILLA,
-    to: '/stays',
   },
   {
     id: 'table',
     index: '04',
     backdrop: IMG_TEA_TERRACES,
     featureImage: IMG_SHAN_NOODLES,
-    to: '/dining',
   },
 ];
 
@@ -78,7 +76,18 @@ const STAY_CATEGORIES: Array<'All' | StayCategory> = [
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { destinations, stays, experiences, restaurants, rentals, properties, articles, t } = useApp();
+  const {
+    destinations,
+    stays,
+    experiences,
+    restaurants,
+    rentals,
+    properties,
+    articles,
+    openItemModal,
+    openGallery,
+    t,
+  } = useApp();
 
   // Hero search & spotlight state
   const [activeSpotlight, setActiveSpotlight] = useState<'ridges' | 'heritage' | 'lodges' | 'table'>('ridges');
@@ -209,17 +218,64 @@ export const HomePage: React.FC = () => {
 
             {/* Right Column: Curated Featured Visual Folio */}
             <div className="lg:col-span-5 space-y-3">
-              <Link
-                to={currentHighlight.to}
-                className="group block bg-[#292B27]/80 border border-[#F4F0E6]/25 overflow-hidden"
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  if (currentHighlight.id === 'ridges' && destinations[0]) {
+                    openItemModal({ kind: 'destination', data: destinations[0] });
+                  } else if (currentHighlight.id === 'heritage' && destinations[2]) {
+                    openItemModal({ kind: 'destination', data: destinations[2] });
+                  } else if (currentHighlight.id === 'lodges' && stays[0]) {
+                    openItemModal({ kind: 'stay', data: stays[0] });
+                  } else if (currentHighlight.id === 'table' && restaurants[0]) {
+                    openItemModal({ kind: 'restaurant', data: restaurants[0] });
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (currentHighlight.id === 'ridges' && destinations[0]) {
+                      openItemModal({ kind: 'destination', data: destinations[0] });
+                    } else if (currentHighlight.id === 'heritage' && destinations[2]) {
+                      openItemModal({ kind: 'destination', data: destinations[2] });
+                    } else if (currentHighlight.id === 'lodges' && stays[0]) {
+                      openItemModal({ kind: 'stay', data: stays[0] });
+                    } else if (currentHighlight.id === 'table' && restaurants[0]) {
+                      openItemModal({ kind: 'restaurant', data: restaurants[0] });
+                    }
+                  }
+                }}
+                className="group block bg-[#292B27]/80 border border-[#F4F0E6]/25 overflow-hidden cursor-pointer"
               >
-                <div className="aspect-[16/10] overflow-hidden bg-[#243D32]">
+                <div className="aspect-[16/10] overflow-hidden bg-[#243D32] relative">
                   <img
                     src={currentHighlight.featureImage}
                     alt={currentHighlightCopy.title}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openGallery(
+                        currentHighlightCopy.title,
+                        [
+                          { type: 'image', src: currentHighlight.featureImage, caption: currentHighlightCopy.title },
+                          { type: 'image', src: currentHighlight.backdrop, caption: currentHighlightCopy.caption },
+                          { type: 'image', src: IMG_PINE_TRAIL, caption: 'Kalaw Pine Corridor' },
+                          { type: 'video', src: VID_RIDGE_TOUR, poster: currentHighlight.featureImage, caption: 'Kalaw Scenic Reel' },
+                        ],
+                        0,
+                        currentHighlightCopy.meta
+                      );
+                    }}
+                    className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#292B27]/85 hover:bg-[#243D32] text-[#F4F0E6] text-[11px] font-medium border border-[#F4F0E6]/25 cursor-pointer"
+                  >
+                    <Images className="w-3 h-3" />
+                    <span>{t.actions.viewInGallery}</span>
+                  </button>
                 </div>
                 <div className="p-4 flex items-end justify-between gap-4">
                   <div className="space-y-1 min-w-0">
@@ -235,7 +291,7 @@ export const HomePage: React.FC = () => {
                   </div>
                   <ArrowRight className="w-4 h-4 text-[#D9CCB8] shrink-0 mb-1" />
                 </div>
-              </Link>
+              </div>
 
               {/* 4-Plate Featured Gallery Strip */}
               <div className="grid grid-cols-4 gap-2.5">
@@ -387,7 +443,10 @@ export const HomePage: React.FC = () => {
 
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
             <ScrollReveal delay={0.1} className="sm:col-span-7">
-              <figure className="group">
+              <figure
+                className="group cursor-pointer"
+                onClick={() => destinations[1] && openItemModal({ kind: 'destination', data: destinations[1] })}
+              >
                 <EditorialImage
                   src={IMG_PINE_TRAIL}
                   alt="Red-earth hiking path winding through Burmese pine forest in Kalaw"
@@ -399,7 +458,10 @@ export const HomePage: React.FC = () => {
               </figure>
             </ScrollReveal>
             <ScrollReveal delay={0.22} className="sm:col-span-5 sm:mt-14">
-              <figure className="group">
+              <figure
+                className="group cursor-pointer"
+                onClick={() => destinations[0] && openItemModal({ kind: 'destination', data: destinations[0] })}
+              >
                 <EditorialImage
                   src={IMG_PAGODA_VIEWPOINT}
                   alt="Ancient hillside stupas framed by pine branches and morning fog in Kalaw"
@@ -456,14 +518,15 @@ export const HomePage: React.FC = () => {
           {filteredDestinations.map((dest, idx) => (
             <ScrollStaggerItem key={dest.id} index={idx} className="flex flex-col">
               <article className="group flex flex-col flex-1">
-                <div className="relative">
-                  <Link to={`/destinations/${dest.slug}`}>
-                    <EditorialImage src={dest.image} alt={dest.name} aspectClass="aspect-[4/3]" />
-                  </Link>
-                  <div className="absolute top-3 right-3">
-                    <FavoriteButton itemId={dest.id} compact />
-                  </div>
-                </div>
+                <CardMediaCarousel
+                  title={dest.name}
+                  subtitle={`${t.categories[dest.category] || dest.category} · ${dest.location}`}
+                  media={resolveMediaList(dest.media, [dest.image], dest.name)}
+                  aspectClass="aspect-[4/3]"
+                  onOpenInfo={() => openItemModal({ kind: 'destination', data: dest })}
+                  modalItem={{ kind: 'destination', data: dest }}
+                  topRightOverlay={<FavoriteButton itemId={dest.id} compact />}
+                />
                 <div className="pt-4 space-y-2 flex-1 flex flex-col">
                   <div className="flex items-center gap-2 text-xs text-[#52634A]">
                     <span>{t.categories[dest.category] || dest.category}</span>
@@ -472,19 +535,26 @@ export const HomePage: React.FC = () => {
                     <span aria-hidden="true">·</span>
                     <span className="tabular-nums">{dest.elevation}</span>
                   </div>
-                  <h3 className="font-serif text-2xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
-                    <Link to={`/destinations/${dest.slug}`}>{dest.name}</Link>
+                  <h3 className="font-serif text-2xl text-[#243D32]">
+                    <button
+                      type="button"
+                      onClick={() => openItemModal({ kind: 'destination', data: dest })}
+                      className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                    >
+                      {dest.name}
+                    </button>
                   </h3>
                   <p className="text-sm text-[#292B27]/80 leading-relaxed flex-1">
                     {dest.shortDescription}
                   </p>
-                  <Link
-                    to={`/destinations/${dest.slug}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52] transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => openItemModal({ kind: 'destination', data: dest })}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52] transition-colors cursor-pointer self-start"
                   >
                     <span>{t.home.readGuide}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
+                  </button>
                 </div>
               </article>
             </ScrollStaggerItem>
@@ -534,14 +604,15 @@ export const HomePage: React.FC = () => {
             {filteredStays.map((stay, idx) => (
               <ScrollStaggerItem key={stay.id} index={idx} className="flex flex-col">
                 <article className="group bg-[#F4F0E6] border border-[#D9CCB8] flex flex-col flex-1">
-                  <div className="relative">
-                    <Link to={`/stays/${stay.slug}`}>
-                      <EditorialImage src={stay.images[0]} alt={stay.name} aspectClass="aspect-[4/3]" />
-                    </Link>
-                    <div className="absolute top-3 right-3">
-                      <FavoriteButton itemId={stay.id} compact />
-                    </div>
-                  </div>
+                  <CardMediaCarousel
+                    title={stay.name}
+                    subtitle={`${t.categories[stay.category] || stay.category} · ${stay.location}`}
+                    media={resolveMediaList(stay.media, stay.images, stay.name)}
+                    aspectClass="aspect-[4/3]"
+                    onOpenInfo={() => openItemModal({ kind: 'stay', data: stay })}
+                    modalItem={{ kind: 'stay', data: stay }}
+                    topRightOverlay={<FavoriteButton itemId={stay.id} compact />}
+                  />
                   <div className="p-6 flex-1 flex flex-col space-y-3">
                     <div className="flex items-center justify-between text-xs text-[#52634A]">
                       <span>{t.categories[stay.category] || stay.category} · {stay.location}</span>
@@ -551,9 +622,13 @@ export const HomePage: React.FC = () => {
                       </span>
                     </div>
                     <h3 className="font-serif text-2xl text-[#243D32]">
-                      <Link to={`/stays/${stay.slug}`} className="hover:text-[#B66F52] transition-colors">
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'stay', data: stay })}
+                        className="text-left hover:text-[#B66F52] transition-colors cursor-pointer"
+                      >
                         {stay.name}
-                      </Link>
+                      </button>
                     </h3>
                     <p className="text-sm text-[#292B27]/80 leading-relaxed flex-1">
                       {stay.shortDescription}
@@ -565,12 +640,13 @@ export const HomePage: React.FC = () => {
                         </span>
                         <span className="text-xs text-[#52634A]"> {t.home.perNight}</span>
                       </div>
-                      <Link
-                        to={`/stays/${stay.slug}`}
-                        className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors"
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'stay', data: stay })}
+                        className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
                       >
                         {t.home.viewDetails}
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -608,16 +684,30 @@ export const HomePage: React.FC = () => {
                   key={exp.id}
                   className="group grid grid-cols-1 sm:grid-cols-12 gap-5 pb-6 border-b border-[#D9CCB8] last:border-b-0"
                 >
-                  <Link to="/experiences" className="sm:col-span-4">
-                    <EditorialImage src={exp.image} alt={exp.title} aspectClass="aspect-[4/3]" />
-                  </Link>
-                  <div className="sm:col-span-8 flex flex-col justify-between space-y-2">
+                  <div className="sm:col-span-5">
+                    <CardMediaCarousel
+                      title={exp.title}
+                      subtitle={t.categories[exp.category] || exp.category}
+                      media={resolveMediaList(exp.media, [exp.image], exp.title)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'experience', data: exp })}
+                      modalItem={{ kind: 'experience', data: exp }}
+                      compactControls
+                    />
+                  </div>
+                  <div className="sm:col-span-7 flex flex-col justify-between space-y-2">
                     <div className="space-y-1.5">
                       <p className="text-xs text-[#52634A]">
                         {t.categories[exp.category] || exp.category} · {exp.duration} · {exp.difficulty}
                       </p>
-                      <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
-                        <Link to="/experiences">{exp.title}</Link>
+                      <h3 className="font-serif text-xl text-[#243D32]">
+                        <button
+                          type="button"
+                          onClick={() => openItemModal({ kind: 'experience', data: exp })}
+                          className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                        >
+                          {exp.title}
+                        </button>
                       </h3>
                       <p className="text-sm text-[#292B27]/80 leading-relaxed">
                         {exp.shortDescription}
@@ -627,12 +717,13 @@ export const HomePage: React.FC = () => {
                       <span className="text-sm font-medium text-[#243D32] tabular-nums">
                         ${exp.pricePerGuest} {t.home.perGuest}
                       </span>
-                      <Link
-                        to="/experiences"
-                        className="text-xs font-medium text-[#B66F52] hover:underline"
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'experience', data: exp })}
+                        className="text-xs font-medium text-[#B66F52] hover:underline cursor-pointer"
                       >
                         {t.home.requestExp} →
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -665,16 +756,30 @@ export const HomePage: React.FC = () => {
                   key={rest.id}
                   className="group grid grid-cols-1 sm:grid-cols-12 gap-5 pb-6 border-b border-[#D9CCB8] last:border-b-0"
                 >
-                  <Link to="/dining" className="sm:col-span-4">
-                    <EditorialImage src={rest.image} alt={rest.name} aspectClass="aspect-[4/3]" />
-                  </Link>
-                  <div className="sm:col-span-8 flex flex-col justify-between space-y-2">
+                  <div className="sm:col-span-5">
+                    <CardMediaCarousel
+                      title={rest.name}
+                      subtitle={rest.cuisine}
+                      media={resolveMediaList(rest.media, [rest.image], rest.name)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'restaurant', data: rest })}
+                      modalItem={{ kind: 'restaurant', data: rest }}
+                      compactControls
+                    />
+                  </div>
+                  <div className="sm:col-span-7 flex flex-col justify-between space-y-2">
                     <div className="space-y-1.5">
                       <p className="text-xs text-[#52634A]">
                         {rest.cuisine} · {rest.priceRange} · {rest.openingHours}
                       </p>
-                      <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
-                        <Link to="/dining">{rest.name}</Link>
+                      <h3 className="font-serif text-xl text-[#243D32]">
+                        <button
+                          type="button"
+                          onClick={() => openItemModal({ kind: 'restaurant', data: rest })}
+                          className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                        >
+                          {rest.name}
+                        </button>
                       </h3>
                       <p className="text-sm text-[#292B27]/80 leading-relaxed">
                         {rest.shortDescription}
@@ -682,12 +787,13 @@ export const HomePage: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-between pt-1 text-xs text-[#52634A]">
                       <span>{rest.location}</span>
-                      <Link
-                        to="/dining"
-                        className="font-medium text-[#243D32] hover:text-[#B66F52]"
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'restaurant', data: rest })}
+                        className="font-medium text-[#243D32] hover:text-[#B66F52] cursor-pointer"
                       >
                         {t.home.viewMenuNotes} →
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -723,26 +829,38 @@ export const HomePage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {rentals.slice(0, 4).map((rental, idx) => (
                 <ScrollStaggerItem key={rental.id} index={idx} className="flex">
-                  <Link
-                    to="/rentals"
-                    className="group border border-[#F4F0E6]/15 p-5 hover:border-[#D9CCB8]/50 transition-colors flex flex-col justify-between space-y-4 w-full"
-                  >
-                    <div className="space-y-2">
-                      <p className="text-xs text-[#D9CCB8]/75">{t.categories[rental.category] || rental.category}</p>
-                      <h3 className="font-serif text-xl text-[#F4F0E6] group-hover:text-[#D9CCB8] transition-colors">
-                        {rental.name}
-                      </h3>
-                      <p className="text-xs text-[#F4F0E6]/70 leading-relaxed">
-                        {rental.shortDescription}
-                      </p>
-                    </div>
-                    <div className="pt-3 border-t border-[#F4F0E6]/10 flex items-center justify-between text-xs tabular-nums">
-                      <span className="text-[#D9CCB8] font-medium">
-                        ${rental.pricePerDay} {t.home.perDay}
-                      </span>
-                      <span className="text-[#F4F0E6]/70">{rental.capacity}</span>
-                    </div>
-                  </Link>
+                  <div className="group border border-[#F4F0E6]/15 hover:border-[#D9CCB8]/50 transition-colors flex flex-col justify-between w-full">
+                    <CardMediaCarousel
+                      title={rental.name}
+                      subtitle={t.categories[rental.category] || rental.category}
+                      media={resolveMediaList(rental.media, [rental.image], rental.name)}
+                      aspectClass="aspect-[16/10]"
+                      onOpenInfo={() => openItemModal({ kind: 'rental', data: rental })}
+                      modalItem={{ kind: 'rental', data: rental }}
+                      compactControls
+                    />
+                    <button
+                      type="button"
+                      onClick={() => openItemModal({ kind: 'rental', data: rental })}
+                      className="p-5 text-left flex-1 flex flex-col justify-between space-y-4 cursor-pointer"
+                    >
+                      <div className="space-y-2">
+                        <p className="text-xs text-[#D9CCB8]/75">{t.categories[rental.category] || rental.category}</p>
+                        <h3 className="font-serif text-xl text-[#F4F0E6] group-hover:text-[#D9CCB8] transition-colors">
+                          {rental.name}
+                        </h3>
+                        <p className="text-xs text-[#F4F0E6]/70 leading-relaxed">
+                          {rental.shortDescription}
+                        </p>
+                      </div>
+                      <div className="pt-3 border-t border-[#F4F0E6]/10 flex items-center justify-between text-xs tabular-nums w-full">
+                        <span className="text-[#D9CCB8] font-medium">
+                          ${rental.pricePerDay} {t.home.perDay}
+                        </span>
+                        <span className="text-[#F4F0E6]/70">{rental.capacity}</span>
+                      </div>
+                    </button>
+                  </div>
                 </ScrollStaggerItem>
               ))}
             </div>
@@ -779,29 +897,7 @@ export const HomePage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {properties.slice(0, 3).map((prop, idx) => (
                 <ScrollStaggerItem key={prop.id} index={idx} className="flex">
-                  <article className="group border border-[#F4F0E6]/15 bg-[#243D32]/35 flex flex-col w-full">
-                    <Link to={`/real-estate/${prop.slug}`}>
-                      <EditorialImage src={prop.images[0]} alt={prop.title} aspectClass="aspect-[4/3]" />
-                    </Link>
-                    <div className="p-6 flex-1 flex flex-col space-y-3">
-                      <p className="text-xs text-[#D9CCB8]/80">
-                        {t.categories[prop.category] || prop.category} · {prop.location}
-                      </p>
-                      <h3 className="font-serif text-2xl text-[#F4F0E6] group-hover:text-[#D9CCB8] transition-colors">
-                        <Link to={`/real-estate/${prop.slug}`}>{prop.title}</Link>
-                      </h3>
-                      <p className="text-sm text-[#F4F0E6]/75 leading-relaxed flex-1">
-                        {prop.shortDescription}
-                      </p>
-                      <div className="pt-4 border-t border-[#F4F0E6]/15 flex items-center justify-between">
-                        <span className="font-serif text-2xl text-[#F4F0E6] tabular-nums">
-                          ${prop.price.toLocaleString()}
-                          {prop.priceUnit === 'per month' ? ` ${t.home.perMonth}` : ''}
-                        </span>
-                        <span className="text-xs text-[#D9CCB8] tabular-nums">{prop.areaSize}</span>
-                      </div>
-                    </div>
-                  </article>
+                  <PropertyCard prop={prop} variant="dark" />
                 </ScrollStaggerItem>
               ))}
             </div>
@@ -833,19 +929,26 @@ export const HomePage: React.FC = () => {
           {leadArticle && (
             <ScrollReveal className="lg:col-span-7">
               <article className="group">
-                <Link to={`/journal/${leadArticle.slug}`}>
-                  <EditorialImage
-                    src={leadArticle.coverImage}
-                    alt={leadArticle.title}
-                    aspectClass="aspect-[16/10]"
-                  />
-                </Link>
+                <CardMediaCarousel
+                  title={leadArticle.title}
+                  subtitle={`${leadArticle.category} · ${leadArticle.publishedAt}`}
+                  media={resolveMediaList(leadArticle.media, [leadArticle.coverImage], leadArticle.title)}
+                  aspectClass="aspect-[16/10]"
+                  onOpenInfo={() => openItemModal({ kind: 'article', data: leadArticle })}
+                  modalItem={{ kind: 'article', data: leadArticle }}
+                />
                 <div className="pt-5 space-y-3">
                   <p className="text-xs text-[#52634A]">
                     {leadArticle.category} · {leadArticle.publishedAt} · {leadArticle.readTime}
                   </p>
-                  <h3 className="font-serif text-3xl md:text-4xl text-[#243D32] group-hover:text-[#B66F52] transition-colors headline-balance">
-                    <Link to={`/journal/${leadArticle.slug}`}>{leadArticle.title}</Link>
+                  <h3 className="font-serif text-3xl md:text-4xl text-[#243D32] headline-balance">
+                    <button
+                      type="button"
+                      onClick={() => openItemModal({ kind: 'article', data: leadArticle })}
+                      className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                    >
+                      {leadArticle.title}
+                    </button>
                   </h3>
                   <p className="text-base text-[#292B27]/80 leading-relaxed max-w-2xl">
                     {leadArticle.excerpt}
@@ -859,15 +962,29 @@ export const HomePage: React.FC = () => {
             {secondaryArticles.map((article, idx) => (
               <ScrollStaggerItem key={article.id} index={idx}>
                 <article className="py-6 first:pt-0 group flex gap-5">
-                  <Link to={`/journal/${article.slug}`} className="w-28 shrink-0">
-                    <EditorialImage src={article.coverImage} alt={article.title} aspectClass="aspect-square" />
-                  </Link>
+                  <div className="w-36 shrink-0">
+                    <CardMediaCarousel
+                      title={article.title}
+                      subtitle={article.category}
+                      media={resolveMediaList(article.media, [article.coverImage], article.title)}
+                      aspectClass="aspect-[4/3]"
+                      onOpenInfo={() => openItemModal({ kind: 'article', data: article })}
+                      modalItem={{ kind: 'article', data: article }}
+                      compactControls
+                    />
+                  </div>
                   <div className="space-y-1.5">
                     <p className="text-xs text-[#52634A]">
                       {article.category} · {article.readTime}
                     </p>
-                    <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
-                      <Link to={`/journal/${article.slug}`}>{article.title}</Link>
+                    <h3 className="font-serif text-xl text-[#243D32]">
+                      <button
+                        type="button"
+                        onClick={() => openItemModal({ kind: 'article', data: article })}
+                        className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                      >
+                        {article.title}
+                      </button>
                     </h3>
                     <p className="text-xs text-[#292B27]/75 leading-relaxed line-clamp-2">
                       {article.excerpt}

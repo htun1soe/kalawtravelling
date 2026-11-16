@@ -34,6 +34,13 @@ export type PropertyCategory =
 
 export type BookingStatus = 'pending_verification' | 'verified' | 'declined' | 'cancelled';
 
+export interface MediaItem {
+  type: 'image' | 'video';
+  src: string;
+  poster?: string;
+  caption?: string;
+}
+
 export interface Destination {
   id: string;
   slug: string;
@@ -48,6 +55,7 @@ export interface Destination {
   editorialOverview: string;
   highlights: string[];
   image: string;
+  media?: MediaItem[];
   featured: boolean;
 }
 
@@ -68,6 +76,7 @@ export interface Stay {
   availableFrom: string;
   availableTo: string;
   images: string[];
+  media?: MediaItem[];
   featured: boolean;
 }
 
@@ -85,6 +94,7 @@ export interface Experience {
   shortDescription: string;
   included: string[];
   image: string;
+  media?: MediaItem[];
   featured: boolean;
 }
 
@@ -100,6 +110,7 @@ export interface Restaurant {
   shortDescription: string;
   description: string;
   image: string;
+  media?: MediaItem[];
   featured: boolean;
 }
 
@@ -116,6 +127,7 @@ export interface Rental {
   shortDescription: string;
   terms: string[];
   image: string;
+  media?: MediaItem[];
   available: boolean;
 }
 
@@ -137,6 +149,7 @@ export interface PropertyListing {
   description: string;
   features: string[];
   images: string[];
+  media?: MediaItem[];
   featured: boolean;
   status: 'Active' | 'Under Review' | 'Reserved';
 }
@@ -151,11 +164,21 @@ export interface JournalArticle {
   publishedAt: string;
   readTime: string;
   coverImage: string;
+  media?: MediaItem[];
   excerpt: string;
   paragraphs: string[];
   marginNote: string;
   pullQuote: string;
 }
+
+export type ModalItem =
+  | { kind: 'destination'; data: Destination }
+  | { kind: 'stay'; data: Stay }
+  | { kind: 'experience'; data: Experience }
+  | { kind: 'restaurant'; data: Restaurant }
+  | { kind: 'rental'; data: Rental }
+  | { kind: 'property'; data: PropertyListing }
+  | { kind: 'article'; data: JournalArticle };
 
 export interface BookingRequest {
   id: string;
