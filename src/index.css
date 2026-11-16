@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Cormorant Garamond", "Noto Serif Myanmar", Georgia, Cambria, "Times New Roman", serif;
-  --font-sans: "DM Sans", "Noto Sans Myanmar", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Cormorant Garamond", "Noto Sans Myanmar", "Padauk", Georgia, serif;
+  --font-sans: "DM Sans", "Noto Sans Myanmar", "Padauk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   --color-forest: #243D32;
   --color-olive: #52634A;
@@ -23,6 +23,56 @@
   h1, h2, h3, h4, .font-editorial {
     font-family: var(--font-serif);
   }
+}
+
+/* Refined typographic proportion & spacing for Burmese (Myanmar script) */
+html[lang="my"] {
+  font-size: 14.5px;
+}
+
+html[lang="my"] body {
+  line-height: 1.78;
+  letter-spacing: 0;
+}
+
+html[lang="my"] h1,
+html[lang="my"] h2,
+html[lang="my"] h3,
+html[lang="my"] h4,
+html[lang="my"] .font-serif,
+html[lang="my"] .font-editorial {
+  font-family: "Cormorant Garamond", "Noto Sans Myanmar", "Padauk", sans-serif;
+  letter-spacing: 0 !important;
+  font-weight: 600;
+}
+
+html[lang="my"] h1 {
+  font-size: clamp(1.85rem, 3.1vw, 2.85rem) !important;
+  line-height: 1.38 !important;
+}
+
+html[lang="my"] h2 {
+  font-size: clamp(1.3rem, 2.1vw, 1.9rem) !important;
+  line-height: 1.42 !important;
+}
+
+html[lang="my"] h3 {
+  font-size: 1.125rem !important;
+  line-height: 1.48 !important;
+}
+
+html[lang="my"] p,
+html[lang="my"] a,
+html[lang="my"] button,
+html[lang="my"] span,
+html[lang="my"] label {
+  letter-spacing: 0 !important;
+}
+
+html[lang="my"] .tracking-widest,
+html[lang="my"] .tracking-wider,
+html[lang="my"] [class*="tracking-"] {
+  letter-spacing: 0.01em !important;
 }
 
 .tabular-nums {
