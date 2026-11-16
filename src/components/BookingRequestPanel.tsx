@@ -1,0 +1,280 @@
+import React, { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Calendar, CheckCircle2, Clock, Users } from 'lucide-react';
+import { useApp } from '../context/AppContext';
+import { submitBookingRequest } from '../services/api';
+import type { BookingRequest } from '../types/kalaw';
+
+interface BookingRequestPanelProps {
+  itemType: BookingRequest['itemType'];
+  itemId: string;
+  itemTitle: string;
+  unitPrice: number;
+  priceLabel: string;
+  requireCheckOut?: boolean;
+  maxGuests?: number;
+  ctaLabel?: string;
+}
+
+export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
+  itemType,
+  itemId,
+  itemTitle,
+  unitPrice,
+  priceLabel,
+  requireCheckOut = false,
+  maxGuests = 8,
+  ctaLabel = 'Submit Booking Request',
+}) => {
+  const { user } = useApp();
+  const [checkIn, setCheckIn] = useState('2026-12-10');
+  const [checkOut, setCheckOut] = useState('2026-12-13');
+  const [guests, setGuests] = useState(2);
+  const [guestName, setGuestName] = useState(user?.name || '');
+  const [guestEmail, setGuestEmail] = useState(user?.email || '');
+  const [notes, setNotes] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState<BookingRequest | null>(null);
+
+  const nightsOrUnits = useMemo(() => {
+    if (!requireCheckOut) return itemType === 'experience' ? guests : 1;
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diff = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 1;
+  }, [checkIn, checkOut, guests, itemType, requireCheckOut]);
+
+  const totalEstimate = unitPrice > 0 ? unitPrice * nightsOrUnits : 0;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!guestName.trim() || !guestEmail.trim()) {
+      setError('Please enter your name and email so our local concierge can verify availability.');
+      return;
+    }
+    if (requireCheckOut && new Date(checkOut) <= new Date(checkIn)) {
+      setError('Check-out date must be after check-in date.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const created = await submitBookingRequest({
+        userId: user?.id || 'guest',
+        userName: guestName.trim(),
+        userEmail: guestEmail.trim(),
+        itemType,
+        itemId,
+        itemTitle,
+        checkIn,
+        checkOut: requireCheckOut ? checkOut : undefined,
+        guests,
+        totalEstimate,
+        notes,
+      });
+      setSubmitted(created);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to reach the booking server. Your request has not been saved.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div className="bg-[#F4F0E6] border border-[#243D32]/25 p-6 md:p-8 space-y-5">
+        <div className="flex items-start gap-3">
+          <Clock className="w-5 h-5 text-[#B66F52] shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs uppercase tracking-widest text-[#B66F52] font-medium">
+              Pending Host Verification
+            </p>
+            <h3 className="font-serif text-2xl text-[#243D32] mt-1">Request Logged</h3>
+          </div>
+        </div>
+        <p className="text-sm text-[#292B27]/85 leading-relaxed">
+          Your request for <span className="font-medium text-[#243D32]">{submitted.itemTitle}</span> has been recorded as{' '}
+          <span className="font-medium text-[#243D32] tabular-nums">{submitted.referenceCode}</span>. Availability is not confirmed until verified by our Kalaw host team.
+        </p>
+        <div className="border-t border-b border-[#D9CCB8] py-3 space-y-1.5 text-xs text-[#52634A] tabular-nums">
+          <div className="flex justify-between">
+            <span>Requested Date</span>
+            <span className="text-[#292B27]">
+              {submitted.checkIn}
+              {submitted.checkOut ? ` → ${submitted.checkOut}` : ''}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span>Party Size</span>
+            <span className="text-[#292B27]">{submitted.guests} Guests</span>
+          </div>
+          {submitted.totalEstimate > 0 && (
+            <div className="flex justify-between font-medium text-[#243D32]">
+              <span>Estimated Total</span>
+              <span>${submitted.totalEstimate.toLocaleString()}</span>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/bookings"
+            className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors"
+          >
+            Manage Requests
+          </Link>
+          <button
+            type="button"
+            onClick={() => setSubmitted(null)}
+            className="px-4 py-2.5 border border-[#243D32]/30 text-[#243D32] text-xs font-medium rounded-sm hover:bg-[#D9CCB8]/40 transition-colors cursor-pointer"
+          >
+            Submit Another
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-[#F4F0E6] border border-[#D9CCB8] p-6 md:p-8 space-y-5">
+      <div className="flex items-baseline justify-between border-b border-[#D9CCB8] pb-4">
+        <div>
+          {unitPrice > 0 ? (
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-serif text-3xl text-[#243D32] tabular-nums">
+                ${unitPrice.toLocaleString()}
+              </span>
+              <span className="text-xs text-[#52634A]">{priceLabel}</span>
+            </div>
+          ) : (
+            <span className="font-serif text-2xl text-[#243D32]">{priceLabel}</span>
+          )}
+        </div>
+        <span className="text-xs text-[#52634A]">Request &amp; Verify</span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs text-[#52634A] mb-1.5">
+            {requireCheckOut ? 'Check-in' : 'Preferred Date'}
+          </label>
+          <div className="relative">
+            <Calendar className="w-3.5 h-3.5 text-[#52634A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="date"
+              required
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className="w-full pl-9 pr-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] tabular-nums focus:outline-none focus:border-[#243D32]"
+            />
+          </div>
+        </div>
+
+        {requireCheckOut && (
+          <div>
+            <label className="block text-xs text-[#52634A] mb-1.5">Check-out</label>
+            <div className="relative">
+              <Calendar className="w-3.5 h-3.5 text-[#52634A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="date"
+                required
+                value={checkOut}
+                onChange={(e) => setCheckOut(e.target.value)}
+                className="w-full pl-9 pr-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] tabular-nums focus:outline-none focus:border-[#243D32]"
+              />
+            </div>
+          </div>
+        )}
+
+        <div className={requireCheckOut ? 'sm:col-span-2' : ''}>
+          <label className="block text-xs text-[#52634A] mb-1.5">Guests / Party Size</label>
+          <div className="relative">
+            <Users className="w-3.5 h-3.5 text-[#52634A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <select
+              value={guests}
+              onChange={(e) => setGuests(Number(e.target.value))}
+              className="w-full pl-9 pr-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] tabular-nums focus:outline-none focus:border-[#243D32]"
+            >
+              {Array.from({ length: maxGuests }, (_, idx) => idx + 1).map((num) => (
+                <option key={num} value={num}>
+                  {num} {num === 1 ? 'Guest' : 'Guests'}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs text-[#52634A] mb-1.5">Full Name</label>
+          <input
+            type="text"
+            required
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+            placeholder="Your full name"
+            className="w-full px-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] focus:outline-none focus:border-[#243D32]"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-[#52634A] mb-1.5">Email Address</label>
+          <input
+            type="email"
+            required
+            value={guestEmail}
+            onChange={(e) => setGuestEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full px-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] focus:outline-none focus:border-[#243D32]"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs text-[#52634A] mb-1.5">Notes for Local Host (Optional)</label>
+        <textarea
+          rows={2}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Dietary preferences, pickup timing, or viewing questions..."
+          className="w-full px-3 py-2 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] focus:outline-none focus:border-[#243D32]"
+        />
+      </div>
+
+      {totalEstimate > 0 && (
+        <div className="pt-2 border-t border-[#D9CCB8] flex items-center justify-between text-sm">
+          <span className="text-[#52634A] tabular-nums">
+            ${unitPrice} × {nightsOrUnits} {requireCheckOut ? (nightsOrUnits === 1 ? 'night' : 'nights') : itemType === 'experience' ? (nightsOrUnits === 1 ? 'guest' : 'guests') : 'day'}
+          </span>
+          <span className="font-semibold text-[#243D32] tabular-nums">
+            Est. ${totalEstimate.toLocaleString()}
+          </span>
+        </div>
+      )}
+
+      {error && (
+        <div role="alert" className="p-3 bg-[#B66F52]/10 border border-[#B66F52] text-xs text-[#292B27]">
+          {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={submitting}
+        className="w-full py-3 px-4 bg-[#243D32] text-[#F4F0E6] text-sm font-medium rounded-sm hover:bg-[#52634A] disabled:opacity-60 transition-colors cursor-pointer"
+      >
+        {submitting ? 'Submitting Request...' : ctaLabel}
+      </button>
+
+      <p className="flex items-center gap-1.5 text-xs text-[#52634A]">
+        <CheckCircle2 className="w-3.5 h-3.5 text-[#52634A] shrink-0" />
+        <span>No charge yet. Requests are verified directly by Kalaw hosts.</span>
+      </p>
+    </form>
+  );
+};

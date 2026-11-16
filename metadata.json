@@ -1,0 +1,8 @@
+{
+  "name": "Kalaw Travel",
+  "description": "An editorial travel discovery, trip planning, local service booking, and real-estate marketplace platform for Kalaw, Myanmar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
