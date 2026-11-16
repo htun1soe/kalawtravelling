@@ -5,7 +5,7 @@ import { EditorialImage } from '../components/EditorialImage';
 import { useApp } from '../context/AppContext';
 
 export const JournalPage: React.FC = () => {
-  const { articles } = useApp();
+  const { articles, t } = useApp();
   const lead = articles[0];
   const rest = articles.slice(1);
 
@@ -13,13 +13,13 @@ export const JournalPage: React.FC = () => {
     <div className="pt-24 pb-24 max-w-[1360px] mx-auto px-6 md:px-10">
       <div className="max-w-3xl space-y-4 pb-10 border-b border-[#D9CCB8]">
         <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-          The Kalaw Journal
+          {t.pages.journalEyebrow}
         </p>
         <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-          Travel Guides, Essays &amp; Seasonal Field Notes
+          {t.pages.journalTitle}
         </h1>
         <p className="text-base text-[#292B27]/80 leading-relaxed">
-          Long-form dispatches written from Kalaw’s market lanes, pine ridges, and mountain kitchens.
+          {t.pages.journalDesc}
         </p>
       </div>
 
@@ -30,7 +30,7 @@ export const JournalPage: React.FC = () => {
           </Link>
           <div className="lg:col-span-5 space-y-4">
             <p className="text-xs text-[#52634A]">
-              Lead Dispatch · {lead.category} · {lead.publishedAt} · {lead.readTime}
+              {lead.category} · {lead.publishedAt} · {lead.readTime}
             </p>
             <h2 className="font-serif text-3xl md:text-4xl text-[#243D32] group-hover:text-[#B66F52] transition-colors headline-balance">
               <Link to={`/journal/${lead.slug}`}>{lead.title}</Link>
@@ -40,7 +40,7 @@ export const JournalPage: React.FC = () => {
               to={`/journal/${lead.slug}`}
               className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52]"
             >
-              <span>Read Essay</span>
+              <span>{t.home.readDispatches}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

@@ -7,7 +7,7 @@ import { useApp } from '../context/AppContext';
 
 export const DestinationDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { destinations, stays, experiences, addToTripPlan } = useApp();
+  const { destinations, stays, experiences, addToTripPlan, t } = useApp();
   const [addedToPlan, setAddedToPlan] = useState(false);
 
   const destination = destinations.find((d) => d.slug === slug || d.id === slug);
@@ -43,7 +43,7 @@ export const DestinationDetailPage: React.FC = () => {
           className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52634A] hover:text-[#243D32] mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>All Destinations</span>
+          <span>{t.nav.destinations}</span>
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -56,7 +56,7 @@ export const DestinationDetailPage: React.FC = () => {
 
             <div className="space-y-4 pt-2">
               <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-                {destination.category}
+                {t.categories[destination.category] || destination.category}
               </p>
               <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
                 {destination.name}
@@ -122,12 +122,12 @@ export const DestinationDetailPage: React.FC = () => {
                   {addedToPlan ? (
                     <>
                       <Compass className="w-4 h-4" />
-                      <span>Added to Your Trip Plan</span>
+                      <span>{t.actions.addedToPlan}</span>
                     </>
                   ) : (
                     <>
                       <Plus className="w-4 h-4" />
-                      <span>Add to Trip Planner</span>
+                      <span>{t.actions.addToTripPlan}</span>
                     </>
                   )}
                 </button>

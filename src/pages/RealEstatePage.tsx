@@ -22,7 +22,7 @@ const CATEGORIES: Array<'All' | PropertyCategory> = [
 ];
 
 export const RealEstatePage: React.FC = () => {
-  const { properties, refreshCatalog } = useApp();
+  const { properties, refreshCatalog, t } = useApp();
   const [searchParams] = useSearchParams();
   const initialCat = (searchParams.get('cat') as PropertyCategory | null) || 'All';
   const [selectedCat, setSelectedCat] = useState<'All' | PropertyCategory>(
@@ -90,13 +90,13 @@ export const RealEstatePage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-[#D9CCB8]">
         <div className="max-w-3xl space-y-4">
           <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-            Highland Property Marketplace
+            {t.pages.reEyebrow}
           </p>
           <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-            Kalaw Houses, Land &amp; Heritage Estates
+            {t.pages.reTitle}
           </h1>
           <p className="text-base text-[#292B27]/80 leading-relaxed">
-            Curated residential homes, long-term seasonal leases, pine-ridge acreage, and hospitality corners verified with local agents.
+            {t.pages.reDesc}
           </p>
         </div>
         <button
@@ -108,7 +108,7 @@ export const RealEstatePage: React.FC = () => {
           className="inline-flex items-center gap-2 px-5 py-3 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>List a Property</span>
+          <span>{t.home.listProperty}</span>
         </button>
       </div>
 
@@ -124,7 +124,7 @@ export const RealEstatePage: React.FC = () => {
                 : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
             }`}
           >
-            {cat}
+            {t.categories[cat] || cat}
           </button>
         ))}
       </div>
@@ -142,7 +142,7 @@ export const RealEstatePage: React.FC = () => {
             </div>
             <div className="p-6 md:p-8 flex-1 flex flex-col space-y-3">
               <div className="flex items-center justify-between text-xs text-[#52634A]">
-                <span>{prop.category} · {prop.location}</span>
+                <span>{t.categories[prop.category] || prop.category} · {prop.location}</span>
                 <span className="text-[#243D32] font-medium">{prop.status}</span>
               </div>
               <h2 className="font-serif text-3xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
@@ -161,14 +161,14 @@ export const RealEstatePage: React.FC = () => {
                     ${prop.price.toLocaleString()}
                   </span>
                   {prop.priceUnit === 'per month' && (
-                    <span className="text-xs text-[#52634A]"> / month</span>
+                    <span className="text-xs text-[#52634A]"> {t.home.perMonth}</span>
                   )}
                 </div>
                 <Link
                   to={`/real-estate/${prop.slug}`}
                   className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] hover:text-[#B66F52]"
                 >
-                  <span>Inspect Dossier</span>
+                  <span>{t.actions.inspectDossier}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>

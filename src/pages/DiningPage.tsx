@@ -6,7 +6,7 @@ import { useApp } from '../context/AppContext';
 import type { Restaurant } from '../types/kalaw';
 
 export const DiningPage: React.FC = () => {
-  const { restaurants } = useApp();
+  const { restaurants, t } = useApp();
   const [priceFilter, setPriceFilter] = useState<'All' | '$' | '$$' | '$$$'>('All');
   const [selectedTable, setSelectedTable] = useState<Restaurant | null>(null);
 
@@ -22,13 +22,13 @@ export const DiningPage: React.FC = () => {
     <div className="pt-24 pb-24 max-w-[1360px] mx-auto px-6 md:px-10">
       <div className="max-w-3xl space-y-4 pb-10 border-b border-[#D9CCB8]">
         <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-          Kalaw Table
+          {t.pages.diningEyebrow}
         </p>
         <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-          Food, Restaurants &amp; Mountain Teahouses
+          {t.pages.diningTitle}
         </h1>
         <p className="text-base text-[#292B27]/80 leading-relaxed">
-          From steaming dawn bowls of Shan khao swe and Gurkha clay-pot thalis to single-origin Ywangan coffee roasteries.
+          {t.pages.diningDesc}
         </p>
       </div>
 
@@ -44,7 +44,7 @@ export const DiningPage: React.FC = () => {
                 : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
             }`}
           >
-            {tier === 'All' ? 'All Price Ranges' : `${tier} Dining`}
+            {tier === 'All' ? t.categories.All : `${tier} ${t.nav.dining}`}
           </button>
         ))}
       </div>
@@ -59,7 +59,7 @@ export const DiningPage: React.FC = () => {
                 <span className="font-medium text-[#243D32]">{rest.priceRange}</span>
               </div>
               <h2 className="font-serif text-3xl text-[#243D32]">{rest.name}</h2>
-              <p className="text-sm text-[#292B27]/85 leading-relaxed">{rest.description}</p>
+              <p className="text-sm text-[#292B27]/85 leading-relaxed">{rest.shortDescription}</p>
               <div className="space-y-1.5 text-xs text-[#52634A] pt-1">
                 <p className="flex items-center gap-2">
                   <MapPin className="w-3.5 h-3.5 text-[#B66F52]" />
@@ -84,7 +84,7 @@ export const DiningPage: React.FC = () => {
                   onClick={() => setSelectedTable(rest)}
                   className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
                 >
-                  Request Table Reservation
+                  {t.actions.requestTable}
                 </button>
               </div>
             </div>
@@ -116,9 +116,9 @@ export const DiningPage: React.FC = () => {
               itemId={selectedTable.id}
               itemTitle={selectedTable.name}
               unitPrice={0}
-              priceLabel={`Table Inquiry · ${selectedTable.openingHours}`}
+              priceLabel={selectedTable.openingHours}
               maxGuests={10}
-              ctaLabel="Request Table Holding"
+              ctaLabel={t.actions.requestTable}
             />
           </div>
         </div>

@@ -17,7 +17,7 @@ const CATEGORIES: Array<'All' | DestinationCategory> = [
 ];
 
 export const DestinationsPage: React.FC = () => {
-  const { destinations, catalogLoading } = useApp();
+  const { destinations, catalogLoading, t } = useApp();
   const [selectedCategory, setSelectedCategory] = useState<'All' | DestinationCategory>('All');
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<'featured' | 'name'>('featured');
@@ -44,13 +44,13 @@ export const DestinationsPage: React.FC = () => {
     <div className="pt-24 pb-24 max-w-[1360px] mx-auto px-6 md:px-10">
       <div className="max-w-3xl space-y-4 pb-10 border-b border-[#D9CCB8]">
         <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-          Kalaw Atlas
+          {t.pages.destAtlas}
         </p>
         <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-          Explore Destinations &amp; Hidden Places
+          {t.pages.destTitle}
         </h1>
         <p className="text-base text-[#292B27]/80 leading-relaxed">
-          From sunrise monastery ridges and century-old railway quarters to pine forest trails and quiet tea escarpments across Kalaw.
+          {t.pages.destDesc}
         </p>
       </div>
 
@@ -68,7 +68,7 @@ export const DestinationsPage: React.FC = () => {
                   : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
               }`}
             >
-              {cat}
+              {t.categories[cat] || cat}
             </button>
           ))}
         </div>
@@ -80,7 +80,7 @@ export const DestinationsPage: React.FC = () => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Filter places..."
+              placeholder={`${t.nav.searchBtn}...`}
               className="pl-9 pr-3 py-2 bg-white/70 border border-[#D9CCB8] text-xs text-[#292B27] focus:outline-none focus:border-[#243D32]"
             />
           </div>
@@ -97,7 +97,7 @@ export const DestinationsPage: React.FC = () => {
       </div>
 
       {catalogLoading ? (
-        <div className="py-20 text-center text-sm text-[#52634A]">Loading Kalaw destinations...</div>
+        <div className="py-20 text-center text-sm text-[#52634A]">Loading...</div>
       ) : filtered.length === 0 ? (
         <div className="py-20 text-center space-y-3">
           <p className="font-serif text-2xl text-[#243D32]">No destinations match your filter.</p>
@@ -109,7 +109,7 @@ export const DestinationsPage: React.FC = () => {
             }}
             className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm cursor-pointer"
           >
-            Reset Filters
+            {t.actions.resetFilters}
           </button>
         </div>
       ) : (
@@ -126,7 +126,7 @@ export const DestinationsPage: React.FC = () => {
               </div>
               <div className="pt-4 space-y-2 flex-1 flex flex-col">
                 <p className="text-xs text-[#52634A]">
-                  {dest.category} · {dest.location} · <span className="tabular-nums">{dest.elevation}</span>
+                  {t.categories[dest.category] || dest.category} · {dest.location} · <span className="tabular-nums">{dest.elevation}</span>
                 </p>
                 <h2 className="font-serif text-2xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
                   <Link to={`/destinations/${dest.slug}`}>{dest.name}</Link>
@@ -138,7 +138,7 @@ export const DestinationsPage: React.FC = () => {
                   to={`/destinations/${dest.slug}`}
                   className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52]"
                 >
-                  <span>Read Field Guide</span>
+                  <span>{t.home.readGuide}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>

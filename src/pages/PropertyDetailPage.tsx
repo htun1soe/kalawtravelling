@@ -8,7 +8,7 @@ import { useApp } from '../context/AppContext';
 
 export const PropertyDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { properties } = useApp();
+  const { properties, t } = useApp();
 
   const property = properties.find((p) => p.slug === slug || p.id === slug);
 
@@ -30,7 +30,7 @@ export const PropertyDetailPage: React.FC = () => {
         className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52634A] hover:text-[#243D32] mb-6"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        <span>All Properties</span>
+        <span>{t.nav.realEstate}</span>
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -44,7 +44,7 @@ export const PropertyDetailPage: React.FC = () => {
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-                {property.category} · {property.location}
+                {t.categories[property.category] || property.category} · {property.location}
               </p>
               <FavoriteButton itemId={property.id} />
             </div>
@@ -58,7 +58,7 @@ export const PropertyDetailPage: React.FC = () => {
                 ${property.price.toLocaleString()}
               </span>
               {property.priceUnit === 'per month' && (
-                <span className="text-sm text-[#52634A]">per month</span>
+                <span className="text-sm text-[#52634A]">{t.home.perMonth}</span>
               )}
               <span className="text-xs text-[#52634A] tabular-nums">
                 · {property.areaSize}

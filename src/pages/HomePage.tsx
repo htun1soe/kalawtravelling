@@ -19,12 +19,8 @@ import {
 import type { DestinationCategory, StayCategory } from '../types/kalaw';
 
 interface HeroHighlight {
-  id: string;
+  id: 'ridges' | 'heritage' | 'lodges' | 'table';
   index: string;
-  label: string;
-  title: string;
-  caption: string;
-  meta: string;
   backdrop: string;
   featureImage: string;
   to: string;
@@ -34,10 +30,6 @@ const HERO_HIGHLIGHTS: HeroHighlight[] = [
   {
     id: 'ridges',
     index: '01',
-    label: 'Pine Ridges',
-    title: 'Dawn Mist & Burmese Pine Trails',
-    caption: 'Walk red-earth footpaths from Thein Taung ridge toward quiet Danu and Pa-O mountain hamlets.',
-    meta: '1,385 m Elevation · Viewpoints & Trekking',
     backdrop: IMG_HERO_MOUNTAINS,
     featureImage: IMG_PAGODA_VIEWPOINT,
     to: '/destinations',
@@ -45,10 +37,6 @@ const HERO_HIGHLIGHTS: HeroHighlight[] = [
   {
     id: 'heritage',
     index: '02',
-    label: '1914 Heritage',
-    title: 'Railway Quarter & Five-Day Market',
-    caption: 'Explore century-old stone masonry, eucalyptus lanes, and vibrant morning hill-tribe produce.',
-    meta: 'Est. 1914 · Central Station Road',
     backdrop: IMG_HERITAGE_STATION,
     featureImage: IMG_HERITAGE_STATION,
     to: '/destinations/kalaw-heritage-railway-quarter',
@@ -56,10 +44,6 @@ const HERO_HIGHLIGHTS: HeroHighlight[] = [
   {
     id: 'lodges',
     index: '03',
-    label: 'Teak Lodges',
-    title: 'Colonial Verandas & Cedar Cabins',
-    caption: 'Rest beside wood-burning hearths in restored 1920s timber lodges and secluded ridge sanctuaries.',
-    meta: 'From $42 – $210 / night · Curated Stays',
     backdrop: IMG_CEDAR_CABINS,
     featureImage: IMG_BOUTIQUE_VILLA,
     to: '/stays',
@@ -67,10 +51,6 @@ const HERO_HIGHLIGHTS: HeroHighlight[] = [
   {
     id: 'table',
     index: '04',
-    label: 'Shan Table',
-    title: 'Shan Noodles & Wild Tea Terraces',
-    caption: 'Savor turmeric-broth Shan khao swe at dawn and pan-fired mountain green tea along western ridges.',
-    meta: 'Highland Cuisine · Cafes & Workshops',
     backdrop: IMG_TEA_TERRACES,
     featureImage: IMG_SHAN_NOODLES,
     to: '/dining',
@@ -98,10 +78,10 @@ const STAY_CATEGORIES: Array<'All' | StayCategory> = [
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { destinations, stays, experiences, restaurants, rentals, properties, articles } = useApp();
+  const { destinations, stays, experiences, restaurants, rentals, properties, articles, t } = useApp();
 
   // Hero search & spotlight state
-  const [activeSpotlight, setActiveSpotlight] = useState<string>('ridges');
+  const [activeSpotlight, setActiveSpotlight] = useState<'ridges' | 'heritage' | 'lodges' | 'table'>('ridges');
   const [searchLocation, setSearchLocation] = useState('');
   const [checkIn, setCheckIn] = useState('2026-12-10');
   const [checkOut, setCheckOut] = useState('2026-12-13');
@@ -109,6 +89,7 @@ export const HomePage: React.FC = () => {
 
   const currentHighlight =
     HERO_HIGHLIGHTS.find((h) => h.id === activeSpotlight) || HERO_HIGHLIGHTS[0];
+  const currentHighlightCopy = t.hero.spotlights[currentHighlight.id];
 
   // Interactive section filters
   const [destFilter, setDestFilter] = useState<'All' | DestinationCategory>('All');
@@ -159,7 +140,7 @@ export const HomePage: React.FC = () => {
         <motion.img
           key={currentHighlight.backdrop}
           src={currentHighlight.backdrop}
-          alt={currentHighlight.title}
+          alt={currentHighlightCopy.title}
           referrerPolicy="no-referrer"
           style={{ y: heroParallaxY, scale: heroParallaxScale }}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 will-change-transform"
@@ -172,13 +153,13 @@ export const HomePage: React.FC = () => {
             {/* Left Column: Editorial Headline, CTAs & Signature Highlights Selector */}
             <div className="lg:col-span-7 space-y-6">
               <p className="text-xs uppercase tracking-[0.22em] text-[#D9CCB8] font-medium">
-                Kalaw · Shan State · 1,320m Highland Plateau
+                {t.hero.eyebrow}
               </p>
-              <h1 className="font-serif text-[clamp(2.85rem,5.2vw,4.75rem)] leading-[1.02] font-medium text-[#F4F0E6] headline-balance max-w-2xl">
-                Find Your Way to Kalaw.
+              <h1 className="font-serif text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.06] font-medium text-[#F4F0E6] headline-balance max-w-2xl">
+                {t.hero.headline}
               </h1>
               <p className="text-base md:text-lg text-[#F4F0E6]/88 leading-relaxed max-w-xl">
-                Where morning clouds drift through Burmese pines, century-old teak lodges open onto wildflower verandas, and quiet footpaths connect tea terraces to Shan kitchens.
+                {t.hero.subtitle}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-1">
@@ -186,7 +167,7 @@ export const HomePage: React.FC = () => {
                   to="/explore"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-[#F4F0E6] text-[#243D32] text-sm font-medium rounded-sm hover:bg-[#D9CCB8] transition-colors whitespace-nowrap"
                 >
-                  <span>Explore Kalaw</span>
+                  <span>{t.hero.exploreCta}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
@@ -194,7 +175,7 @@ export const HomePage: React.FC = () => {
                   className="inline-flex items-center gap-2 px-6 py-3 border border-[#F4F0E6]/60 text-[#F4F0E6] text-sm font-medium rounded-sm hover:bg-[#F4F0E6]/10 transition-colors whitespace-nowrap"
                 >
                   <Compass className="w-4 h-4" />
-                  <span>Plan Your Trip</span>
+                  <span>{t.hero.planCta}</span>
                 </Link>
               </div>
 
@@ -202,6 +183,7 @@ export const HomePage: React.FC = () => {
               <div className="pt-4 border-t border-[#F4F0E6]/20 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {HERO_HIGHLIGHTS.map((item) => {
                   const active = item.id === currentHighlight.id;
+                  const copy = t.hero.spotlights[item.id];
                   return (
                     <button
                       key={item.id}
@@ -217,7 +199,7 @@ export const HomePage: React.FC = () => {
                         {item.index}.
                       </span>
                       <span className="block text-xs font-medium mt-0.5 whitespace-nowrap truncate">
-                        {item.label}
+                        {copy.label}
                       </span>
                     </button>
                   );
@@ -234,7 +216,7 @@ export const HomePage: React.FC = () => {
                 <div className="aspect-[16/10] overflow-hidden bg-[#243D32]">
                   <img
                     src={currentHighlight.featureImage}
-                    alt={currentHighlight.title}
+                    alt={currentHighlightCopy.title}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   />
@@ -242,13 +224,13 @@ export const HomePage: React.FC = () => {
                 <div className="p-4 flex items-end justify-between gap-4">
                   <div className="space-y-1 min-w-0">
                     <p className="text-[11px] uppercase tracking-wider text-[#D9CCB8]">
-                      {currentHighlight.index} · {currentHighlight.meta}
+                      {currentHighlight.index} · {currentHighlightCopy.meta}
                     </p>
                     <h2 className="font-serif text-xl md:text-2xl text-[#F4F0E6] group-hover:text-[#D9CCB8] transition-colors truncate">
-                      {currentHighlight.title}
+                      {currentHighlightCopy.title}
                     </h2>
                     <p className="text-xs text-[#F4F0E6]/75 line-clamp-2">
-                      {currentHighlight.caption}
+                      {currentHighlightCopy.caption}
                     </p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-[#D9CCB8] shrink-0 mb-1" />
@@ -259,12 +241,13 @@ export const HomePage: React.FC = () => {
               <div className="grid grid-cols-4 gap-2.5">
                 {HERO_HIGHLIGHTS.map((item) => {
                   const active = item.id === currentHighlight.id;
+                  const copy = t.hero.spotlights[item.id];
                   return (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setActiveSpotlight(item.id)}
-                      aria-label={`Spotlight ${item.title}`}
+                      aria-label={copy.title}
                       className={`group text-left overflow-hidden border transition-all cursor-pointer ${
                         active
                           ? 'border-[#F4F0E6] opacity-100'
@@ -274,7 +257,7 @@ export const HomePage: React.FC = () => {
                       <div className="aspect-[4/3] overflow-hidden bg-[#243D32]">
                         <img
                           src={item.featureImage}
-                          alt={item.label}
+                          alt={copy.label}
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -293,7 +276,7 @@ export const HomePage: React.FC = () => {
           >
             <div className="md:col-span-4 px-2">
               <label className="block text-[11px] uppercase tracking-wider text-[#52634A] mb-1">
-                Destination or Area
+                {t.hero.destLabel}
               </label>
               <div className="flex items-center gap-2 border-b border-[#D9CCB8] pb-1.5">
                 <MapPin className="w-4 h-4 text-[#B66F52] shrink-0" />
@@ -301,7 +284,7 @@ export const HomePage: React.FC = () => {
                   type="text"
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
-                  placeholder="Pine Ridge, Station Road, Ywa Pu..."
+                  placeholder={t.hero.destPlaceholder}
                   className="w-full bg-transparent text-sm text-[#292B27] placeholder-[#52634A]/65 focus:outline-none"
                 />
               </div>
@@ -309,7 +292,7 @@ export const HomePage: React.FC = () => {
 
             <div className="md:col-span-3 px-2">
               <label className="block text-[11px] uppercase tracking-wider text-[#52634A] mb-1">
-                Check-in
+                {t.hero.checkIn}
               </label>
               <div className="flex items-center gap-2 border-b border-[#D9CCB8] pb-1.5">
                 <Calendar className="w-4 h-4 text-[#52634A] shrink-0" />
@@ -324,7 +307,7 @@ export const HomePage: React.FC = () => {
 
             <div className="md:col-span-2 px-2">
               <label className="block text-[11px] uppercase tracking-wider text-[#52634A] mb-1">
-                Check-out
+                {t.hero.checkOut}
               </label>
               <div className="flex items-center gap-2 border-b border-[#D9CCB8] pb-1.5">
                 <input
@@ -338,14 +321,14 @@ export const HomePage: React.FC = () => {
 
             <div className="md:col-span-1 px-2">
               <label className="block text-[11px] uppercase tracking-wider text-[#52634A] mb-1">
-                Guests
+                {t.hero.guests}
               </label>
               <div className="flex items-center gap-1.5 border-b border-[#D9CCB8] pb-1.5">
                 <Users className="w-4 h-4 text-[#52634A] shrink-0" />
                 <select
                   value={guests}
                   onChange={(e) => setGuests(Number(e.target.value))}
-                  aria-label="Number of guests"
+                  aria-label={t.hero.guests}
                   className="w-full bg-transparent text-sm text-[#292B27] tabular-nums focus:outline-none"
                 >
                   {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -363,7 +346,7 @@ export const HomePage: React.FC = () => {
                 className="w-full py-3 px-4 bg-[#243D32] text-[#F4F0E6] text-sm font-medium rounded-sm hover:bg-[#B66F52] transition-colors inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
               >
                 <Search className="w-4 h-4" />
-                <span>Search Stays</span>
+                <span>{t.hero.searchStays}</span>
               </button>
             </div>
           </form>
@@ -375,29 +358,29 @@ export const HomePage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <ScrollReveal className="lg:col-span-5 space-y-6">
             <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-              01. Discover Kalaw
+              {t.home.discoverEyebrow}
             </p>
             <h2 className="font-serif text-4xl md:text-5xl leading-[1.08] text-[#243D32] headline-balance">
-              Where pine forests meet quiet highland villages.
+              {t.home.discoverTitle}
             </h2>
             <p className="text-base text-[#292B27]/85 leading-relaxed">
-              Once a sleepy railway hill station, Kalaw unfolds across rolling Shan ridges carpeted in Khasi pines, red-earth trekking paths, and family tea terraces. Mornings arrive crisp and veiled in valley fog; afternoons glow warm against century-old brick verandas.
+              {t.home.discoverBody}
             </p>
             <blockquote className="py-5 border-t border-b border-[#D9CCB8] font-serif italic text-2xl text-[#243D32] leading-snug">
-              “A place measured not in monuments, but in cedar air, slow footpaths, and morning bowls of warm Shan noodles.”
+              {t.home.discoverQuote}
             </blockquote>
             <div className="grid grid-cols-3 gap-6 pt-2 tabular-nums">
               <div>
                 <p className="font-serif text-3xl text-[#243D32]">1,320 m</p>
-                <p className="text-xs text-[#52634A] mt-1">Average Elevation</p>
+                <p className="text-xs text-[#52634A] mt-1">{t.home.statElevation}</p>
               </div>
               <div>
                 <p className="font-serif text-3xl text-[#243D32]">5-Day</p>
-                <p className="text-xs text-[#52634A] mt-1">Rotating Hill Market</p>
+                <p className="text-xs text-[#52634A] mt-1">{t.home.statMarket}</p>
               </div>
               <div>
                 <p className="font-serif text-3xl text-[#243D32]">18–22°C</p>
-                <p className="text-xs text-[#52634A] mt-1">Cool Season Days</p>
+                <p className="text-xs text-[#52634A] mt-1">{t.home.statTemp}</p>
               </div>
             </div>
           </ScrollReveal>
@@ -411,7 +394,7 @@ export const HomePage: React.FC = () => {
                   aspectClass="aspect-[4/3]"
                 />
                 <figcaption className="mt-2.5 text-xs font-serif italic text-[#52634A]">
-                  Fig. 01 — Red-earth footpath descending through the Myin Ma Hti pine corridor.
+                  {t.home.fig1}
                 </figcaption>
               </figure>
             </ScrollReveal>
@@ -423,7 +406,7 @@ export const HomePage: React.FC = () => {
                   aspectClass="aspect-[3/4]"
                 />
                 <figcaption className="mt-2.5 text-xs font-serif italic text-[#52634A]">
-                  Fig. 02 — Dawn mist rising behind Thein Taung’s brick stupas.
+                  {t.home.fig2}
                 </figcaption>
               </figure>
             </ScrollReveal>
@@ -436,17 +419,17 @@ export const HomePage: React.FC = () => {
         <ScrollReveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div className="space-y-2 max-w-2xl">
             <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-              02. Explore Places
+              {t.home.placesEyebrow}
             </p>
             <h2 className="font-serif text-3xl md:text-4xl text-[#243D32]">
-              Viewpoints, Ridges &amp; Cultural Landmarks
+              {t.home.placesTitle}
             </h2>
           </div>
           <Link
             to="/destinations"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-[#243D32] hover:text-[#B66F52] transition-colors whitespace-nowrap shrink-0"
           >
-            <span>View All Destinations</span>
+            <span>{t.home.viewAllDest}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </ScrollReveal>
@@ -464,7 +447,7 @@ export const HomePage: React.FC = () => {
                   : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
               }`}
             >
-              {category}
+              {t.categories[category] || category}
             </button>
           ))}
         </div>
@@ -483,7 +466,7 @@ export const HomePage: React.FC = () => {
                 </div>
                 <div className="pt-4 space-y-2 flex-1 flex flex-col">
                   <div className="flex items-center gap-2 text-xs text-[#52634A]">
-                    <span>{dest.category}</span>
+                    <span>{t.categories[dest.category] || dest.category}</span>
                     <span aria-hidden="true">·</span>
                     <span>{dest.location}</span>
                     <span aria-hidden="true">·</span>
@@ -499,7 +482,7 @@ export const HomePage: React.FC = () => {
                     to={`/destinations/${dest.slug}`}
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52] transition-colors"
                   >
-                    <span>Read Destination Guide</span>
+                    <span>{t.home.readGuide}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -515,17 +498,17 @@ export const HomePage: React.FC = () => {
           <ScrollReveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div className="space-y-2 max-w-2xl">
               <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-                03. Find Your Stay
+                {t.home.staysEyebrow}
               </p>
               <h2 className="font-serif text-3xl md:text-4xl text-[#243D32]">
-                Heritage Lodges, Hill Cabins &amp; Homestays
+                {t.home.staysTitle}
               </h2>
             </div>
             <Link
               to="/stays"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-[#243D32] hover:text-[#B66F52] transition-colors whitespace-nowrap shrink-0"
             >
-              <span>Browse All Stays</span>
+              <span>{t.home.browseAllStays}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </ScrollReveal>
@@ -542,7 +525,7 @@ export const HomePage: React.FC = () => {
                     : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/60'
                 }`}
               >
-                {category}
+                {t.categories[category] || category}
               </button>
             ))}
           </div>
@@ -561,7 +544,7 @@ export const HomePage: React.FC = () => {
                   </div>
                   <div className="p-6 flex-1 flex flex-col space-y-3">
                     <div className="flex items-center justify-between text-xs text-[#52634A]">
-                      <span>{stay.category} · {stay.location}</span>
+                      <span>{t.categories[stay.category] || stay.category} · {stay.location}</span>
                       <span className="inline-flex items-center gap-1 text-[#243D32] font-medium tabular-nums">
                         <Star className="w-3.5 h-3.5 fill-[#B66F52] text-[#B66F52]" />
                         {stay.rating.toFixed(1)}
@@ -580,13 +563,13 @@ export const HomePage: React.FC = () => {
                         <span className="font-serif text-2xl text-[#243D32] tabular-nums">
                           ${stay.pricePerNight}
                         </span>
-                        <span className="text-xs text-[#52634A]"> / night</span>
+                        <span className="text-xs text-[#52634A]"> {t.home.perNight}</span>
                       </div>
                       <Link
                         to={`/stays/${stay.slug}`}
                         className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors"
                       >
-                        View Details
+                        {t.home.viewDetails}
                       </Link>
                     </div>
                   </div>
@@ -605,17 +588,17 @@ export const HomePage: React.FC = () => {
             <div className="flex items-end justify-between border-b border-[#D9CCB8] pb-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-                  04. Local Experiences
+                  {t.home.expEyebrow}
                 </p>
                 <h2 className="font-serif text-3xl text-[#243D32] mt-1">
-                  Guided Treks &amp; Cultural Walks
+                  {t.home.expTitle}
                 </h2>
               </div>
               <Link
                 to="/experiences"
                 className="text-xs font-medium text-[#243D32] hover:text-[#B66F52] whitespace-nowrap"
               >
-                All Experiences →
+                {t.home.allExp} →
               </Link>
             </div>
 
@@ -631,7 +614,7 @@ export const HomePage: React.FC = () => {
                   <div className="sm:col-span-8 flex flex-col justify-between space-y-2">
                     <div className="space-y-1.5">
                       <p className="text-xs text-[#52634A]">
-                        {exp.category} · {exp.duration} · {exp.difficulty}
+                        {t.categories[exp.category] || exp.category} · {exp.duration} · {exp.difficulty}
                       </p>
                       <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52] transition-colors">
                         <Link to="/experiences">{exp.title}</Link>
@@ -642,13 +625,13 @@ export const HomePage: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-between pt-1">
                       <span className="text-sm font-medium text-[#243D32] tabular-nums">
-                        ${exp.pricePerGuest} / guest
+                        ${exp.pricePerGuest} {t.home.perGuest}
                       </span>
                       <Link
                         to="/experiences"
                         className="text-xs font-medium text-[#B66F52] hover:underline"
                       >
-                        Request Experience →
+                        {t.home.requestExp} →
                       </Link>
                     </div>
                   </div>
@@ -662,17 +645,17 @@ export const HomePage: React.FC = () => {
             <div className="flex items-end justify-between border-b border-[#D9CCB8] pb-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-                  05. Food &amp; Dining
+                  {t.home.diningEyebrow}
                 </p>
                 <h2 className="font-serif text-3xl text-[#243D32] mt-1">
-                  Shan Kitchens &amp; Mountain Roasteries
+                  {t.home.diningTitle}
                 </h2>
               </div>
               <Link
                 to="/dining"
                 className="text-xs font-medium text-[#243D32] hover:text-[#B66F52] whitespace-nowrap"
               >
-                All Dining →
+                {t.home.allDining} →
               </Link>
             </div>
 
@@ -703,7 +686,7 @@ export const HomePage: React.FC = () => {
                         to="/dining"
                         className="font-medium text-[#243D32] hover:text-[#B66F52]"
                       >
-                        View Menu Notes →
+                        {t.home.viewMenuNotes} →
                       </Link>
                     </div>
                   </div>
@@ -722,17 +705,17 @@ export const HomePage: React.FC = () => {
             <ScrollReveal className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#F4F0E6]/15 pb-6">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-[#D9CCB8] font-medium">
-                  06. Transportation &amp; Rentals
+                  {t.home.rentalsEyebrow}
                 </p>
                 <h2 className="font-serif text-3xl md:text-4xl text-[#F4F0E6] mt-1">
-                  Move Across the Plateau at Your Own Pace
+                  {t.home.rentalsTitle}
                 </h2>
               </div>
               <Link
                 to="/rentals"
                 className="text-sm text-[#D9CCB8] hover:text-[#F4F0E6] inline-flex items-center gap-1.5 whitespace-nowrap"
               >
-                <span>Explore Vehicles &amp; Drivers</span>
+                <span>{t.home.exploreVehicles}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </ScrollReveal>
@@ -745,7 +728,7 @@ export const HomePage: React.FC = () => {
                     className="group border border-[#F4F0E6]/15 p-5 hover:border-[#D9CCB8]/50 transition-colors flex flex-col justify-between space-y-4 w-full"
                   >
                     <div className="space-y-2">
-                      <p className="text-xs text-[#D9CCB8]/75">{rental.category}</p>
+                      <p className="text-xs text-[#D9CCB8]/75">{t.categories[rental.category] || rental.category}</p>
                       <h3 className="font-serif text-xl text-[#F4F0E6] group-hover:text-[#D9CCB8] transition-colors">
                         {rental.name}
                       </h3>
@@ -755,7 +738,7 @@ export const HomePage: React.FC = () => {
                     </div>
                     <div className="pt-3 border-t border-[#F4F0E6]/10 flex items-center justify-between text-xs tabular-nums">
                       <span className="text-[#D9CCB8] font-medium">
-                        ${rental.pricePerDay} / day
+                        ${rental.pricePerDay} {t.home.perDay}
                       </span>
                       <span className="text-[#F4F0E6]/70">{rental.capacity}</span>
                     </div>
@@ -770,10 +753,10 @@ export const HomePage: React.FC = () => {
             <ScrollReveal className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#F4F0E6]/15 pb-6">
               <div className="space-y-2 max-w-2xl">
                 <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-                  07. Highland Real Estate Marketplace
+                  {t.home.realEstateEyebrow}
                 </p>
                 <h2 className="font-serif text-3xl md:text-4xl text-[#F4F0E6]">
-                  Houses, Ridge Land &amp; Heritage Residences
+                  {t.home.realEstateTitle}
                 </h2>
               </div>
               <div className="flex items-center gap-4">
@@ -781,13 +764,13 @@ export const HomePage: React.FC = () => {
                   to="/real-estate?submit=1"
                   className="px-4 py-2 border border-[#D9CCB8]/40 text-xs font-medium text-[#F4F0E6] rounded-sm hover:bg-[#F4F0E6]/10 transition-colors whitespace-nowrap"
                 >
-                  List a Property
+                  {t.home.listProperty}
                 </Link>
                 <Link
                   to="/real-estate"
                   className="text-sm text-[#D9CCB8] hover:text-[#F4F0E6] inline-flex items-center gap-1.5 whitespace-nowrap"
                 >
-                  <span>View Marketplace</span>
+                  <span>{t.home.viewMarketplace}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -802,7 +785,7 @@ export const HomePage: React.FC = () => {
                     </Link>
                     <div className="p-6 flex-1 flex flex-col space-y-3">
                       <p className="text-xs text-[#D9CCB8]/80">
-                        {prop.category} · {prop.location}
+                        {t.categories[prop.category] || prop.category} · {prop.location}
                       </p>
                       <h3 className="font-serif text-2xl text-[#F4F0E6] group-hover:text-[#D9CCB8] transition-colors">
                         <Link to={`/real-estate/${prop.slug}`}>{prop.title}</Link>
@@ -813,7 +796,7 @@ export const HomePage: React.FC = () => {
                       <div className="pt-4 border-t border-[#F4F0E6]/15 flex items-center justify-between">
                         <span className="font-serif text-2xl text-[#F4F0E6] tabular-nums">
                           ${prop.price.toLocaleString()}
-                          {prop.priceUnit === 'per month' ? ' / mo' : ''}
+                          {prop.priceUnit === 'per month' ? ` ${t.home.perMonth}` : ''}
                         </span>
                         <span className="text-xs text-[#D9CCB8] tabular-nums">{prop.areaSize}</span>
                       </div>
@@ -831,17 +814,17 @@ export const HomePage: React.FC = () => {
         <ScrollReveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-[#D9CCB8] pb-6">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-              08. The Kalaw Journal
+              {t.home.journalEyebrow}
             </p>
             <h2 className="font-serif text-3xl md:text-4xl text-[#243D32] mt-1">
-              Field Notes, Seasonal Guides &amp; Culinary Stories
+              {t.home.journalTitle}
             </h2>
           </div>
           <Link
             to="/journal"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-[#243D32] hover:text-[#B66F52] transition-colors whitespace-nowrap"
           >
-            <span>Read All Dispatches</span>
+            <span>{t.home.readDispatches}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </ScrollReveal>

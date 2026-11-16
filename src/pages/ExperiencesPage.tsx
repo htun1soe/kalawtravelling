@@ -16,7 +16,7 @@ const CATEGORIES: Array<'All' | ExperienceCategory> = [
 ];
 
 export const ExperiencesPage: React.FC = () => {
-  const { experiences, addToTripPlan } = useApp();
+  const { experiences, addToTripPlan, t } = useApp();
   const [selectedCat, setSelectedCat] = useState<'All' | ExperienceCategory>('All');
   const [bookingExp, setBookingExp] = useState<Experience | null>(null);
   const [plannedId, setPlannedId] = useState<string | null>(null);
@@ -33,13 +33,13 @@ export const ExperiencesPage: React.FC = () => {
     <div className="pt-24 pb-24 max-w-[1360px] mx-auto px-6 md:px-10">
       <div className="max-w-3xl space-y-4 pb-10 border-b border-[#D9CCB8]">
         <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-          Curated Local Services
+          {t.pages.expEyebrow}
         </p>
         <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-          Experiences, Guided Treks &amp; Workshops
+          {t.pages.expTitle}
         </h1>
         <p className="text-base text-[#292B27]/80 leading-relaxed">
-          Small-group highland walks, dawn photography outings, tea harvest immersions, and market-to-table Shan cooking led by licensed local guides.
+          {t.pages.expDesc}
         </p>
       </div>
 
@@ -55,7 +55,7 @@ export const ExperiencesPage: React.FC = () => {
                 : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
             }`}
           >
-            {cat}
+            {t.categories[cat] || cat}
           </button>
         ))}
       </div>
@@ -74,21 +74,21 @@ export const ExperiencesPage: React.FC = () => {
             </div>
             <div className="p-6 md:p-8 flex-1 flex flex-col space-y-4">
               <div className="flex items-center justify-between text-xs text-[#52634A]">
-                <span>{exp.category} · {exp.duration}</span>
-                <span>Difficulty: {exp.difficulty}</span>
+                <span>{t.categories[exp.category] || exp.category} · {exp.duration}</span>
+                <span>{exp.difficulty}</span>
               </div>
               <h2 className="font-serif text-3xl text-[#243D32]">{exp.title}</h2>
               <p className="text-sm text-[#292B27]/85 leading-relaxed">{exp.shortDescription}</p>
               <div className="text-xs text-[#52634A] space-y-1">
                 <p>Guide: <span className="text-[#292B27] font-medium">{exp.guideName}</span></p>
-                <p>Includes: {exp.included.join(' · ')}</p>
+                <p>{exp.included.join(' · ')}</p>
               </div>
               <div className="pt-4 mt-auto border-t border-[#D9CCB8] flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <span className="font-serif text-2xl text-[#243D32] tabular-nums">
                     ${exp.pricePerGuest}
                   </span>
-                  <span className="text-xs text-[#52634A]"> / guest (max {exp.maxGroupSize})</span>
+                  <span className="text-xs text-[#52634A]"> {t.home.perGuest} (max {exp.maxGroupSize})</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -106,14 +106,14 @@ export const ExperiencesPage: React.FC = () => {
                     }}
                     className="px-3.5 py-2 border border-[#243D32]/30 text-xs font-medium text-[#243D32] rounded-sm hover:border-[#243D32] cursor-pointer"
                   >
-                    {plannedId === exp.id ? 'Added to Plan' : '+ Trip Plan'}
+                    {plannedId === exp.id ? t.actions.addedToPlan : `+ ${t.actions.addToTripPlan}`}
                   </button>
                   <button
                     type="button"
                     onClick={() => setBookingExp(exp)}
                     className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
                   >
-                    Request Date
+                    {t.actions.requestDate}
                   </button>
                 </div>
               </div>
@@ -140,7 +140,9 @@ export const ExperiencesPage: React.FC = () => {
               <X className="w-4 h-4" />
             </button>
             <div>
-              <p className="text-xs uppercase tracking-widest text-[#B66F52]">{bookingExp.category}</p>
+              <p className="text-xs uppercase tracking-widest text-[#B66F52]">
+                {t.categories[bookingExp.category] || bookingExp.category}
+              </p>
               <h2 className="font-serif text-2xl text-[#243D32] mt-1">{bookingExp.title}</h2>
             </div>
             <BookingRequestPanel
@@ -148,9 +150,9 @@ export const ExperiencesPage: React.FC = () => {
               itemId={bookingExp.id}
               itemTitle={bookingExp.title}
               unitPrice={bookingExp.pricePerGuest}
-              priceLabel="per guest"
+              priceLabel={t.home.perGuest}
               maxGuests={bookingExp.maxGroupSize}
-              ctaLabel="Request Experience Date"
+              ctaLabel={t.actions.requestDate}
             />
           </div>
         </div>

@@ -15,6 +15,7 @@ export const ProfilePage: React.FC = () => {
     experiences,
     properties,
     localFavorites,
+    t,
   } = useApp();
   const navigate = useNavigate();
 
@@ -65,7 +66,7 @@ export const ProfilePage: React.FC = () => {
             to="/auth"
             className="px-5 py-3 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] whitespace-nowrap"
           >
-            Sign In / Register
+            {t.nav.signIn}
           </Link>
         </div>
 
@@ -115,7 +116,7 @@ export const ProfilePage: React.FC = () => {
             to="/bookings"
             className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A]"
           >
-            Booking Requests
+            {t.nav.bookings}
           </Link>
           {user.role === 'admin' && (
             <Link

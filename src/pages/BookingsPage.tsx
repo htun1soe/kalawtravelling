@@ -6,7 +6,7 @@ import { fetchBookings, updateBookingStatus } from '../services/api';
 import type { BookingRequest } from '../types/kalaw';
 
 export const BookingsPage: React.FC = () => {
-  const { user } = useApp();
+  const { user, t } = useApp();
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,20 +42,20 @@ export const BookingsPage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#D9CCB8]">
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-            Reservation Concierge
+            {t.pages.bookingsEyebrow}
           </p>
           <h1 className="font-serif text-4xl md:text-5xl text-[#243D32]">
-            Your Booking Requests
+            {t.pages.bookingsTitle}
           </h1>
           <p className="text-sm text-[#52634A] max-w-2xl">
-            All requests are verified directly with local Kalaw lodges, trekking guides, and vehicle owners before confirmation.
+            {t.pages.bookingsDesc}
           </p>
         </div>
         <Link
           to="/stays"
           className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] whitespace-nowrap self-start md:self-auto"
         >
-          Browse Stays
+          {t.home.browseAllStays}
         </Link>
       </div>
 
@@ -113,7 +113,7 @@ export const BookingsPage: React.FC = () => {
                     onClick={() => handleCancel(bk.id)}
                     className="px-3.5 py-2 border border-[#D9CCB8] text-xs font-medium text-[#292B27] hover:border-[#B66F52] hover:text-[#B66F52] rounded-sm cursor-pointer"
                   >
-                    Cancel Request
+                    {t.actions.cancelRequest}
                   </button>
                 )}
               </div>

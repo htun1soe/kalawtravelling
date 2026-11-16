@@ -8,7 +8,7 @@ import { useApp } from '../context/AppContext';
 
 export const StayDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { stays, addToTripPlan } = useApp();
+  const { stays, addToTripPlan, t } = useApp();
   const [added, setAdded] = React.useState(false);
 
   const stay = stays.find((s) => s.slug === slug || s.id === slug);
@@ -31,7 +31,7 @@ export const StayDetailPage: React.FC = () => {
         className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52634A] hover:text-[#243D32] mb-6"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        <span>All Stays</span>
+        <span>{t.nav.stays}</span>
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -54,7 +54,7 @@ export const StayDetailPage: React.FC = () => {
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-                {stay.category} · {stay.location}
+                {t.categories[stay.category] || stay.category} · {stay.location}
               </p>
               <div className="flex items-center gap-3">
                 <span className="inline-flex items-center gap-1 text-xs font-medium text-[#243D32] tabular-nums">
@@ -107,7 +107,7 @@ export const StayDetailPage: React.FC = () => {
               }}
               className="px-4 py-2 border border-[#243D32] text-xs font-medium text-[#243D32] rounded-sm hover:bg-[#243D32] hover:text-[#F4F0E6] transition-colors cursor-pointer"
             >
-              {added ? 'Added to Trip Plan' : 'Add to Trip Planner'}
+              {added ? t.actions.addedToPlan : t.actions.addToTripPlan}
             </button>
           </div>
         </div>
@@ -119,10 +119,10 @@ export const StayDetailPage: React.FC = () => {
             itemId={stay.id}
             itemTitle={stay.name}
             unitPrice={stay.pricePerNight}
-            priceLabel="per night"
+            priceLabel={t.home.perNight}
             requireCheckOut={true}
             maxGuests={stay.maxGuests}
-            ctaLabel="Request Stay Availability"
+            ctaLabel={t.actions.submitBooking}
           />
         </aside>
       </div>

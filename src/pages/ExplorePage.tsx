@@ -7,7 +7,7 @@ import { useApp } from '../context/AppContext';
 type ExploreTab = 'all' | 'destinations' | 'stays' | 'experiences' | 'dining' | 'rentals' | 'properties';
 
 export const ExplorePage: React.FC = () => {
-  const { destinations, stays, experiences, restaurants, rentals, properties } = useApp();
+  const { destinations, stays, experiences, restaurants, rentals, properties, t } = useApp();
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [tab, setTab] = useState<ExploreTab>('all');
@@ -49,23 +49,23 @@ export const ExplorePage: React.FC = () => {
     results.properties.length;
 
   const tabs: Array<{ id: ExploreTab; label: string; count: number }> = [
-    { id: 'all', label: 'All', count: totalCount },
-    { id: 'destinations', label: 'Destinations', count: results.destinations.length },
-    { id: 'stays', label: 'Stays', count: results.stays.length },
-    { id: 'experiences', label: 'Experiences', count: results.experiences.length },
-    { id: 'dining', label: 'Dining', count: results.restaurants.length },
-    { id: 'rentals', label: 'Rentals', count: results.rentals.length },
-    { id: 'properties', label: 'Real Estate', count: results.properties.length },
+    { id: 'all', label: t.categories.All, count: totalCount },
+    { id: 'destinations', label: t.nav.destinations, count: results.destinations.length },
+    { id: 'stays', label: t.nav.stays, count: results.stays.length },
+    { id: 'experiences', label: t.nav.experiences, count: results.experiences.length },
+    { id: 'dining', label: t.nav.dining, count: results.restaurants.length },
+    { id: 'rentals', label: t.nav.rentals, count: results.rentals.length },
+    { id: 'properties', label: t.nav.realEstate, count: results.properties.length },
   ];
 
   return (
     <div className="pt-24 pb-24 max-w-[1360px] mx-auto px-6 md:px-10">
       <div className="max-w-3xl space-y-4 pb-8 border-b border-[#D9CCB8]">
         <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-          Unified Discovery
+          {t.pages.exploreEyebrow}
         </p>
         <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-          Explore Everything in Kalaw
+          {t.pages.exploreTitle}
         </h1>
         <div className="relative pt-2">
           <Search className="w-4 h-4 text-[#52634A] absolute left-4 top-[calc(50%+4px)] -translate-y-1/2" />
@@ -73,25 +73,25 @@ export const ExplorePage: React.FC = () => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search pine trails, lodges, Shan noodles, motorbikes, or ridge land..."
+            placeholder={t.nav.searchPlaceholder}
             className="w-full pl-11 pr-4 py-3 bg-white/80 border border-[#D9CCB8] text-sm text-[#292B27] focus:outline-none focus:border-[#243D32]"
           />
         </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 py-6 border-b border-[#D9CCB8]">
-        {tabs.map((t) => (
+        {tabs.map((tabItem) => (
           <button
-            key={t.id}
+            key={tabItem.id}
             type="button"
-            onClick={() => setTab(t.id)}
+            onClick={() => setTab(tabItem.id)}
             className={`px-3.5 py-2 text-xs font-medium rounded-sm transition-colors cursor-pointer tabular-nums whitespace-nowrap ${
-              tab === t.id
+              tab === tabItem.id
                 ? 'bg-[#243D32] text-[#F4F0E6]'
                 : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
             }`}
           >
-            {t.label} ({t.count})
+            {tabItem.label} ({tabItem.count})
           </button>
         ))}
       </div>
@@ -104,7 +104,7 @@ export const ExplorePage: React.FC = () => {
             onClick={() => setQuery('')}
             className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm cursor-pointer"
           >
-            Clear Search
+            {t.actions.resetFilters}
           </button>
         </div>
       ) : (
@@ -112,13 +112,13 @@ export const ExplorePage: React.FC = () => {
           {(tab === 'all' || tab === 'destinations') && results.destinations.length > 0 && (
             <section className="space-y-6">
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
-                Destinations
+                {t.nav.destinations}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.destinations.map((d) => (
                   <Link key={d.id} to={`/destinations/${d.slug}`} className="group space-y-3">
                     <EditorialImage src={d.image} alt={d.name} aspectClass="aspect-[4/3]" />
-                    <p className="text-xs text-[#52634A]">{d.category} · {d.location}</p>
+                    <p className="text-xs text-[#52634A]">{t.categories[d.category] || d.category} · {d.location}</p>
                     <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52]">{d.name}</h3>
                   </Link>
                 ))}
@@ -129,13 +129,15 @@ export const ExplorePage: React.FC = () => {
           {(tab === 'all' || tab === 'stays') && results.stays.length > 0 && (
             <section className="space-y-6">
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
-                Stays &amp; Lodges
+                {t.nav.stays}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.stays.map((s) => (
                   <Link key={s.id} to={`/stays/${s.slug}`} className="group space-y-3">
                     <EditorialImage src={s.images[0]} alt={s.name} aspectClass="aspect-[4/3]" />
-                    <p className="text-xs text-[#52634A] tabular-nums">{s.category} · ${s.pricePerNight}/night</p>
+                    <p className="text-xs text-[#52634A] tabular-nums">
+                      {t.categories[s.category] || s.category} · ${s.pricePerNight} {t.home.perNight}
+                    </p>
                     <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52]">{s.name}</h3>
                   </Link>
                 ))}
@@ -146,7 +148,7 @@ export const ExplorePage: React.FC = () => {
           {(tab === 'all' || tab === 'experiences') && results.experiences.length > 0 && (
             <section className="space-y-6">
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
-                Experiences
+                {t.nav.experiences}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {results.experiences.map((e) => (
@@ -156,7 +158,7 @@ export const ExplorePage: React.FC = () => {
                     className="p-5 border border-[#D9CCB8] hover:border-[#243D32] transition-colors flex items-center justify-between gap-4"
                   >
                     <div>
-                      <p className="text-xs text-[#52634A]">{e.category} · {e.duration}</p>
+                      <p className="text-xs text-[#52634A]">{t.categories[e.category] || e.category} · {e.duration}</p>
                       <h3 className="font-serif text-xl text-[#243D32] mt-1">{e.title}</h3>
                     </div>
                     <span className="text-sm font-medium text-[#243D32] tabular-nums shrink-0">${e.pricePerGuest}</span>
@@ -169,7 +171,7 @@ export const ExplorePage: React.FC = () => {
           {(tab === 'all' || tab === 'dining') && results.restaurants.length > 0 && (
             <section className="space-y-6">
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
-                Food &amp; Restaurants
+                {t.nav.dining}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {results.restaurants.map((r) => (
@@ -192,7 +194,7 @@ export const ExplorePage: React.FC = () => {
           {(tab === 'all' || tab === 'rentals') && results.rentals.length > 0 && (
             <section className="space-y-6">
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
-                Rentals &amp; Drivers
+                {t.nav.rentals}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {results.rentals.map((r) => (
@@ -202,10 +204,12 @@ export const ExplorePage: React.FC = () => {
                     className="p-5 border border-[#D9CCB8] hover:border-[#243D32] transition-colors flex items-center justify-between gap-4"
                   >
                     <div>
-                      <p className="text-xs text-[#52634A]">{r.category} · {r.capacity}</p>
+                      <p className="text-xs text-[#52634A]">{t.categories[r.category] || r.category} · {r.capacity}</p>
                       <h3 className="font-serif text-xl text-[#243D32] mt-1">{r.name}</h3>
                     </div>
-                    <span className="text-sm font-medium text-[#243D32] tabular-nums shrink-0">${r.pricePerDay}/day</span>
+                    <span className="text-sm font-medium text-[#243D32] tabular-nums shrink-0">
+                      ${r.pricePerDay} {t.home.perDay}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -215,14 +219,14 @@ export const ExplorePage: React.FC = () => {
           {(tab === 'all' || tab === 'properties') && results.properties.length > 0 && (
             <section className="space-y-6">
               <h2 className="font-serif text-3xl text-[#243D32] border-b border-[#D9CCB8] pb-2">
-                Real Estate
+                {t.nav.realEstate}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {results.properties.map((p) => (
                   <Link key={p.id} to={`/real-estate/${p.slug}`} className="group space-y-3">
                     <EditorialImage src={p.images[0]} alt={p.title} aspectClass="aspect-[4/3]" />
                     <p className="text-xs text-[#52634A] tabular-nums">
-                      {p.category} · ${p.price.toLocaleString()}
+                      {t.categories[p.category] || p.category} · ${p.price.toLocaleString()}
                     </p>
                     <h3 className="font-serif text-xl text-[#243D32] group-hover:text-[#B66F52]">{p.title}</h3>
                   </Link>

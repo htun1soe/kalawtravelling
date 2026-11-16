@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   fetchCatalog,
   loginAccount,
@@ -6,6 +6,16 @@ import {
   toggleFavoriteRemote,
   updateUserProfile,
 } from '../services/api';
+import { TRANSLATIONS, type Language, type UIStrings } from '../i18n/translations';
+import {
+  localizeArticle,
+  localizeDestination,
+  localizeExperience,
+  localizeProperty,
+  localizeRental,
+  localizeRestaurant,
+  localizeStay,
+} from '../i18n/catalogTranslations';
 import type {
   Destination,
   Experience,
@@ -19,6 +29,10 @@ import type {
 } from '../types/kalaw';
 
 interface AppContextValue {
+  lang: Language;
+  setLang: (lang: Language) => void;
+  toggleLang: () => void;
+  t: UIStrings;
   user: UserAccount | null;
   destinations: Destination[];
   stays: Stay[];
@@ -76,6 +90,34 @@ const DEFAULT_TRIP_PLAN: TripPlanItem[] = [
 ];
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [lang, setLangState] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem('kalaw_lang');
+      return saved === 'my' ? 'my' : 'en';
+    } catch {
+      return 'en';
+    }
+  });
+
+  const setLang = useCallback((nextLang: Language) => {
+    setLangState(nextLang);
+  }, []);
+
+  const toggleLang = useCallback(() => {
+    setLangState((prev) => (prev === 'en' ? 'my' : 'en'));
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('kalaw_lang', lang);
+    } catch {
+      // ignore storage failure
+    }
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  const t = TRANSLATIONS[lang];
+
   const [user, setUser] = useState<UserAccount | null>(() => {
     try {
       const saved = localStorage.getItem('kalaw_user');
@@ -103,13 +145,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [stays, setStays] = useState<Stay[]>([]);
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [rentals, setRentals] = useState<Rental[]>([]);
-  const [properties, setProperties] = useState<PropertyListing[]>([]);
-  const [articles, setArticles] = useState<JournalArticle[]>([]);
+  const [rawDestinations, setRawDestinations] = useState<Destination[]>([]);
+  const [rawStays, setRawStays] = useState<Stay[]>([]);
+  const [rawExperiences, setRawExperiences] = useState<Experience[]>([]);
+  const [rawRestaurants, setRawRestaurants] = useState<Restaurant[]>([]);
+  const [rawRentals, setRawRentals] = useState<Rental[]>([]);
+  const [rawProperties, setRawProperties] = useState<PropertyListing[]>([]);
+  const [rawArticles, setRawArticles] = useState<JournalArticle[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [isOfflineFallback, setIsOfflineFallback] = useState(false);
 
@@ -117,13 +159,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCatalogLoading(true);
     try {
       const data = await fetchCatalog();
-      setDestinations(data.destinations);
-      setStays(data.stays);
-      setExperiences(data.experiences);
-      setRestaurants(data.restaurants);
-      setRentals(data.rentals);
-      setProperties(data.properties);
-      setArticles(data.articles);
+      setRawDestinations(data.destinations);
+      setRawStays(data.stays);
+      setRawExperiences(data.experiences);
+      setRawRestaurants(data.restaurants);
+      setRawRentals(data.rentals);
+      setRawProperties(data.properties);
+      setRawArticles(data.articles);
       setIsOfflineFallback(Boolean(data.isOfflineFallback));
     } finally {
       setCatalogLoading(false);
@@ -133,6 +175,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     refreshCatalog();
   }, [refreshCatalog]);
+
+  const destinations = useMemo(
+    () => rawDestinations.map((item) => localizeDestination(item, lang)),
+    [rawDestinations, lang]
+  );
+  const stays = useMemo(
+    () => rawStays.map((item) => localizeStay(item, lang)),
+    [rawStays, lang]
+  );
+  const experiences = useMemo(
+    () => rawExperiences.map((item) => localizeExperience(item, lang)),
+    [rawExperiences, lang]
+  );
+  const restaurants = useMemo(
+    () => rawRestaurants.map((item) => localizeRestaurant(item, lang)),
+    [rawRestaurants, lang]
+  );
+  const rentals = useMemo(
+    () => rawRentals.map((item) => localizeRental(item, lang)),
+    [rawRentals, lang]
+  );
+  const properties = useMemo(
+    () => rawProperties.map((item) => localizeProperty(item, lang)),
+    [rawProperties, lang]
+  );
+  const articles = useMemo(
+    () => rawArticles.map((item) => localizeArticle(item, lang)),
+    [rawArticles, lang]
+  );
 
   useEffect(() => {
     localStorage.setItem('kalaw_trip_plan', JSON.stringify(tripPlan));
@@ -214,6 +285,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider
       value={{
+        lang,
+        setLang,
+        toggleLang,
+        t,
         user,
         destinations,
         stays,

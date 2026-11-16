@@ -6,7 +6,7 @@ import { useApp } from '../context/AppContext';
 
 export const ArticleDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { articles } = useApp();
+  const { articles, t } = useApp();
 
   const article = articles.find((a) => a.slug === slug || a.id === slug);
 
@@ -15,7 +15,7 @@ export const ArticleDetailPage: React.FC = () => {
       <div className="pt-32 pb-24 max-w-[1360px] mx-auto px-6 md:px-10 text-center space-y-4">
         <h1 className="font-serif text-3xl text-[#243D32]">Article Not Found</h1>
         <Link to="/journal" className="inline-block text-sm text-[#B66F52] underline">
-          Return to Journal
+          {t.nav.journal}
         </Link>
       </div>
     );
@@ -28,7 +28,7 @@ export const ArticleDetailPage: React.FC = () => {
         className="inline-flex items-center gap-1.5 text-xs font-medium text-[#52634A] hover:text-[#243D32] mb-8"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Back to The Kalaw Journal</span>
+        <span>{t.nav.journal}</span>
       </Link>
 
       <header className="max-w-4xl space-y-4 pb-10 border-b border-[#D9CCB8]">

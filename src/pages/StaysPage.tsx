@@ -16,7 +16,7 @@ const STAY_CATEGORIES: Array<'All' | StayCategory> = [
 ];
 
 export const StaysPage: React.FC = () => {
-  const { stays, catalogLoading } = useApp();
+  const { stays, catalogLoading, t } = useApp();
   const [searchParams] = useSearchParams();
   const initialQ = searchParams.get('q') || '';
   const initialGuests = Number(searchParams.get('guests') || '1');
@@ -50,13 +50,13 @@ export const StaysPage: React.FC = () => {
     <div className="pt-24 pb-24 max-w-[1360px] mx-auto px-6 md:px-10">
       <div className="max-w-3xl space-y-4 pb-10 border-b border-[#D9CCB8]">
         <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-          Kalaw Hospitality
+          {t.pages.staysEyebrow}
         </p>
         <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-          Find Your Stay in the Pines
+          {t.pages.staysTitle}
         </h1>
         <p className="text-base text-[#292B27]/80 leading-relaxed">
-          Restored colonial lodges, stone ridge pavilions, welcoming town guesthouses, and village homestays across Kalaw.
+          {t.pages.staysDesc}
         </p>
       </div>
 
@@ -74,7 +74,7 @@ export const StaysPage: React.FC = () => {
                   : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
               }`}
             >
-              {cat}
+              {t.categories[cat] || cat}
             </button>
           ))}
         </div>
@@ -145,7 +145,7 @@ export const StaysPage: React.FC = () => {
             }}
             className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm cursor-pointer"
           >
-            Reset Filters
+            {t.actions.resetFilters}
           </button>
         </div>
       ) : (
@@ -162,7 +162,7 @@ export const StaysPage: React.FC = () => {
               </div>
               <div className="p-6 flex-1 flex flex-col space-y-3">
                 <div className="flex items-center justify-between text-xs text-[#52634A]">
-                  <span>{stay.category} · {stay.location}</span>
+                  <span>{t.categories[stay.category] || stay.category} · {stay.location}</span>
                   <span className="inline-flex items-center gap-1 text-[#243D32] font-medium tabular-nums">
                     <Star className="w-3.5 h-3.5 fill-[#B66F52] text-[#B66F52]" />
                     {stay.rating.toFixed(1)} ({stay.reviewCount})
@@ -177,20 +177,20 @@ export const StaysPage: React.FC = () => {
                   {stay.shortDescription}
                 </p>
                 <p className="text-xs text-[#52634A] tabular-nums">
-                  Up to {stay.maxGuests} guests · {stay.bedrooms} {stay.bedrooms === 1 ? 'bedroom' : 'bedrooms'} · Available {stay.availableFrom}
+                  Up to {stay.maxGuests} guests · {stay.bedrooms} {stay.bedrooms === 1 ? 'bedroom' : 'bedrooms'} · {stay.availableFrom}
                 </p>
                 <div className="pt-4 border-t border-[#D9CCB8] flex items-center justify-between">
                   <div>
                     <span className="font-serif text-2xl text-[#243D32] tabular-nums">
                       ${stay.pricePerNight}
                     </span>
-                    <span className="text-xs text-[#52634A]"> / night</span>
+                    <span className="text-xs text-[#52634A]"> {t.home.perNight}</span>
                   </div>
                   <Link
                     to={`/stays/${stay.slug}`}
                     className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors"
                   >
-                    View Details
+                    {t.home.viewDetails}
                   </Link>
                 </div>
               </div>

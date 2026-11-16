@@ -4,7 +4,7 @@ import { Menu, Search, User, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const Navbar: React.FC = () => {
-  const { user } = useApp();
+  const { user, lang, toggleLang, t } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -53,7 +53,7 @@ export const Navbar: React.FC = () => {
           : 'bg-[#F4F0E6]/95 backdrop-blur-sm border-b border-[#D9CCB8] text-[#292B27]'
       }`}
     >
-      <div className="max-w-[1360px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between gap-8">
+      <div className="max-w-[1360px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between gap-4 xl:gap-8">
         {/* Zone 1: Single-line Brand Wordmark */}
         <Link
           to="/"
@@ -65,36 +65,55 @@ export const Navbar: React.FC = () => {
         </Link>
 
         {/* Zone 2: Concise single-line desktop links */}
-        <nav className="hidden lg:flex items-center gap-6" aria-label="Primary navigation">
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-6" aria-label="Primary navigation">
           <NavLink to="/explore" className={navLinkClass}>
-            Explore
+            {t.nav.explore}
           </NavLink>
           <NavLink to="/destinations" className={navLinkClass}>
-            Destinations
+            {t.nav.destinations}
           </NavLink>
           <NavLink to="/stays" className={navLinkClass}>
-            Stays
+            {t.nav.stays}
           </NavLink>
           <NavLink to="/experiences" className={navLinkClass}>
-            Experiences
+            {t.nav.experiences}
           </NavLink>
           <NavLink to="/dining" className={navLinkClass}>
-            Dining
+            {t.nav.dining}
           </NavLink>
           <NavLink to="/rentals" className={navLinkClass}>
-            Rentals
+            {t.nav.rentals}
           </NavLink>
           <NavLink to="/real-estate" className={navLinkClass}>
-            Real Estate
+            {t.nav.realEstate}
           </NavLink>
         </nav>
 
-        {/* Zone 3: Search & Auth / Profile Action */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Zone 3: Language Switch, Search & Auth / Profile Action */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={toggleLang}
+            aria-label="Switch language between English and Burmese"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs border rounded-sm whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
+              transparentMode
+                ? 'border-[#F4F0E6]/40 text-[#F4F0E6] hover:bg-[#F4F0E6]/10'
+                : 'border-[#D9CCB8] text-[#243D32] hover:border-[#243D32]'
+            }`}
+          >
+            <span className={lang === 'en' ? 'font-semibold underline underline-offset-4' : 'opacity-65'}>
+              EN
+            </span>
+            <span className="opacity-40">/</span>
+            <span className={lang === 'my' ? 'font-semibold underline underline-offset-4' : 'opacity-65'}>
+              မြန်မာ
+            </span>
+          </button>
+
           <button
             type="button"
             onClick={() => setSearchOpen((v) => !v)}
-            aria-label="Search Kalaw Travel"
+            aria-label={t.nav.searchBtn}
             className={`p-2 rounded-sm transition-colors cursor-pointer ${
               transparentMode
                 ? 'text-[#F4F0E6] hover:bg-[#F4F0E6]/10'
@@ -113,7 +132,7 @@ export const Navbar: React.FC = () => {
             }`}
           >
             <User className="w-3.5 h-3.5" />
-            <span>{user ? user.name.split(' ')[0] : 'Sign In'}</span>
+            <span>{user ? user.name.split(' ')[0] : t.nav.signIn}</span>
           </Link>
 
           <button
@@ -142,14 +161,14 @@ export const Navbar: React.FC = () => {
               autoFocus
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search pine trails, heritage lodges, Shan noodles, motorbikes, or hillside land..."
+              placeholder={t.nav.searchPlaceholder}
               className="w-full bg-transparent text-sm text-[#292B27] placeholder-[#52634A]/70 focus:outline-none"
             />
             <button
               type="submit"
               className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] whitespace-nowrap shrink-0 cursor-pointer"
             >
-              Search
+              {t.nav.searchBtn}
             </button>
           </form>
         </div>
@@ -159,23 +178,23 @@ export const Navbar: React.FC = () => {
       {mobileOpen && (
         <div className="lg:hidden bg-[#F4F0E6] border-t border-[#D9CCB8] text-[#292B27] px-6 py-6 space-y-4">
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <Link to="/explore" className="py-2 border-b border-[#D9CCB8]">Explore All</Link>
-            <Link to="/destinations" className="py-2 border-b border-[#D9CCB8]">Destinations</Link>
-            <Link to="/stays" className="py-2 border-b border-[#D9CCB8]">Stays</Link>
-            <Link to="/experiences" className="py-2 border-b border-[#D9CCB8]">Experiences</Link>
-            <Link to="/dining" className="py-2 border-b border-[#D9CCB8]">Dining</Link>
-            <Link to="/rentals" className="py-2 border-b border-[#D9CCB8]">Rentals</Link>
-            <Link to="/real-estate" className="py-2 border-b border-[#D9CCB8]">Real Estate</Link>
-            <Link to="/journal" className="py-2 border-b border-[#D9CCB8]">Journal</Link>
-            <Link to="/plan-trip" className="py-2 border-b border-[#D9CCB8]">Trip Planner</Link>
-            <Link to="/bookings" className="py-2 border-b border-[#D9CCB8]">Bookings</Link>
+            <Link to="/explore" className="py-2 border-b border-[#D9CCB8]">{t.nav.explore}</Link>
+            <Link to="/destinations" className="py-2 border-b border-[#D9CCB8]">{t.nav.destinations}</Link>
+            <Link to="/stays" className="py-2 border-b border-[#D9CCB8]">{t.nav.stays}</Link>
+            <Link to="/experiences" className="py-2 border-b border-[#D9CCB8]">{t.nav.experiences}</Link>
+            <Link to="/dining" className="py-2 border-b border-[#D9CCB8]">{t.nav.dining}</Link>
+            <Link to="/rentals" className="py-2 border-b border-[#D9CCB8]">{t.nav.rentals}</Link>
+            <Link to="/real-estate" className="py-2 border-b border-[#D9CCB8]">{t.nav.realEstate}</Link>
+            <Link to="/journal" className="py-2 border-b border-[#D9CCB8]">{t.nav.journal}</Link>
+            <Link to="/plan-trip" className="py-2 border-b border-[#D9CCB8]">{t.nav.planTrip}</Link>
+            <Link to="/bookings" className="py-2 border-b border-[#D9CCB8]">{t.nav.bookings}</Link>
           </div>
           <div className="pt-2 flex items-center gap-3">
             <Link
               to={user ? '/profile' : '/auth'}
               className="flex-1 text-center py-2.5 bg-[#243D32] text-[#F4F0E6] text-sm font-medium rounded-sm"
             >
-              {user ? `Profile (${user.name.split(' ')[0]})` : 'Sign In / Register'}
+              {user ? user.name.split(' ')[0] : t.nav.signIn}
             </Link>
             {user?.role === 'admin' && (
               <Link

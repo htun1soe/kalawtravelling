@@ -10,10 +10,10 @@ interface FavoriteButtonProps {
 
 export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   itemId,
-  label = 'Save',
+  label,
   compact = false,
 }) => {
-  const { isFavorite, toggleFavorite } = useApp();
+  const { isFavorite, toggleFavorite, t } = useApp();
   const saved = isFavorite(itemId);
 
   return (
@@ -25,7 +25,7 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         toggleFavorite(itemId);
       }}
       aria-pressed={saved}
-      aria-label={saved ? 'Remove from saved places' : 'Save to favorites'}
+      aria-label={saved ? t.actions.saved : label || t.actions.save}
       className={`inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
         compact
           ? `p-2 bg-[#F4F0E6]/90 hover:bg-[#F4F0E6] text-[#243D32]`
@@ -39,7 +39,7 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
       <Heart
         className={`w-3.5 h-3.5 ${saved ? 'fill-[#B66F52] text-[#B66F52]' : 'text-[#243D32]'}`}
       />
-      {!compact && <span>{saved ? 'Saved' : label}</span>}
+      {!compact && <span>{saved ? t.actions.saved : label || t.actions.save}</span>}
     </button>
   );
 };

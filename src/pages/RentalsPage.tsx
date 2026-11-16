@@ -14,7 +14,7 @@ const CATEGORIES: Array<'All' | RentalCategory> = [
 ];
 
 export const RentalsPage: React.FC = () => {
-  const { rentals } = useApp();
+  const { rentals, t } = useApp();
   const [cat, setCat] = useState<'All' | RentalCategory>('All');
   const [selectedRental, setSelectedRental] = useState<Rental | null>(null);
 
@@ -27,13 +27,13 @@ export const RentalsPage: React.FC = () => {
     <div className="pt-24 pb-24 max-w-[1360px] mx-auto px-6 md:px-10">
       <div className="max-w-3xl space-y-4 pb-10 border-b border-[#D9CCB8]">
         <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-          Plateau Mobility
+          {t.pages.rentalsEyebrow}
         </p>
         <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-          Transportation, Motorbikes &amp; Private Drivers
+          {t.pages.rentalsTitle}
         </h1>
         <p className="text-base text-[#292B27]/80 leading-relaxed">
-          Explore Pindaya limestone caves, ridge viewpoints, or arrange punctual transfers between Kalaw, Heho Airport, and Inle Lake.
+          {t.pages.rentalsDesc}
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export const RentalsPage: React.FC = () => {
                 : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
             }`}
           >
-            {c}
+            {t.categories[c] || c}
           </button>
         ))}
       </div>
@@ -60,7 +60,7 @@ export const RentalsPage: React.FC = () => {
             <EditorialImage src={rental.image} alt={rental.name} aspectClass="aspect-[16/10]" />
             <div className="p-6 md:p-8 flex-1 flex flex-col space-y-4">
               <div className="flex items-center justify-between text-xs text-[#52634A]">
-                <span>{rental.category} · {rental.location}</span>
+                <span>{t.categories[rental.category] || rental.category} · {rental.location}</span>
                 <span>{rental.includesDriver ? 'Driver Included' : 'Self-Drive'}</span>
               </div>
               <h2 className="font-serif text-3xl text-[#243D32]">{rental.name}</h2>
@@ -69,8 +69,8 @@ export const RentalsPage: React.FC = () => {
                 {rental.transmissionOrService} · {rental.capacity}
               </p>
               <ul className="space-y-1 text-xs text-[#292B27]/80 border-t border-[#D9CCB8] pt-3">
-                {rental.terms.map((t) => (
-                  <li key={t}>— {t}</li>
+                {rental.terms.map((term) => (
+                  <li key={term}>— {term}</li>
                 ))}
               </ul>
               <div className="pt-4 mt-auto border-t border-[#D9CCB8] flex items-center justify-between">
@@ -78,14 +78,14 @@ export const RentalsPage: React.FC = () => {
                   <span className="font-serif text-2xl text-[#243D32] tabular-nums">
                     ${rental.pricePerDay}
                   </span>
-                  <span className="text-xs text-[#52634A]"> / day or trip</span>
+                  <span className="text-xs text-[#52634A]"> {t.home.perDay}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedRental(rental)}
                   className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors cursor-pointer"
                 >
-                  Request Vehicle
+                  {t.actions.requestVehicle}
                 </button>
               </div>
             </div>
@@ -109,7 +109,9 @@ export const RentalsPage: React.FC = () => {
               <X className="w-4 h-4" />
             </button>
             <div>
-              <p className="text-xs uppercase tracking-widest text-[#B66F52]">{selectedRental.category}</p>
+              <p className="text-xs uppercase tracking-widest text-[#B66F52]">
+                {t.categories[selectedRental.category] || selectedRental.category}
+              </p>
               <h2 className="font-serif text-2xl text-[#243D32] mt-1">{selectedRental.name}</h2>
             </div>
             <BookingRequestPanel
@@ -117,10 +119,10 @@ export const RentalsPage: React.FC = () => {
               itemId={selectedRental.id}
               itemTitle={selectedRental.name}
               unitPrice={selectedRental.pricePerDay}
-              priceLabel="per day / transfer"
+              priceLabel={t.home.perDay}
               requireCheckOut={!selectedRental.includesDriver}
               maxGuests={6}
-              ctaLabel="Request Vehicle Availability"
+              ctaLabel={t.actions.requestVehicle}
             />
           </div>
         </div>

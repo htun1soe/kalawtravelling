@@ -15,6 +15,7 @@ export const TripPlannerPage: React.FC = () => {
     addToTripPlan,
     removeFromTripPlan,
     clearTripPlan,
+    t,
   } = useApp();
 
   const [day, setDay] = useState(1);
@@ -59,13 +60,13 @@ export const TripPlannerPage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-[#D9CCB8]">
         <div className="max-w-3xl space-y-4">
           <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
-            Itinerary Composer
+            {t.pages.tripEyebrow}
           </p>
           <h1 className="font-serif text-4xl md:text-5xl text-[#243D32] headline-balance">
-            Plan Your Kalaw Journey
+            {t.pages.tripTitle}
           </h1>
           <p className="text-base text-[#292B27]/80 leading-relaxed">
-            Assemble your viewpoints, morning teahouses, boutique lodges, and ridge treks day by day.
+            {t.pages.tripDesc}
           </p>
         </div>
         {tripPlan.length > 0 && (
@@ -113,11 +114,11 @@ export const TripPlannerPage: React.FC = () => {
                 }}
                 className="w-full px-3 py-2 bg-white/80 border border-[#D9CCB8] text-sm"
               >
-                <option value="destination">Destination</option>
-                <option value="stay">Accommodation</option>
-                <option value="experience">Guided Experience</option>
-                <option value="restaurant">Food &amp; Teahouse</option>
-                <option value="rental">Transport &amp; Rental</option>
+                <option value="destination">{t.nav.destinations}</option>
+                <option value="stay">{t.nav.stays}</option>
+                <option value="experience">{t.nav.experiences}</option>
+                <option value="restaurant">{t.nav.dining}</option>
+                <option value="rental">{t.nav.rentals}</option>
               </select>
             </div>
 
@@ -214,13 +215,13 @@ export const TripPlannerPage: React.FC = () => {
                 to="/stays"
                 className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A]"
               >
-                Browse Stays
+                {t.home.browseAllStays}
               </Link>
               <Link
                 to="/bookings"
                 className="px-4 py-2 border border-[#243D32] text-[#243D32] text-xs font-medium rounded-sm hover:bg-[#D9CCB8]/40"
               >
-                View Booking Requests
+                {t.nav.bookings}
               </Link>
             </div>
           </div>

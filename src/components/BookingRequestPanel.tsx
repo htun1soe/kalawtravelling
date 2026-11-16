@@ -24,9 +24,9 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
   priceLabel,
   requireCheckOut = false,
   maxGuests = 8,
-  ctaLabel = 'Submit Booking Request',
+  ctaLabel,
 }) => {
-  const { user } = useApp();
+  const { user, t } = useApp();
   const [checkIn, setCheckIn] = useState('2026-12-10');
   const [checkOut, setCheckOut] = useState('2026-12-13');
   const [guests, setGuests] = useState(2);
@@ -93,9 +93,9 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
           <Clock className="w-5 h-5 text-[#B66F52] shrink-0 mt-0.5" />
           <div>
             <p className="text-xs uppercase tracking-widest text-[#B66F52] font-medium">
-              Pending Host Verification
+              {t.bookingStatus.pending_verification}
             </p>
-            <h3 className="font-serif text-2xl text-[#243D32] mt-1">Request Logged</h3>
+            <h3 className="font-serif text-2xl text-[#243D32] mt-1">{t.bookingStatus.pending_verification}</h3>
           </div>
         </div>
         <p className="text-sm text-[#292B27]/85 leading-relaxed">
@@ -268,12 +268,12 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
         disabled={submitting}
         className="w-full py-3 px-4 bg-[#243D32] text-[#F4F0E6] text-sm font-medium rounded-sm hover:bg-[#52634A] disabled:opacity-60 transition-colors cursor-pointer"
       >
-        {submitting ? 'Submitting Request...' : ctaLabel}
+        {submitting ? t.actions.submitting : ctaLabel || t.actions.submitBooking}
       </button>
 
       <p className="flex items-center gap-1.5 text-xs text-[#52634A]">
         <CheckCircle2 className="w-3.5 h-3.5 text-[#52634A] shrink-0" />
-        <span>No charge yet. Requests are verified directly by Kalaw hosts.</span>
+        <span>{t.actions.noChargeNote}</span>
       </p>
     </form>
   );
