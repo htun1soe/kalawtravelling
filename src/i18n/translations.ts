@@ -133,6 +133,160 @@ export interface UIStrings {
     locationLabel: string;
     descriptionLabel: string;
     closeModal: string;
+    navigateHere: string;
+  };
+  modal: {
+    fieldHighlights: string;
+    fieldInfo: string;
+    elevation: string;
+    bestWindow: string;
+    duration: string;
+    coordinates: string;
+    amenitiesInclusions: string;
+    whatIsIncluded: string;
+    signatureDishes: string;
+    termsNotes: string;
+    keyFeatures: string;
+    marginFieldNote: string;
+    byAuthor: string;
+    reviews: string;
+    upToGuests: string;
+    bedrooms: string;
+    bathrooms: string;
+    bedShort: string;
+    bathShort: string;
+    difficulty: string;
+    maxGuests: string;
+    guide: string;
+    driverIncluded: string;
+    selfDrive: string;
+    privateViewing: string;
+    requestViewing: string;
+    overnightStay: string;
+    dossierAndBooking: string;
+    directionsAndRoute: string;
+    openFullNavigator: string;
+  };
+  booking: {
+    requestVerify: string;
+    checkIn: string;
+    preferredDate: string;
+    checkOut: string;
+    partySize: string;
+    guestSingular: string;
+    guestPlural: string;
+    fullName: string;
+    fullNamePlaceholder: string;
+    emailAddress: string;
+    notesLabel: string;
+    notesPlaceholder: string;
+    estPrefix: string;
+    nightSingular: string;
+    nightPlural: string;
+    daySingular: string;
+    requestedDate: string;
+    estimatedTotal: string;
+    recordedMessagePrefix: string;
+    recordedMessageMid: string;
+    recordedMessageSuffix: string;
+    manageRequests: string;
+    submitAnother: string;
+    missingContactError: string;
+    dateOrderError: string;
+    serverError: string;
+  };
+  navigationMap: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    goalLabel: string;
+    goals: {
+      all: string;
+      sunrise: string;
+      trekking: string;
+      heritage: string;
+      staysDining: string;
+    };
+    originLabel: string;
+    destinationLabel: string;
+    useCurrentLocation: string;
+    locatingGps: string;
+    gpsOriginLabel: string;
+    gpsError: string;
+    travelModeLabel: string;
+    modes: {
+      WALKING: string;
+      TWO_WHEELER: string;
+      DRIVING: string;
+    };
+    distanceLabel: string;
+    durationLabel: string;
+    calculatingRoute: string;
+    routeError: string;
+    twoWheelerFallbackNote: string;
+    turnByTurnTitle: string;
+    noStepsYet: string;
+    openDossier: string;
+    addStopToPlan: string;
+    addedStop: string;
+    startingHubsGroup: string;
+    placesGroup: string;
+    staysDiningGroup: string;
+    missingKeyNotice: string;
+    quotaBannerTitle: string;
+    quotaBannerLinkText: string;
+    selectedStop: string;
+  };
+  reviews: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    tabLabel: string;
+    allGoals: string;
+    filterByGoal: string;
+    filterByPlace: string;
+    allPlaces: string;
+    goals: {
+      sunrise: string;
+      trekking: string;
+      heritage: string;
+      photography: string;
+      calmRest: string;
+      culinary: string;
+    };
+    goalTipLabel: string;
+    helpfulLabel: string;
+    helpfulMarked: string;
+    explorePlace: string;
+    directionsToPlace: string;
+    shareButton: string;
+    cancelShare: string;
+    noReviewsMatch: string;
+    resetGoalFilter: string;
+    matchingPlacesNote: string;
+    form: {
+      title: string;
+      placeLabel: string;
+      goalLabel: string;
+      ratingLabel: string;
+      authorName: string;
+      authorNamePlaceholder: string;
+      authorOrigin: string;
+      authorOriginPlaceholder: string;
+      visitedSeason: string;
+      visitedSeasonPlaceholder: string;
+      headline: string;
+      headlinePlaceholder: string;
+      story: string;
+      storyPlaceholder: string;
+      goalTip: string;
+      goalTipPlaceholder: string;
+      submitBtn: string;
+      submittingBtn: string;
+      missingFieldsError: string;
+      serverError: string;
+      successMessage: string;
+    };
   };
   bookingStatus: {
     pending_verification: string;
@@ -279,12 +433,18 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       'Houses for Rent': 'Houses for Rent',
       'Land for Sale': 'Land for Sale',
       'Commercial Properties': 'Commercial Properties',
+      Gentle: 'Gentle',
+      Moderate: 'Moderate',
+      Challenging: 'Challenging',
+      Active: 'Active',
+      Reserved: 'Reserved',
+      'Under Review': 'Under Review',
     },
     pages: {
       destAtlas: 'Kalaw Atlas',
-      destTitle: 'Explore Destinations & Hidden Places',
+      destTitle: 'Explore Destinations & Interactive Plateau Navigation',
       destDesc:
-        'From sunrise monastery ridges and century-old railway quarters to pine forest trails and quiet tea escarpments across Kalaw.',
+        'From sunrise monastery ridges and century-old railway quarters to pine forest trails—plan your exact route across Kalaw.',
       staysEyebrow: 'Kalaw Hospitality',
       staysTitle: 'Find Your Stay in the Pines',
       staysDesc:
@@ -345,6 +505,162 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       locationLabel: 'Location',
       descriptionLabel: 'Description',
       closeModal: 'Close',
+      navigateHere: 'Navigate Here',
+    },
+    modal: {
+      fieldHighlights: 'Field Highlights',
+      fieldInfo: 'Field Information',
+      elevation: 'Elevation',
+      bestWindow: 'Best Window',
+      duration: 'Duration',
+      coordinates: 'Coordinates',
+      amenitiesInclusions: 'Amenities & Inclusions',
+      whatIsIncluded: 'What Is Included',
+      signatureDishes: 'Signature Dishes',
+      termsNotes: 'Terms & Service Notes',
+      keyFeatures: 'Key Features',
+      marginFieldNote: 'Margin Field Note',
+      byAuthor: 'By',
+      reviews: 'reviews',
+      upToGuests: 'Up to',
+      bedrooms: 'Bedrooms',
+      bathrooms: 'Bathrooms',
+      bedShort: 'Bed',
+      bathShort: 'Bath',
+      difficulty: 'Difficulty',
+      maxGuests: 'Max',
+      guide: 'Guide',
+      driverIncluded: 'Driver Included',
+      selfDrive: 'Self-Drive',
+      privateViewing: 'Private Viewing & Inquiry',
+      requestViewing: 'Request Property Viewing',
+      overnightStay: 'Overnight Stay',
+      dossierAndBooking: 'Overview & Reservation',
+      directionsAndRoute: 'Route & Interactive Map',
+      openFullNavigator: 'Open Full Plateau Navigator',
+    },
+    booking: {
+      requestVerify: 'Request & Verify',
+      checkIn: 'Check-in',
+      preferredDate: 'Preferred Date',
+      checkOut: 'Check-out',
+      partySize: 'Guests / Party Size',
+      guestSingular: 'Guest',
+      guestPlural: 'Guests',
+      fullName: 'Full Name',
+      fullNamePlaceholder: 'Your full name',
+      emailAddress: 'Email Address',
+      notesLabel: 'Notes for Local Host (Optional)',
+      notesPlaceholder: 'Dietary preferences, pickup timing, or viewing questions...',
+      estPrefix: 'Est.',
+      nightSingular: 'night',
+      nightPlural: 'nights',
+      daySingular: 'day',
+      requestedDate: 'Requested Date',
+      estimatedTotal: 'Estimated Total',
+      recordedMessagePrefix: 'Your request for',
+      recordedMessageMid: 'has been recorded as',
+      recordedMessageSuffix: 'Availability is not confirmed until verified by our Kalaw host team.',
+      manageRequests: 'Manage Requests',
+      submitAnother: 'Submit Another',
+      missingContactError: 'Please enter your name and email so our local concierge can verify availability.',
+      dateOrderError: 'Check-out date must be after check-in date.',
+      serverError: 'Unable to reach the booking server. Your request has not been saved.',
+    },
+    navigationMap: {
+      eyebrow: 'Interactive Plateau Navigator',
+      title: 'Navigate Kalaw by Goal & Route',
+      subtitle:
+        'Select your travel goal, starting point or current GPS position, and travel mode to preview live distances, mountain routes, and turn-by-turn directions.',
+      goalLabel: 'Filter by Goal',
+      goals: {
+        all: 'All Landmarks',
+        sunrise: 'Sunrise & Viewpoints',
+        trekking: 'Trekking & Nature',
+        heritage: 'Heritage & Culture',
+        staysDining: 'Stays & Dining',
+      },
+      originLabel: 'Starting Point',
+      destinationLabel: 'Destination',
+      useCurrentLocation: 'Use My GPS',
+      locatingGps: 'Locating...',
+      gpsOriginLabel: 'My Current Location (GPS)',
+      gpsError: 'Location permission denied or unavailable. Select a Kalaw landmark origin instead.',
+      travelModeLabel: 'Travel Mode',
+      modes: {
+        WALKING: 'Walking Trail',
+        TWO_WHEELER: 'Motorbike',
+        DRIVING: '4x4 / Car',
+      },
+      distanceLabel: 'Distance',
+      durationLabel: 'Estimated Time',
+      calculatingRoute: 'Computing plateau route...',
+      routeError: 'Unable to compute a road or path route between these two points right now.',
+      twoWheelerFallbackNote: 'Two-wheeler routing unavailable here; displaying car route instead.',
+      turnByTurnTitle: 'Turn-by-Turn Directions',
+      noStepsYet: 'Select an origin and destination to load route steps.',
+      openDossier: 'Inspect Details',
+      addStopToPlan: 'Add Stop to Planner',
+      addedStop: 'Added to Plan',
+      startingHubsGroup: 'Kalaw Hubs',
+      placesGroup: 'Destinations & Trails',
+      staysDiningGroup: 'Stays & Dining',
+      missingKeyNotice: 'Interactive Google Map awaits a Google Maps API key configuration.',
+      quotaBannerTitle: 'Google Maps Platform demo quota reached — map display and route calculation may be temporarily limited.',
+      quotaBannerLinkText: 'View Quota & Upgrade Guide',
+      selectedStop: 'Selected Stop',
+    },
+    reviews: {
+      eyebrow: 'Traveler Field Notes & Goal Guide',
+      title: 'Shared Experiences & How to Reach Your Goal',
+      subtitle:
+        'Filter firsthand stories by what you hope to experience in Kalaw—dawn mist, heritage walks, forest trekking, or local cuisine—and read practical advice from fellow travelers.',
+      tabLabel: 'Traveler Reviews',
+      allGoals: 'All Goals',
+      filterByGoal: 'Find Places by Your Goal',
+      filterByPlace: 'Place',
+      allPlaces: 'All Kalaw Places',
+      goals: {
+        sunrise: 'Sunrise & Viewpoints',
+        trekking: 'Trekking & Nature',
+        heritage: 'Heritage & Culture',
+        photography: 'Photography',
+        calmRest: 'Quiet & Slow Rest',
+        culinary: 'Local Culinary',
+      },
+      goalTipLabel: 'Traveler Tip to Achieve This Goal',
+      helpfulLabel: 'Helpful',
+      helpfulMarked: 'Helpful',
+      explorePlace: 'Inspect Place',
+      directionsToPlace: 'Navigate Here',
+      shareButton: 'Share Your Experience',
+      cancelShare: 'Close Form',
+      noReviewsMatch: 'No traveler stories match this place and goal filter yet.',
+      resetGoalFilter: 'Show All Stories',
+      matchingPlacesNote: 'stories',
+      form: {
+        title: 'Add Your Kalaw Experience & Goal Guidance',
+        placeLabel: 'Place Visited',
+        goalLabel: 'Primary Goal Achieved',
+        ratingLabel: 'Experience Rating',
+        authorName: 'Your Name',
+        authorNamePlaceholder: 'e.g. Thura Aung',
+        authorOrigin: 'City & Travel Style',
+        authorOriginPlaceholder: 'e.g. Yangon · Solo Trekker',
+        visitedSeason: 'Month & Year Visited',
+        visitedSeasonPlaceholder: 'e.g. November 2026',
+        headline: 'Story Headline',
+        headlinePlaceholder: 'Summarize what stood out most...',
+        story: 'Your Experience',
+        storyPlaceholder: 'Describe what you saw, felt, and how the place unfolded during your visit...',
+        goalTip: 'Advice to Help Others Reach This Goal',
+        goalTipPlaceholder: 'Best arrival time, trail fork, viewpoint spot, or what to bring...',
+        submitBtn: 'Publish Experience',
+        submittingBtn: 'Publishing...',
+        missingFieldsError: 'Please fill in your name, headline, experience story, and goal tip.',
+        serverError: 'Unable to reach the review server right now. Please try again.',
+        successMessage: 'Thank you—your experience and goal guidance are now live for future visitors.',
+      },
     },
     bookingStatus: {
       pending_verification: 'Pending Host Verification',
@@ -490,12 +806,18 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       'Houses for Rent': 'ငှားရန်အိမ်',
       'Land for Sale': 'ရောင်းရန်မြေ',
       'Commercial Properties': 'စီးပွားရေးမြေ',
+      Gentle: 'လွယ်ကူ',
+      Moderate: 'အလယ်အလတ်',
+      Challenging: 'ခက်ခဲ',
+      Active: 'ရရှိနိုင်သည်',
+      Reserved: 'ကြိုတင်ထားပြီး',
+      'Under Review': 'စိစစ်နေဆဲ',
     },
     pages: {
       destAtlas: 'ကလော မြေပုံ',
-      destTitle: 'လည်ပတ်စရာ နေရာများ',
+      destTitle: 'လည်ပတ်စရာ နေရာများနှင့် လမ်းကြောင်းညွှန်',
       destDesc:
-        'နံနက်ခင်း ရှုခင်းသာတောင်ကုန်းများ၊ ဘူတာရပ်ကွက်မှ ထင်းရှူးတောလမ်းများအထိ လေ့လာပါ။',
+        'နံနက်ခင်း ရှုခင်းသာတောင်ကုန်းများ၊ ဘူတာရပ်ကွက်မှ ထင်းရှူးတောလမ်းများအထိ မြေပုံဖြင့် လမ်းကြောင်းရှာဖွေပါ။',
       staysEyebrow: 'ကလော တည်းခိုခန်း',
       staysTitle: 'ထင်းရှူးတောကြား တည်းခိုရန်',
       staysDesc:
@@ -556,6 +878,162 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       locationLabel: 'တည်နေရာ',
       descriptionLabel: 'အသေးစိတ်ဖော်ပြချက်',
       closeModal: 'ပိတ်မည်',
+      navigateHere: 'လမ်းကြောင်းရှာမည်',
+    },
+    modal: {
+      fieldHighlights: 'အဓိက ထူးခြားချက်များ',
+      fieldInfo: 'နေရာဆိုင်ရာ အချက်အလက်',
+      elevation: 'ပင်လယ်ရေမျက်နှာပြင်အမြင့်',
+      bestWindow: 'အကောင်းဆုံးအချိန်',
+      duration: 'ကြာမြင့်ချိန်',
+      coordinates: 'တည်နေရာ ကိုသြဒီနိတ်',
+      amenitiesInclusions: 'ပါဝင်သော ဝန်ဆောင်မှုများ',
+      whatIsIncluded: 'ခရီးစဉ်တွင် ပါဝင်သည်များ',
+      signatureDishes: 'နာမည်ကြီး ဟင်းလျာများ',
+      termsNotes: 'စည်းကမ်းနှင့် ဝန်ဆောင်မှုမှတ်စု',
+      keyFeatures: 'အဓိက အချက်အလက်များ',
+      marginFieldNote: 'အယ်ဒီတာ မှတ်စု',
+      byAuthor: 'ရေးသားသူ —',
+      reviews: 'သုံးသပ်ချက်',
+      upToGuests: 'အများဆုံး',
+      bedrooms: 'အိပ်ခန်း',
+      bathrooms: 'ရေချိုးခန်း',
+      bedShort: 'အိပ်ခန်း',
+      bathShort: 'ရေချိုးခန်း',
+      difficulty: 'ခက်ခဲမှုအဆင့်',
+      maxGuests: 'အများဆုံး',
+      guide: 'လမ်းညွှန်',
+      driverIncluded: 'ဒရိုင်ဘာ ပါဝင်သည်',
+      selfDrive: 'ကိုယ်တိုင်မောင်းနှင်',
+      privateViewing: 'အိမ်ခြံမြေ ကြည့်ရှုမေးမြန်းရန်',
+      requestViewing: 'ကြည့်ရှုရန် ရက်ချိန်းတောင်းမည်',
+      overnightStay: 'ညအိပ်တည်းခိုရန်',
+      dossierAndBooking: 'အသေးစိတ်နှင့် ဘွတ်ကင်',
+      directionsAndRoute: 'လမ်းညွှန်နှင့် မြေပုံ',
+      openFullNavigator: 'မြေပုံအပြည့်ဖြင့် ကြည့်ရန်',
+    },
+    booking: {
+      requestVerify: 'တောင်းဆိုပြီး စိစစ်မည်',
+      checkIn: 'ဝင်ရောက်မည့်ရက်',
+      preferredDate: 'နှစ်သက်ရာ ရက်စွဲ',
+      checkOut: 'ထွက်ခွာမည့်ရက်',
+      partySize: 'ဧည့်သည် / လူဦးရေ',
+      guestSingular: 'ဦး',
+      guestPlural: 'ဦး',
+      fullName: 'အမည်အပြည့်အစုံ',
+      fullNamePlaceholder: 'သင့်အမည် ထည့်ပါ',
+      emailAddress: 'အီးမေးလ်လိပ်စာ',
+      notesLabel: 'ဒေသခံအိမ်ရှင်ထံ မှတ်ချက် (မထည့်လည်းရ)',
+      notesPlaceholder: 'အစားအသောက်၊ လာကြိုရမည့်အချိန် သို့မဟုတ် မေးမြန်းလိုသည်များ...',
+      estPrefix: 'ခန့်မှန်း',
+      nightSingular: 'ည',
+      nightPlural: 'ည',
+      daySingular: 'ရက်',
+      requestedDate: 'တောင်းဆိုထားသည့်ရက်',
+      estimatedTotal: 'ခန့်မှန်းကုန်ကျစရိတ်',
+      recordedMessagePrefix: '',
+      recordedMessageMid: 'အတွက် တောင်းဆိုမှုကို အမှတ်စဉ်',
+      recordedMessageSuffix: 'ဖြင့် မှတ်တမ်းတင်ပြီးပါပြီ။ ကလောအိမ်ရှင်အဖွဲ့မှ စိစစ်အတည်ပြုပေးပါမည်။',
+      manageRequests: 'ဘွတ်ကင်များ ကြည့်ရန်',
+      submitAnother: 'နောက်တစ်ခု တင်မည်',
+      missingContactError: 'ရရှိနိုင်မှု စိစစ်နိုင်ရန် အမည်နှင့် အီးမေးလ် ဖြည့်သွင်းပေးပါ။',
+      dateOrderError: 'ထွက်ခွာမည့်ရက်သည် ဝင်ရောက်မည့်ရက်ထက် နောက်ကျရပါမည်။',
+      serverError: 'ဘွတ်ကင်ဆာဗာနှင့် ချိတ်ဆက်မရပါ။ တောင်းဆိုမှု မသိမ်းဆည်းရသေးပါ။',
+    },
+    navigationMap: {
+      eyebrow: 'ကလော လမ်းညွှန်မြေပုံ',
+      title: 'ရည်မှန်းချက်အလိုက် ကလောတစ်ခွင် လမ်းကြောင်းရှာပါ',
+      subtitle:
+        'သင်သွားလိုသည့် ပန်းတိုင်အမျိုးအစား၊ စတင်ထွက်ခွာမည့်နေရာ (သို့) GPS တည်နေရာနှင့် သွားလာမှုပုံစံကို ရွေးချယ်၍ အကွာအဝေးနှင့် လမ်းညွှန်အဆင့်ဆင့်ကို ကြည့်ရှုပါ။',
+      goalLabel: 'ခရီးစဉ်ရည်မှန်းချက်',
+      goals: {
+        all: 'နေရာအားလုံး',
+        sunrise: 'နေထွက်နှင့် ရှုခင်းသာ',
+        trekking: 'တောင်တက်နှင့် သဘာဝ',
+        heritage: 'ယဉ်ကျေးမှုနှင့် ဘုရားစေတီ',
+        staysDining: 'တည်းခိုခန်းနှင့် စားသောက်ဆိုင်',
+      },
+      originLabel: 'စတင်ထွက်ခွာမည့်နေရာ',
+      destinationLabel: 'သွားရောက်မည့်နေရာ',
+      useCurrentLocation: 'GPS တည်နေရာသုံးမည်',
+      locatingGps: 'တည်နေရာ ရှာနေသည်...',
+      gpsOriginLabel: 'လက်ရှိ GPS တည်နေရာ',
+      gpsError: 'GPS ခွင့်ပြုချက် မရရှိပါ။ ကလောအထင်ကရနေရာတစ်ခုကို စမှတ်အဖြစ် ရွေးချယ်ပါ။',
+      travelModeLabel: 'သွားလာမှုပုံစံ',
+      modes: {
+        WALKING: 'ခြေလျင်လမ်း',
+        TWO_WHEELER: 'ဆိုင်ကယ်',
+        DRIVING: '4x4 / ကား',
+      },
+      distanceLabel: 'အကွာအဝေး',
+      durationLabel: 'ခန့်မှန်းကြာချိန်',
+      calculatingRoute: 'လမ်းကြောင်း တွက်ချက်နေသည်...',
+      routeError: 'ဤနေရာနှစ်ခုကြား လမ်းကြောင်း တွက်ချက်၍ မရသေးပါ။',
+      twoWheelerFallbackNote: 'ဆိုင်ကယ်လမ်းကြောင်း မရနိုင်သဖြင့် ကားလမ်းကြောင်းအတိုင်း ပြသထားပါသည်။',
+      turnByTurnTitle: 'အဆင့်ဆင့် လမ်းညွှန်ချက်များ',
+      noStepsYet: 'လမ်းညွှန်ချက်များ ကြည့်ရှုရန် စမှတ်နှင့် ပန်းတိုင်ကို ရွေးချယ်ပါ။',
+      openDossier: 'အသေးစိတ် ကြည့်ရန်',
+      addStopToPlan: 'ခရီးစဉ်ထဲ ထည့်မည်',
+      addedStop: 'ထည့်ပြီး',
+      startingHubsGroup: 'ကလော မြို့လယ်အချက်အချာ',
+      placesGroup: 'လည်ပတ်စရာနေရာများ',
+      staysDiningGroup: 'တည်းခိုခန်းနှင့် စားသောက်ဆိုင်',
+      missingKeyNotice: 'Google Maps API key ချိတ်ဆက်ပြီးပါက မြေပုံပေါ်လာပါမည်။',
+      quotaBannerTitle: 'Google Maps Platform demo quota ပြည့်သွားပါသဖြင့် မြေပုံနှင့် လမ်းကြောင်းတွက်ချက်မှု ယာယီကန့်သတ်ထားပါသည်။',
+      quotaBannerLinkText: 'Quota လမ်းညွှန် ကြည့်ရန်',
+      selectedStop: 'ရွေးချယ်ထားသည့်နေရာ',
+    },
+    reviews: {
+      eyebrow: 'ခရီးသွားအတွေ့အကြုံနှင့် ရည်မှန်းချက်လမ်းညွှန်',
+      title: 'ခရီးသွားများ၏ အတွေ့အကြုံနှင့် လက်တွေ့အကြံပြုချက်များ',
+      subtitle:
+        'နံနက်ခင်းနေထွက်မြင်ကွင်း၊ တောင်တက်လမ်းလျှောက်ခြင်း၊ ရှေးဟောင်းယဉ်ကျေးမှု သို့မဟုတ် ဒေသအစားအစာ စသည့် သင်မျှော်မှန်းထားသည့် ရည်မှန်းချက်အလိုက် ရွေးချယ်ဖတ်ရှုပြီး သင့်တော်သောနေရာများကို ရှာဖွေပါ။',
+      tabLabel: 'ခရီးသွားသုံးသပ်ချက်',
+      allGoals: 'ရည်မှန်းချက်အားလုံး',
+      filterByGoal: 'ရည်မှန်းချက်အလိုက် နေရာရှာရန်',
+      filterByPlace: 'နေရာ',
+      allPlaces: 'ကလော နေရာအားလုံး',
+      goals: {
+        sunrise: 'နေထွက်နှင့် ရှုခင်းသာ',
+        trekking: 'တောင်တက်နှင့် သဘာဝ',
+        heritage: 'ယဉ်ကျေးမှုနှင့် ရှေးဟောင်း',
+        photography: 'ဓာတ်ပုံရိုက်ကူးရေး',
+        calmRest: 'တိတ်ဆိတ်အေးချမ်းအနားယူ',
+        culinary: 'ဒေသအစားအစာ',
+      },
+      goalTipLabel: 'ဤရည်မှန်းချက် အောင်မြင်စေရန် အကြံပြုချက်',
+      helpfulLabel: 'အသုံးဝင်သည်',
+      helpfulMarked: 'အသုံးဝင်သည်',
+      explorePlace: 'အသေးစိတ်ကြည့်ရန်',
+      directionsToPlace: 'လမ်းကြောင်းရှာရန်',
+      shareButton: 'သင့်အတွေ့အကြုံ မျှဝေရန်',
+      cancelShare: 'ဖောင်ပိတ်မည်',
+      noReviewsMatch: 'ဤနေရာနှင့် ရည်မှန်းချက်အတွက် ခရီးသွားသုံးသပ်ချက် မရှိသေးပါ။',
+      resetGoalFilter: 'အားလုံးပြန်ကြည့်ရန်',
+      matchingPlacesNote: 'ပုဒ်',
+      form: {
+        title: 'သင့်ကလောအတွေ့အကြုံနှင့် ရည်မှန်းချက်အကြံပြုချက် ရေးသားပါ',
+        placeLabel: 'သွားရောက်ခဲ့သည့်နေရာ',
+        goalLabel: 'အဓိက အောင်မြင်ခဲ့သည့် ရည်မှန်းချက်',
+        ratingLabel: 'အမှတ်ပေးမှု',
+        authorName: 'သင့်အမည်',
+        authorNamePlaceholder: 'ဥပမာ - သူရအောင်',
+        authorOrigin: 'မြို့နှင့် ခရီးသွားပုံစံ',
+        authorOriginPlaceholder: 'ဥပမာ - ရန်ကုန် · တောင်တက်ဝါသနာရှင်',
+        visitedSeason: 'သွားရောက်ခဲ့သည့် လ/နှစ်',
+        visitedSeasonPlaceholder: 'ဥပမာ - နိုဝင်ဘာ ၂၀၂၆',
+        headline: 'ခေါင်းစဉ်',
+        headlinePlaceholder: 'အမှတ်ရဆုံးအချက်ကို အကျဉ်းချုပ်ရေးပါ...',
+        story: 'သင့်အတွေ့အကြုံ',
+        storyPlaceholder: 'မြင်တွေ့ခဲ့ရသည့် ရှုခင်း၊ ခံစားချက်နှင့် ခရီးစဉ်အတွေ့အကြုံကို မျှဝေပေးပါ...',
+        goalTip: 'နောက်လာမည့်ခရီးသွားများ ရည်မှန်းချက်အောင်မြင်စေရန် အကြံပြုချက်',
+        goalTipPlaceholder: 'သွားသင့်သည့်အချိန်၊ လမ်းခွဲ၊ ရှုခင်းအကောင်းဆုံးနေရာ သို့မဟုတ် ယူဆောင်သွားသင့်သည်များ...',
+        submitBtn: 'အတွေ့အကြုံ တင်မည်',
+        submittingBtn: 'သိမ်းဆည်းနေသည်...',
+        missingFieldsError: 'အမည်၊ ခေါင်းစဉ်၊ အတွေ့အကြုံနှင့် အကြံပြုချက်တို့ကို ဖြည့်သွင်းပေးပါ။',
+        serverError: 'ဆာဗာနှင့် ချိတ်ဆက်မရပါ။ ခဏနေမှ ထပ်မံကြိုးစားပါ။',
+        successMessage: 'ကျေးဇူးတင်ပါသည် — သင့်အတွေ့အကြုံနှင့် အကြံပြုချက်ကို မျှဝေပြီးပါပြီ။',
+      },
     },
     bookingStatus: {
       pending_verification: 'စိစစ်နေဆဲ',

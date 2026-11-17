@@ -38,19 +38,19 @@ export const Navbar: React.FC = () => {
     `text-sm whitespace-nowrap shrink-0 transition-colors duration-150 pb-0.5 border-b ${
       isActive
         ? transparentMode
-          ? 'text-[#F4F0E6] border-[#F4F0E6]'
-          : 'text-[#243D32] border-[#B66F52] font-medium'
+          ? 'text-[#FAF7F0] border-[#C7AA74]'
+          : 'text-[#1B3128] border-[#A4834C] font-medium'
         : transparentMode
-          ? 'text-[#F4F0E6]/85 border-transparent hover:text-[#F4F0E6] hover:border-[#F4F0E6]/50'
-          : 'text-[#292B27]/80 border-transparent hover:text-[#243D32] hover:border-[#243D32]/40'
+          ? 'text-[#FAF7F0]/85 border-transparent hover:text-[#FAF7F0] hover:border-[#C7AA74]/60'
+          : 'text-[#222420]/80 border-transparent hover:text-[#1B3128] hover:border-[#A4834C]/50'
     }`;
 
   return (
     <header
       className={`fixed top-0 inset-x-0 z-40 transition-colors duration-200 ${
         transparentMode
-          ? 'bg-gradient-to-b from-[#292B27]/65 to-transparent text-[#F4F0E6]'
-          : 'bg-[#F4F0E6]/95 backdrop-blur-sm border-b border-[#D9CCB8] text-[#292B27]'
+          ? 'bg-gradient-to-b from-[#1B211D]/75 to-transparent text-[#FAF7F0]'
+          : 'bg-[#FAF7F0]/95 backdrop-blur-sm border-b border-[#A4834C]/30 text-[#222420]'
       }`}
     >
       <div className="max-w-[1360px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between gap-4 xl:gap-8">
@@ -58,7 +58,7 @@ export const Navbar: React.FC = () => {
         <Link
           to="/"
           className={`font-serif text-2xl font-semibold tracking-tight whitespace-nowrap shrink-0 ${
-            transparentMode ? 'text-[#F4F0E6]' : 'text-[#243D32]'
+            transparentMode ? 'text-[#FAF7F0]' : 'text-[#1B3128]'
           }`}
         >
           Kalaw Travel
@@ -97,8 +97,8 @@ export const Navbar: React.FC = () => {
             aria-label="Switch language between English and Burmese"
             className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs border rounded-sm whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
               transparentMode
-                ? 'border-[#F4F0E6]/40 text-[#F4F0E6] hover:bg-[#F4F0E6]/10'
-                : 'border-[#D9CCB8] text-[#243D32] hover:border-[#243D32]'
+                ? 'border-[#C7AA74]/50 text-[#FAF7F0] hover:bg-[#FAF7F0]/10'
+                : 'border-[#A4834C]/40 text-[#1B3128] hover:border-[#1B3128]'
             }`}
           >
             <span className={lang === 'en' ? 'font-semibold underline underline-offset-4' : 'opacity-65'}>
@@ -116,8 +116,8 @@ export const Navbar: React.FC = () => {
             aria-label={t.nav.searchBtn}
             className={`p-2 rounded-sm transition-colors cursor-pointer ${
               transparentMode
-                ? 'text-[#F4F0E6] hover:bg-[#F4F0E6]/10'
-                : 'text-[#243D32] hover:bg-[#D9CCB8]/40'
+                ? 'text-[#FAF7F0] hover:bg-[#FAF7F0]/10'
+                : 'text-[#1B3128] hover:bg-[#D9CCB8]/40'
             }`}
           >
             <Search className="w-4 h-4" />
@@ -127,8 +127,8 @@ export const Navbar: React.FC = () => {
             to={user ? '/profile' : '/auth'}
             className={`hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-medium tracking-wide whitespace-nowrap shrink-0 transition-colors rounded-sm ${
               transparentMode
-                ? 'bg-[#F4F0E6] text-[#243D32] hover:bg-[#D9CCB8]'
-                : 'bg-[#243D32] text-[#F4F0E6] hover:bg-[#52634A]'
+                ? 'bg-[#FAF7F0] text-[#1B3128] hover:bg-[#C7AA74] hover:text-[#1B3128]'
+                : 'bg-[#1B3128] text-[#FAF7F0] hover:bg-[#A4834C]'
             }`}
           >
             <User className="w-3.5 h-3.5" />
@@ -140,7 +140,7 @@ export const Navbar: React.FC = () => {
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle navigation menu"
             className={`lg:hidden p-2 rounded-sm cursor-pointer ${
-              transparentMode ? 'text-[#F4F0E6]' : 'text-[#243D32]'
+              transparentMode ? 'text-[#FAF7F0]' : 'text-[#1B3128]'
             }`}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -150,23 +150,23 @@ export const Navbar: React.FC = () => {
 
       {/* Quick Search Bar Drawer */}
       {searchOpen && (
-        <div className="bg-[#F4F0E6] border-t border-b border-[#D9CCB8] text-[#292B27]">
+        <div className="bg-[#FAF7F0] border-t border-b border-[#A4834C]/30 text-[#222420]">
           <form
             onSubmit={handleQuickSearch}
             className="max-w-[1360px] mx-auto px-6 md:px-10 py-4 flex items-center gap-4"
           >
-            <Search className="w-4 h-4 text-[#52634A] shrink-0" />
+            <Search className="w-4 h-4 text-[#4F6047] shrink-0" />
             <input
               type="text"
               autoFocus
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t.nav.searchPlaceholder}
-              className="w-full bg-transparent text-sm text-[#292B27] placeholder-[#52634A]/70 focus:outline-none"
+              className="w-full bg-transparent text-sm text-[#222420] placeholder-[#4F6047]/70 focus:outline-none"
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] whitespace-nowrap shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-[#1B3128] text-[#FAF7F0] text-xs font-medium rounded-sm hover:bg-[#A4834C] whitespace-nowrap shrink-0 cursor-pointer"
             >
               {t.nav.searchBtn}
             </button>
@@ -176,7 +176,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Navigation Drawer */}
       {mobileOpen && (
-        <div className="lg:hidden bg-[#F4F0E6] border-t border-[#D9CCB8] text-[#292B27] px-6 py-6 space-y-4">
+        <div className="lg:hidden bg-[#FAF7F0] border-t border-[#A4834C]/30 text-[#222420] px-6 py-6 space-y-4">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <Link to="/explore" className="py-2 border-b border-[#D9CCB8]">{t.nav.explore}</Link>
             <Link to="/destinations" className="py-2 border-b border-[#D9CCB8]">{t.nav.destinations}</Link>
@@ -192,14 +192,14 @@ export const Navbar: React.FC = () => {
           <div className="pt-2 flex items-center gap-3">
             <Link
               to={user ? '/profile' : '/auth'}
-              className="flex-1 text-center py-2.5 bg-[#243D32] text-[#F4F0E6] text-sm font-medium rounded-sm"
+              className="flex-1 text-center py-2.5 bg-[#1B3128] text-[#FAF7F0] text-sm font-medium rounded-sm"
             >
               {user ? user.name.split(' ')[0] : t.nav.signIn}
             </Link>
             {user?.role === 'admin' && (
               <Link
                 to="/admin"
-                className="px-4 py-2.5 border border-[#243D32] text-[#243D32] text-sm font-medium rounded-sm"
+                className="px-4 py-2.5 border border-[#1B3128] text-[#1B3128] text-sm font-medium rounded-sm"
               >
                 Admin
               </Link>

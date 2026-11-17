@@ -4,19 +4,23 @@
   --font-serif: "Cormorant Garamond", "Noto Sans Myanmar", "Padauk", Georgia, serif;
   --font-sans: "DM Sans", "Noto Sans Myanmar", "Padauk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  --color-forest: #243D32;
-  --color-olive: #52634A;
-  --color-cream: #F4F0E6;
+  --color-forest: #1B3128;
+  --color-pine: #243D32;
+  --color-olive: #4F6047;
+  --color-cream: #F6F2E9;
+  --color-alabaster: #FAF7F0;
   --color-sand: #D9CCB8;
+  --color-brass: #A4834C;
+  --color-brass-light: #C7AA74;
   --color-terracotta: #B66F52;
-  --color-charcoal: #292B27;
+  --color-charcoal: #222420;
 }
 
 @layer base {
   html {
     font-family: var(--font-sans);
-    background-color: #F4F0E6;
-    color: #292B27;
+    background-color: #F6F2E9;
+    color: #222420;
     scroll-behavior: smooth;
   }
 
@@ -25,13 +29,23 @@
   }
 }
 
-/* Refined typographic proportion & spacing for Burmese (Myanmar script) */
+/* Subtle boutique luxury architectural hairline helpers */
+.luxury-frame {
+  border: 1px solid rgba(164, 131, 76, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(250, 247, 240, 0.45);
+}
+
+.luxury-divider {
+  border-color: rgba(164, 131, 76, 0.28);
+}
+
+/* Prevent Burmese (Myanmar script) ascenders/descenders and diacritics from clipping */
 html[lang="my"] {
   font-size: 14.5px;
 }
 
 html[lang="my"] body {
-  line-height: 1.78;
+  line-height: 1.82;
   letter-spacing: 0;
 }
 
@@ -41,32 +55,42 @@ html[lang="my"] h3,
 html[lang="my"] h4,
 html[lang="my"] .font-serif,
 html[lang="my"] .font-editorial {
-  font-family: "Cormorant Garamond", "Noto Sans Myanmar", "Padauk", sans-serif;
+  font-family: "Noto Sans Myanmar", "Padauk", "Cormorant Garamond", sans-serif !important;
   letter-spacing: 0 !important;
   font-weight: 600;
+  padding-block: 0.08em;
+  overflow: visible;
 }
 
 html[lang="my"] h1 {
-  font-size: clamp(1.85rem, 3.1vw, 2.85rem) !important;
-  line-height: 1.38 !important;
+  font-size: clamp(1.75rem, 3vw, 2.75rem) !important;
+  line-height: 1.56 !important;
 }
 
 html[lang="my"] h2 {
-  font-size: clamp(1.3rem, 2.1vw, 1.9rem) !important;
-  line-height: 1.42 !important;
+  font-size: clamp(1.25rem, 2vw, 1.85rem) !important;
+  line-height: 1.58 !important;
 }
 
 html[lang="my"] h3 {
   font-size: 1.125rem !important;
-  line-height: 1.48 !important;
+  line-height: 1.62 !important;
 }
 
 html[lang="my"] p,
 html[lang="my"] a,
 html[lang="my"] button,
 html[lang="my"] span,
-html[lang="my"] label {
+html[lang="my"] label,
+html[lang="my"] dt,
+html[lang="my"] dd {
   letter-spacing: 0 !important;
+}
+
+html[lang="my"] .truncate {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
 }
 
 html[lang="my"] .tracking-widest,

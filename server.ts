@@ -13,11 +13,13 @@ import {
   INITIAL_STAYS,
   INITIAL_USERS,
 } from './src/data/kalawData.ts';
+import { INITIAL_REVIEWS } from './src/data/kalawReviews.ts';
 import type {
   BookingRequest,
   Destination,
   Experience,
   JournalArticle,
+  PlaceReview,
   PropertyListing,
   Rental,
   Restaurant,
@@ -42,6 +44,7 @@ const store: {
   articles: JournalArticle[];
   bookings: BookingRequest[];
   users: UserAccount[];
+  reviews: PlaceReview[];
 } = {
   destinations: [...INITIAL_DESTINATIONS],
   stays: [...INITIAL_STAYS],
@@ -52,6 +55,7 @@ const store: {
   articles: [...INITIAL_ARTICLES],
   bookings: [...INITIAL_BOOKINGS],
   users: [...INITIAL_USERS],
+  reviews: [...INITIAL_REVIEWS],
 };
 
 function makeSlug(text: string): string {
@@ -64,6 +68,13 @@ function makeSlug(text: string): string {
 // Health check
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'kalaw-travel-api' });
+});
+
+// Google Maps Platform client configuration
+app.get('/api/maps-config', (_req, res) => {
+  res.json({
+    apiKey: process.env.VITE_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY || '',
+  });
 });
 
 // Unified catalog search & discovery
@@ -444,6 +455,51 @@ app.post('/api/users/:id/favorites', (req, res) => {
   }
   store.users[idx].favorites = Array.from(favs);
   res.json(store.users[idx]);
+});
+
+// Traveler Reviews & Goal Guidance
+app.get('/api/reviews', (req, res) => {
+  const placeId = req.query.placeId as string | undefined;
+  const goal = req.query.goal as string | undefined;
+  let list = store.reviews;
+  if (placeId) list = list.filter((r) => r.placeId === placeId);
+  if (goal && goal !== 'all') list = list.filter((r) => r.goal === goal);
+  res.json(list);
+});
+
+app.post('/api/reviews', (req, res) => {
+  const payload = req.body as Partial<PlaceReview>;
+  if (!payload.placeId || !payload.placeName || !payload.headline || !payload.story || !payload.goalTip) {
+    return res.status(400).json({ error: 'Please complete the place, headline, experience story, and goal tip.' });
+  }
+  const created: PlaceReview = {
+    id: `rev-${Date.now()}`,
+    placeId: payload.placeId,
+    placeKind: payload.placeKind || 'destination',
+    placeName: payload.placeName,
+    goal: payload.goal || 'sunrise',
+    authorName: payload.authorName?.trim() || 'Kalaw Traveler',
+    authorOrigin: payload.authorOrigin?.trim() || 'Plateau Visitor',
+    visitedSeason: payload.visitedSeason?.trim() || 'November 2026',
+    rating: Math.min(5, Math.max(1, Number(payload.rating) || 5)),
+    headline: payload.headline.trim(),
+    story: payload.story.trim(),
+    goalTip: payload.goalTip.trim(),
+    helpfulCount: 1,
+    createdAt: new Date().toISOString(),
+  };
+  store.reviews.unshift(created);
+  res.status(201).json(created);
+});
+
+app.post('/api/reviews/:id/helpful', (req, res) => {
+  const idx = store.reviews.findIndex((r) => r.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Review not found' });
+  store.reviews[idx] = {
+    ...store.reviews[idx],
+    helpfulCount: store.reviews[idx].helpfulCount + 1,
+  };
+  res.json(store.reviews[idx]);
 });
 
 // Admin summary stats

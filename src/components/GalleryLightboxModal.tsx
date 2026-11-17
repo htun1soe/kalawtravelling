@@ -39,7 +39,7 @@ export const GalleryLightboxModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-[70] bg-[#181A17]/95 backdrop-blur-sm text-[#F4F0E6] flex flex-col justify-between p-4 md:p-8"
+      className="fixed inset-0 z-[70] bg-[#141714]/95 backdrop-blur-sm text-[#FAF7F0] flex flex-col justify-between p-4 md:p-8"
       role="dialog"
       aria-modal="true"
       aria-label={`${galleryState.title} Gallery`}
@@ -47,16 +47,16 @@ export const GalleryLightboxModal: React.FC = () => {
     >
       {/* Top Bar */}
       <div
-        className="max-w-[1360px] w-full mx-auto flex items-center justify-between gap-4 pb-4 border-b border-[#F4F0E6]/15"
+        className="max-w-[1360px] w-full mx-auto flex items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#C7AA74]/25"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="min-w-0">
+        <div className="min-w-0 space-y-0.5">
           {galleryState.subtitle && (
-            <p className="text-xs uppercase tracking-[0.18em] text-[#D9CCB8] truncate">
+            <p className="text-xs uppercase tracking-[0.18em] text-[#C7AA74]">
               {galleryState.subtitle}
             </p>
           )}
-          <h2 className="font-serif text-xl md:text-2xl text-[#F4F0E6] truncate">
+          <h2 className="font-serif text-xl md:text-2xl text-[#FAF7F0] leading-relaxed">
             {galleryState.title}
           </h2>
         </div>
@@ -69,9 +69,9 @@ export const GalleryLightboxModal: React.FC = () => {
             <button
               type="button"
               onClick={() => openItemModal(galleryState.item!)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-[#D9CCB8]/40 text-xs font-medium text-[#F4F0E6] hover:bg-[#F4F0E6]/10 transition-colors cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-[#C7AA74]/45 text-xs font-medium text-[#FAF7F0] hover:bg-[#FAF7F0]/10 transition-colors cursor-pointer whitespace-nowrap"
             >
-              <Info className="w-3.5 h-3.5" />
+              <Info className="w-3.5 h-3.5 text-[#C7AA74]" />
               <span>{t.actions.inspectDossier}</span>
             </button>
           )}
@@ -79,7 +79,7 @@ export const GalleryLightboxModal: React.FC = () => {
             type="button"
             onClick={closeGallery}
             aria-label={t.actions.closeModal}
-            className="p-2.5 border border-[#F4F0E6]/25 text-[#F4F0E6] hover:bg-[#F4F0E6] hover:text-[#243D32] transition-colors cursor-pointer"
+            className="p-2.5 border border-[#FAF7F0]/25 text-[#FAF7F0] hover:bg-[#FAF7F0] hover:text-[#1B3128] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -96,7 +96,7 @@ export const GalleryLightboxModal: React.FC = () => {
             type="button"
             onClick={() => setActiveIndex((prev) => (prev - 1 + items.length) % items.length)}
             aria-label={t.actions.previousPhoto}
-            className="absolute left-0 md:left-2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-[#292B27]/80 hover:bg-[#F4F0E6] text-[#F4F0E6] hover:text-[#243D32] border border-[#F4F0E6]/25 transition-colors cursor-pointer"
+            className="absolute left-0 md:left-2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-[#222420]/85 hover:bg-[#FAF7F0] text-[#FAF7F0] hover:text-[#1B3128] border border-[#C7AA74]/35 transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -114,12 +114,12 @@ export const GalleryLightboxModal: React.FC = () => {
               loop
               playsInline
               onError={() => setFailedMap((prev) => ({ ...prev, [safeIdx]: true }))}
-              className="max-h-[62vh] max-w-full w-auto object-contain border border-[#F4F0E6]/15 bg-black"
+              className="max-h-[62vh] max-w-full w-auto object-contain border border-[#C7AA74]/25 bg-black"
             />
           ) : isFailed || !current.src ? (
-            <div className="w-full max-w-2xl aspect-[16/10] bg-[#243D32]/40 border border-[#F4F0E6]/20 flex flex-col items-center justify-center p-8 text-center">
-              <Mountain className="w-9 h-9 text-[#D9CCB8] mb-3" />
-              <p className="font-serif text-xl text-[#F4F0E6]">{galleryState.title}</p>
+            <div className="w-full max-w-2xl aspect-[16/10] bg-[#1B3128]/50 border border-[#C7AA74]/25 flex flex-col items-center justify-center p-8 text-center">
+              <Mountain className="w-9 h-9 text-[#C7AA74] mb-3" />
+              <p className="font-serif text-xl text-[#FAF7F0]">{galleryState.title}</p>
             </div>
           ) : (
             <img
@@ -128,7 +128,7 @@ export const GalleryLightboxModal: React.FC = () => {
               alt={current.caption || galleryState.title}
               referrerPolicy="no-referrer"
               onError={() => setFailedMap((prev) => ({ ...prev, [safeIdx]: true }))}
-              className="max-h-[62vh] max-w-full w-auto object-contain border border-[#F4F0E6]/15"
+              className="max-h-[62vh] max-w-full w-auto object-contain border border-[#C7AA74]/25"
             />
           )}
 
@@ -144,7 +144,7 @@ export const GalleryLightboxModal: React.FC = () => {
             type="button"
             onClick={() => setActiveIndex((prev) => (prev + 1) % items.length)}
             aria-label={t.actions.nextPhoto}
-            className="absolute right-0 md:right-2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-[#292B27]/80 hover:bg-[#F4F0E6] text-[#F4F0E6] hover:text-[#243D32] border border-[#F4F0E6]/25 transition-colors cursor-pointer"
+            className="absolute right-0 md:right-2 z-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-[#222420]/85 hover:bg-[#FAF7F0] text-[#FAF7F0] hover:text-[#1B3128] border border-[#C7AA74]/35 transition-colors cursor-pointer"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -153,7 +153,7 @@ export const GalleryLightboxModal: React.FC = () => {
 
       {/* Thumbnail Strip */}
       <div
-        className="max-w-[900px] w-full mx-auto pt-3 border-t border-[#F4F0E6]/15 flex items-center justify-center gap-2.5 overflow-x-auto"
+        className="max-w-[900px] w-full mx-auto pt-3 border-t border-[#C7AA74]/20 flex items-center justify-center gap-2.5 overflow-x-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {items.map((item, idx) => {
@@ -165,7 +165,7 @@ export const GalleryLightboxModal: React.FC = () => {
               type="button"
               onClick={() => setActiveIndex(idx)}
               className={`relative w-20 h-14 shrink-0 overflow-hidden border transition-all cursor-pointer ${
-                isActive ? 'border-[#F4F0E6] opacity-100 scale-105' : 'border-[#F4F0E6]/25 opacity-55 hover:opacity-90'
+                isActive ? 'border-[#C7AA74] opacity-100 scale-105' : 'border-[#FAF7F0]/25 opacity-55 hover:opacity-90'
               }`}
             >
               <img
@@ -176,7 +176,7 @@ export const GalleryLightboxModal: React.FC = () => {
               />
               {item.type === 'video' && (
                 <span className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <Film className="w-4 h-4 text-[#F4F0E6]" />
+                  <Film className="w-4 h-4 text-[#FAF7F0]" />
                 </span>
               )}
             </button>

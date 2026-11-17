@@ -7,6 +7,7 @@ import {
   INITIAL_RESTAURANTS,
   INITIAL_STAYS,
 } from '../data/kalawData';
+import { INITIAL_REVIEWS } from '../data/kalawReviews';
 import type {
   AuthResponse,
   BookingRequest,
@@ -14,10 +15,12 @@ import type {
   Destination,
   Experience,
   JournalArticle,
+  PlaceReview,
   PropertyListing,
   Rental,
   Restaurant,
   Stay,
+  TravelGoalTag,
   UserAccount,
 } from '../types/kalaw';
 
@@ -262,4 +265,41 @@ export async function deleteCatalogItem(
 
 export async function fetchUsers(): Promise<UserAccount[]> {
   return requestJson<UserAccount[]>('/users');
+}
+
+export async function fetchReviews(placeId?: string, goal?: string): Promise<PlaceReview[]> {
+  const params = new URLSearchParams();
+  if (placeId) params.set('placeId', placeId);
+  if (goal && goal !== 'all') params.set('goal', goal);
+  const qs = params.toString() ? `?${params.toString()}` : '';
+  try {
+    return await requestJson<PlaceReview[]>(`/reviews${qs}`);
+  } catch {
+    return INITIAL_REVIEWS;
+  }
+}
+
+export async function submitPlaceReview(payload: {
+  placeId: string;
+  placeKind: PlaceReview['placeKind'];
+  placeName: string;
+  goal: TravelGoalTag;
+  authorName: string;
+  authorOrigin: string;
+  visitedSeason: string;
+  rating: number;
+  headline: string;
+  story: string;
+  goalTip: string;
+}): Promise<PlaceReview> {
+  return requestJson<PlaceReview>('/reviews', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function markReviewHelpful(id: string): Promise<PlaceReview> {
+  return requestJson<PlaceReview>(`/reviews/${id}/helpful`, {
+    method: 'POST',
+  });
 }

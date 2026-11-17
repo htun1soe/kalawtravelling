@@ -1,16 +1,21 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   fetchCatalog,
+  fetchReviews,
   loginAccount,
+  markReviewHelpful,
   registerAccount,
+  submitPlaceReview,
   toggleFavoriteRemote,
   updateUserProfile,
 } from '../services/api';
+import { INITIAL_REVIEWS, localizeReview } from '../data/kalawReviews';
 import { TRANSLATIONS, type Language, type UIStrings } from '../i18n/translations';
 import {
   localizeArticle,
   localizeDestination,
   localizeExperience,
+  localizeModalItem,
   localizeProperty,
   localizeRental,
   localizeRestaurant,
@@ -22,10 +27,12 @@ import type {
   JournalArticle,
   MediaItem,
   ModalItem,
+  PlaceReview,
   PropertyListing,
   Rental,
   Restaurant,
   Stay,
+  TravelGoalTag,
   TripPlanItem,
   UserAccount,
 } from '../types/kalaw';
@@ -43,6 +50,8 @@ interface AppContextValue {
   setLang: (lang: Language) => void;
   toggleLang: () => void;
   t: UIStrings;
+  mapsApiKey: string;
+  quotaExceeded: boolean;
   user: UserAccount | null;
   destinations: Destination[];
   stays: Stay[];
@@ -51,11 +60,26 @@ interface AppContextValue {
   rentals: Rental[];
   properties: PropertyListing[];
   articles: JournalArticle[];
+  reviews: PlaceReview[];
   catalogLoading: boolean;
   isOfflineFallback: boolean;
   tripPlan: TripPlanItem[];
   localFavorites: string[];
   refreshCatalog: () => Promise<void>;
+  addPlaceReview: (payload: {
+    placeId: string;
+    placeKind: PlaceReview['placeKind'];
+    placeName: string;
+    goal: TravelGoalTag;
+    authorName: string;
+    authorOrigin: string;
+    visitedSeason: string;
+    rating: number;
+    headline: string;
+    story: string;
+    goalTip: string;
+  }) => Promise<PlaceReview>;
+  markHelpfulReview: (reviewId: string) => Promise<void>;
   signIn: (email: string) => Promise<UserAccount>;
   register: (name: string, email: string, role: 'traveler' | 'owner') => Promise<UserAccount>;
   signOut: () => void;
@@ -121,6 +145,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
+  const [mapsApiKey, setMapsApiKey] = useState<string>(
+    () => (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined) || ''
+  );
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
+
+  useEffect(() => {
+    const onQuotaExceeded = () => setQuotaExceeded(true);
+    window.addEventListener('gmp-quota-exceeded', onQuotaExceeded);
+    return () => window.removeEventListener('gmp-quota-exceeded', onQuotaExceeded);
+  }, []);
+
+  useEffect(() => {
+    if (mapsApiKey) return;
+    let active = true;
+    fetch('/api/maps-config')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { apiKey?: string } | null) => {
+        if (active && data?.apiKey) {
+          setMapsApiKey(data.apiKey);
+        }
+      })
+      .catch(() => {
+        // Silent fallback if backend maps-config unavailable
+      });
+    return () => {
+      active = false;
+    };
+  }, [mapsApiKey]);
+
   const setLang = useCallback((nextLang: Language) => {
     setLangState(nextLang);
   }, []);
@@ -174,13 +227,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [rawRentals, setRawRentals] = useState<Rental[]>([]);
   const [rawProperties, setRawProperties] = useState<PropertyListing[]>([]);
   const [rawArticles, setRawArticles] = useState<JournalArticle[]>([]);
+  const [rawReviews, setRawReviews] = useState<PlaceReview[]>(INITIAL_REVIEWS);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [isOfflineFallback, setIsOfflineFallback] = useState(false);
 
   const refreshCatalog = useCallback(async () => {
     setCatalogLoading(true);
     try {
-      const data = await fetchCatalog();
+      const [data, fetchedReviews] = await Promise.all([fetchCatalog(), fetchReviews()]);
       setRawDestinations(data.destinations);
       setRawStays(data.stays);
       setRawExperiences(data.experiences);
@@ -188,6 +242,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setRawRentals(data.rentals);
       setRawProperties(data.properties);
       setRawArticles(data.articles);
+      setRawReviews(fetchedReviews);
       setIsOfflineFallback(Boolean(data.isOfflineFallback));
     } finally {
       setCatalogLoading(false);
@@ -226,6 +281,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     () => rawArticles.map((item) => localizeArticle(item, lang)),
     [rawArticles, lang]
   );
+  const reviews = useMemo(
+    () => rawReviews.map((rev) => localizeReview(rev, lang)),
+    [rawReviews, lang]
+  );
+
+  const addPlaceReview = useCallback(
+    async (payload: {
+      placeId: string;
+      placeKind: PlaceReview['placeKind'];
+      placeName: string;
+      goal: TravelGoalTag;
+      authorName: string;
+      authorOrigin: string;
+      visitedSeason: string;
+      rating: number;
+      headline: string;
+      story: string;
+      goalTip: string;
+    }) => {
+      const created = await submitPlaceReview(payload);
+      setRawReviews((prev) => [created, ...prev]);
+      return created;
+    },
+    []
+  );
+
+  const markHelpfulReview = useCallback(async (reviewId: string) => {
+    const updated = await markReviewHelpful(reviewId);
+    setRawReviews((prev) => prev.map((r) => (r.id === reviewId ? updated : r)));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('kalaw_trip_plan', JSON.stringify(tripPlan));
@@ -272,7 +357,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         localStorage.setItem('kalaw_user', JSON.stringify(updated));
         return;
       } catch {
-        // Fallback to updating local user object if session expired
         const nextFavs = user.favorites.includes(itemId)
           ? user.favorites.filter((id) => id !== itemId)
           : [...user.favorites, itemId];
@@ -304,17 +388,108 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTripPlan([]);
   };
 
-  const [activeModal, setActiveModal] = useState<ModalItem | null>(null);
-  const [galleryState, setGalleryState] = useState<GalleryState | null>(null);
+  const [rawActiveModal, setRawActiveModal] = useState<ModalItem | null>(null);
+  const [rawGalleryState, setRawGalleryState] = useState<GalleryState | null>(null);
+
+  const activeModal = useMemo<ModalItem | null>(() => {
+    if (!rawActiveModal) return null;
+    switch (rawActiveModal.kind) {
+      case 'destination': {
+        const found = destinations.find((d) => d.id === rawActiveModal.data.id);
+        return found ? { kind: 'destination', data: found } : localizeModalItem(rawActiveModal, lang);
+      }
+      case 'stay': {
+        const found = stays.find((s) => s.id === rawActiveModal.data.id);
+        return found ? { kind: 'stay', data: found } : localizeModalItem(rawActiveModal, lang);
+      }
+      case 'experience': {
+        const found = experiences.find((e) => e.id === rawActiveModal.data.id);
+        return found ? { kind: 'experience', data: found } : localizeModalItem(rawActiveModal, lang);
+      }
+      case 'restaurant': {
+        const found = restaurants.find((r) => r.id === rawActiveModal.data.id);
+        return found ? { kind: 'restaurant', data: found } : localizeModalItem(rawActiveModal, lang);
+      }
+      case 'rental': {
+        const found = rentals.find((r) => r.id === rawActiveModal.data.id);
+        return found ? { kind: 'rental', data: found } : localizeModalItem(rawActiveModal, lang);
+      }
+      case 'property': {
+        const found = properties.find((p) => p.id === rawActiveModal.data.id);
+        return found ? { kind: 'property', data: found } : localizeModalItem(rawActiveModal, lang);
+      }
+      case 'article': {
+        const found = articles.find((a) => a.id === rawActiveModal.data.id);
+        return found ? { kind: 'article', data: found } : localizeModalItem(rawActiveModal, lang);
+      }
+    }
+  }, [rawActiveModal, destinations, stays, experiences, restaurants, rentals, properties, articles, lang]);
 
   const openItemModal = useCallback((item: ModalItem) => {
-    setGalleryState(null);
-    setActiveModal(item);
+    setRawGalleryState(null);
+    setRawActiveModal(item);
   }, []);
 
   const closeItemModal = useCallback(() => {
-    setActiveModal(null);
+    setRawActiveModal(null);
   }, []);
+
+  const galleryState = useMemo<GalleryState | null>(() => {
+    if (!rawGalleryState) return null;
+    if (!rawGalleryState.item) return rawGalleryState;
+    const item = rawGalleryState.item;
+    let localizedTitle = rawGalleryState.title;
+    let localizedMedia = rawGalleryState.media;
+    if (item.kind === 'destination') {
+      const found = destinations.find((d) => d.id === item.data.id);
+      if (found) {
+        localizedTitle = found.name;
+        localizedMedia = found.media || localizedMedia;
+      }
+    } else if (item.kind === 'stay') {
+      const found = stays.find((s) => s.id === item.data.id);
+      if (found) {
+        localizedTitle = found.name;
+        localizedMedia = found.media || localizedMedia;
+      }
+    } else if (item.kind === 'experience') {
+      const found = experiences.find((e) => e.id === item.data.id);
+      if (found) {
+        localizedTitle = found.title;
+        localizedMedia = found.media || localizedMedia;
+      }
+    } else if (item.kind === 'restaurant') {
+      const found = restaurants.find((r) => r.id === item.data.id);
+      if (found) {
+        localizedTitle = found.name;
+        localizedMedia = found.media || localizedMedia;
+      }
+    } else if (item.kind === 'rental') {
+      const found = rentals.find((r) => r.id === item.data.id);
+      if (found) {
+        localizedTitle = found.name;
+        localizedMedia = found.media || localizedMedia;
+      }
+    } else if (item.kind === 'property') {
+      const found = properties.find((p) => p.id === item.data.id);
+      if (found) {
+        localizedTitle = found.title;
+        localizedMedia = found.media || localizedMedia;
+      }
+    } else if (item.kind === 'article') {
+      const found = articles.find((a) => a.id === item.data.id);
+      if (found) {
+        localizedTitle = found.title;
+        localizedMedia = found.media || localizedMedia;
+      }
+    }
+    return {
+      ...rawGalleryState,
+      title: localizedTitle,
+      media: localizedMedia,
+      item: localizeModalItem(item, lang),
+    };
+  }, [rawGalleryState, destinations, stays, experiences, restaurants, rentals, properties, articles, lang]);
 
   const openGallery = useCallback(
     (
@@ -324,13 +499,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       subtitle?: string,
       item?: ModalItem
     ) => {
-      setGalleryState({ title, media, initialIndex, subtitle, item });
+      setRawGalleryState({ title, media, initialIndex, subtitle, item });
     },
     []
   );
 
   const closeGallery = useCallback(() => {
-    setGalleryState(null);
+    setRawGalleryState(null);
   }, []);
 
   return (
@@ -340,6 +515,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLang,
         toggleLang,
         t,
+        mapsApiKey,
+        quotaExceeded,
         user,
         destinations,
         stays,
@@ -348,11 +525,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         rentals,
         properties,
         articles,
+        reviews,
         catalogLoading,
         isOfflineFallback,
         tripPlan,
         localFavorites,
         refreshCatalog,
+        addPlaceReview,
+        markHelpfulReview,
         signIn,
         register,
         signOut,

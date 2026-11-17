@@ -73,22 +73,22 @@ export const ExperiencesPage: React.FC = () => {
               topRightOverlay={<FavoriteButton itemId={exp.id} compact />}
             />
             <div className="p-6 md:p-8 flex-1 flex flex-col space-y-4">
-              <div className="flex items-center justify-between text-xs text-[#52634A]">
+              <div className="flex items-center justify-between text-xs text-[#4F6047]">
                 <span>{t.categories[exp.category] || exp.category} · {exp.duration}</span>
-                <span>{exp.difficulty}</span>
+                <span>{t.categories[exp.difficulty] || exp.difficulty}</span>
               </div>
-              <h2 className="font-serif text-3xl text-[#243D32]">
+              <h2 className="font-serif text-3xl text-[#1B3128]">
                 <button
                   type="button"
                   onClick={() => openItemModal({ kind: 'experience', data: exp })}
-                  className="text-left hover:text-[#B66F52] transition-colors cursor-pointer"
+                  className="text-left hover:text-[#A4834C] transition-colors cursor-pointer"
                 >
                   {exp.title}
                 </button>
               </h2>
-              <p className="text-sm text-[#292B27]/85 leading-relaxed">{exp.shortDescription}</p>
-              <div className="text-xs text-[#52634A] space-y-1">
-                <p>Guide: <span className="text-[#292B27] font-medium">{exp.guideName}</span></p>
+              <p className="text-sm text-[#222420]/85 leading-relaxed">{exp.shortDescription}</p>
+              <div className="text-xs text-[#4F6047] space-y-1">
+                <p>{t.modal.guide}: <span className="text-[#222420] font-medium">{exp.guideName}</span></p>
                 <p>{exp.included.join(' · ')}</p>
               </div>
               <div className="pt-4 mt-auto border-t border-[#D9CCB8] flex flex-wrap items-center justify-between gap-3">

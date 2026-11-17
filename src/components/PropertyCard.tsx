@@ -19,10 +19,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ prop, variant = 'lig
 
   return (
     <article
-      className={`group flex flex-col w-full border ${
+      className={`group flex flex-col w-full border transition-colors ${
         isDark
-          ? 'border-[#F4F0E6]/15 bg-[#243D32]/35 text-[#F4F0E6]'
-          : 'border-[#D9CCB8] bg-[#F4F0E6] text-[#292B27]'
+          ? 'border-[#C7AA74]/25 bg-[#1B3128]/55 text-[#FAF7F0]'
+          : 'border-[#A4834C]/35 bg-[#FAF7F0] text-[#222420]'
       }`}
     >
       <CardMediaCarousel
@@ -38,25 +38,25 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ prop, variant = 'lig
       <div className="p-6 flex-1 flex flex-col space-y-3.5">
         <div
           className={`flex items-center justify-between gap-2 text-xs ${
-            isDark ? 'text-[#D9CCB8]' : 'text-[#52634A]'
+            isDark ? 'text-[#C7AA74]' : 'text-[#A4834C]'
           }`}
         >
           <span>{t.categories[prop.category] || prop.category}</span>
-          <span className={`font-medium ${isDark ? 'text-[#F4F0E6]' : 'text-[#243D32]'}`}>
-            {prop.status}
+          <span className={`font-medium ${isDark ? 'text-[#FAF7F0]' : 'text-[#1B3128]'}`}>
+            {t.categories[prop.status] || prop.status}
           </span>
         </div>
 
         <h3
-          className={`font-serif text-2xl leading-snug ${
-            isDark ? 'text-[#F4F0E6]' : 'text-[#243D32]'
+          className={`font-serif text-2xl leading-relaxed ${
+            isDark ? 'text-[#FAF7F0]' : 'text-[#1B3128]'
           }`}
         >
           <button
             type="button"
             onClick={handleOpenModal}
             className={`text-left transition-colors cursor-pointer ${
-              isDark ? 'hover:text-[#D9CCB8]' : 'hover:text-[#B66F52]'
+              isDark ? 'hover:text-[#C7AA74]' : 'hover:text-[#A4834C]'
             }`}
           >
             {prop.title}
@@ -65,49 +65,48 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ prop, variant = 'lig
 
         <p
           className={`text-sm leading-relaxed flex-1 ${
-            isDark ? 'text-[#F4F0E6]/80' : 'text-[#292B27]/85'
+            isDark ? 'text-[#FAF7F0]/80' : 'text-[#222420]/85'
           }`}
         >
           {prop.shortDescription}
         </p>
 
-        {/* Required Real Estate Specifications: Location, Land/Property Type, Area, Contact */}
         <dl
           className={`grid grid-cols-1 gap-2 py-3 border-t border-b text-xs ${
-            isDark ? 'border-[#F4F0E6]/15 text-[#D9CCB8]' : 'border-[#D9CCB8] text-[#52634A]'
+            isDark ? 'border-[#C7AA74]/20 text-[#D9CCB8]' : 'border-[#A4834C]/25 text-[#4F6047]'
           }`}
         >
           <div className="flex items-start justify-between gap-3">
             <dt className="inline-flex items-center gap-1.5 shrink-0">
-              <MapPin className="w-3.5 h-3.5 text-[#B66F52]" />
+              <MapPin className="w-3.5 h-3.5 text-[#A4834C]" />
               <span>{t.actions.locationLabel}</span>
             </dt>
-            <dd className={`text-right font-medium ${isDark ? 'text-[#F4F0E6]' : 'text-[#243D32]'}`}>
+            <dd className={`text-right font-medium ${isDark ? 'text-[#FAF7F0]' : 'text-[#1B3128]'}`}>
               {prop.location}
             </dd>
           </div>
           <div className="flex items-start justify-between gap-3">
             <dt className="shrink-0">{t.actions.landTypeLabel}</dt>
-            <dd className={`text-right font-medium ${isDark ? 'text-[#F4F0E6]' : 'text-[#243D32]'}`}>
+            <dd className={`text-right font-medium ${isDark ? 'text-[#FAF7F0]' : 'text-[#1B3128]'}`}>
               {t.categories[prop.category] || prop.category} · {prop.titleStatus}
             </dd>
           </div>
           <div className="flex items-start justify-between gap-3 tabular-nums">
             <dt className="inline-flex items-center gap-1.5 shrink-0">
-              <Ruler className="w-3.5 h-3.5 text-[#B66F52]" />
+              <Ruler className="w-3.5 h-3.5 text-[#A4834C]" />
               <span>{t.actions.areaLabel}</span>
             </dt>
-            <dd className={`text-right font-medium ${isDark ? 'text-[#F4F0E6]' : 'text-[#243D32]'}`}>
+            <dd className={`text-right font-medium ${isDark ? 'text-[#FAF7F0]' : 'text-[#1B3128]'}`}>
               {prop.areaSize}
-              {prop.bedrooms ? ` · ${prop.bedrooms} Bed` : ''}
+              {prop.bedrooms ? ` · ${prop.bedrooms} ${t.modal.bedShort}` : ''}
             </dd>
           </div>
           <div className="flex items-start justify-between gap-3">
             <dt className="inline-flex items-center gap-1.5 shrink-0">
-              <User className="w-3.5 h-3.5 text-[#B66F52]" />
+              <User className="w-3.5 h-3.5 text-[#A4834C]" />
               <span>{t.actions.contactLabel}</span>
             </dt>
-            <dd className={`text-right font-medium ${isDark ? 'text-[#F4F0E6]' : 'text-[#243D32]'}`}>
+            <dd className={`text-right font-medium ${isDark ? 'text-[#FAF7F0]' : 'text-[#1B3128]'}`}>
               <span>{prop.agentName}</span>
               <span className="block text-[11px] opacity-80 inline-flex items-center justify-end gap-1 ml-1">
                 <Mail className="w-3 h-3 inline" /> {prop.agentContact}
@@ -120,13 +119,13 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ prop, variant = 'lig
           <div>
             <span
               className={`font-serif text-2xl tabular-nums ${
-                isDark ? 'text-[#F4F0E6]' : 'text-[#243D32]'
+                isDark ? 'text-[#FAF7F0]' : 'text-[#1B3128]'
               }`}
             >
               ${prop.price.toLocaleString()}
             </span>
             {prop.priceUnit === 'per month' && (
-              <span className={`text-xs ${isDark ? 'text-[#D9CCB8]' : 'text-[#52634A]'}`}>
+              <span className={`text-xs ${isDark ? 'text-[#D9CCB8]' : 'text-[#4F6047]'}`}>
                 {' '}
                 {t.home.perMonth}
               </span>
@@ -136,10 +135,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ prop, variant = 'lig
           <button
             type="button"
             onClick={handleOpenModal}
-            className={`inline-flex items-center gap-1.5 text-xs font-medium cursor-pointer whitespace-nowrap ${
+            className={`inline-flex items-center gap-1.5 text-xs font-medium cursor-pointer whitespace-nowrap rounded-sm transition-colors ${
               isDark
-                ? 'px-3.5 py-2 bg-[#F4F0E6] text-[#243D32] hover:bg-[#D9CCB8] rounded-sm'
-                : 'px-3.5 py-2 bg-[#243D32] text-[#F4F0E6] hover:bg-[#52634A] rounded-sm'
+                ? 'px-3.5 py-2 bg-[#C7AA74] text-[#1B3128] hover:bg-[#FAF7F0]'
+                : 'px-3.5 py-2 bg-[#1B3128] text-[#FAF7F0] hover:bg-[#A4834C]'
             }`}
           >
             <span>{t.actions.inspectDossier}</span>

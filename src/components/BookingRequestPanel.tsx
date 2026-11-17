@@ -51,11 +51,11 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
     e.preventDefault();
     setError(null);
     if (!guestName.trim() || !guestEmail.trim()) {
-      setError('Please enter your name and email so our local concierge can verify availability.');
+      setError(t.booking.missingContactError);
       return;
     }
     if (requireCheckOut && new Date(checkOut) <= new Date(checkIn)) {
-      setError('Check-out date must be after check-in date.');
+      setError(t.booking.dateOrderError);
       return;
     }
 
@@ -76,11 +76,7 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
       });
       setSubmitted(created);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to reach the booking server. Your request has not been saved.'
-      );
+      setError(err instanceof Error ? err.message : t.booking.serverError);
     } finally {
       setSubmitting(false);
     }
@@ -88,35 +84,43 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
 
   if (submitted) {
     return (
-      <div className="bg-[#F4F0E6] border border-[#243D32]/25 p-6 md:p-8 space-y-5">
+      <div className="bg-[#FAF7F0] luxury-frame p-6 md:p-8 space-y-5">
         <div className="flex items-start gap-3">
-          <Clock className="w-5 h-5 text-[#B66F52] shrink-0 mt-0.5" />
+          <Clock className="w-5 h-5 text-[#A4834C] shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs uppercase tracking-widest text-[#B66F52] font-medium">
+            <p className="text-xs uppercase tracking-widest text-[#A4834C] font-medium">
               {t.bookingStatus.pending_verification}
             </p>
-            <h3 className="font-serif text-2xl text-[#243D32] mt-1">{t.bookingStatus.pending_verification}</h3>
+            <h3 className="font-serif text-2xl text-[#1B3128] mt-1">
+              {t.bookingStatus.pending_verification}
+            </h3>
           </div>
         </div>
-        <p className="text-sm text-[#292B27]/85 leading-relaxed">
-          Your request for <span className="font-medium text-[#243D32]">{submitted.itemTitle}</span> has been recorded as{' '}
-          <span className="font-medium text-[#243D32] tabular-nums">{submitted.referenceCode}</span>. Availability is not confirmed until verified by our Kalaw host team.
+        <p className="text-sm text-[#222420]/85 leading-relaxed">
+          {t.booking.recordedMessagePrefix}{' '}
+          <span className="font-medium text-[#1B3128]">{submitted.itemTitle}</span>{' '}
+          {t.booking.recordedMessageMid}{' '}
+          <span className="font-medium text-[#1B3128] tabular-nums">{submitted.referenceCode}</span>{' '}
+          {t.booking.recordedMessageSuffix}
         </p>
-        <div className="border-t border-b border-[#D9CCB8] py-3 space-y-1.5 text-xs text-[#52634A] tabular-nums">
+        <div className="border-t border-b border-[#A4834C]/25 py-3 space-y-1.5 text-xs text-[#4F6047] tabular-nums">
           <div className="flex justify-between">
-            <span>Requested Date</span>
-            <span className="text-[#292B27]">
+            <span>{t.booking.requestedDate}</span>
+            <span className="text-[#222420]">
               {submitted.checkIn}
               {submitted.checkOut ? ` → ${submitted.checkOut}` : ''}
             </span>
           </div>
           <div className="flex justify-between">
-            <span>Party Size</span>
-            <span className="text-[#292B27]">{submitted.guests} Guests</span>
+            <span>{t.booking.partySize}</span>
+            <span className="text-[#222420]">
+              {submitted.guests}{' '}
+              {submitted.guests === 1 ? t.booking.guestSingular : t.booking.guestPlural}
+            </span>
           </div>
           {submitted.totalEstimate > 0 && (
-            <div className="flex justify-between font-medium text-[#243D32]">
-              <span>Estimated Total</span>
+            <div className="flex justify-between font-medium text-[#1B3128]">
+              <span>{t.booking.estimatedTotal}</span>
               <span>${submitted.totalEstimate.toLocaleString()}</span>
             </div>
           )}
@@ -124,16 +128,16 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <Link
             to="/bookings"
-            className="px-4 py-2.5 bg-[#243D32] text-[#F4F0E6] text-xs font-medium rounded-sm hover:bg-[#52634A] transition-colors"
+            className="px-4 py-2.5 bg-[#1B3128] text-[#FAF7F0] text-xs font-medium rounded-sm hover:bg-[#4F6047] transition-colors"
           >
-            Manage Requests
+            {t.booking.manageRequests}
           </Link>
           <button
             type="button"
             onClick={() => setSubmitted(null)}
-            className="px-4 py-2.5 border border-[#243D32]/30 text-[#243D32] text-xs font-medium rounded-sm hover:bg-[#D9CCB8]/40 transition-colors cursor-pointer"
+            className="px-4 py-2.5 border border-[#A4834C]/45 text-[#1B3128] text-xs font-medium rounded-sm hover:bg-[#D9CCB8]/40 transition-colors cursor-pointer"
           >
-            Submit Another
+            {t.booking.submitAnother}
           </button>
         </div>
       </div>
@@ -141,68 +145,68 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-[#F4F0E6] border border-[#D9CCB8] p-6 md:p-8 space-y-5">
-      <div className="flex items-baseline justify-between border-b border-[#D9CCB8] pb-4">
+    <form onSubmit={handleSubmit} className="bg-[#FAF7F0] luxury-frame p-6 md:p-8 space-y-5">
+      <div className="flex items-baseline justify-between border-b border-[#A4834C]/25 pb-4">
         <div>
           {unitPrice > 0 ? (
             <div className="flex items-baseline gap-1.5">
-              <span className="font-serif text-3xl text-[#243D32] tabular-nums">
+              <span className="font-serif text-3xl text-[#1B3128] tabular-nums">
                 ${unitPrice.toLocaleString()}
               </span>
-              <span className="text-xs text-[#52634A]">{priceLabel}</span>
+              <span className="text-xs text-[#4F6047]">{priceLabel}</span>
             </div>
           ) : (
-            <span className="font-serif text-2xl text-[#243D32]">{priceLabel}</span>
+            <span className="font-serif text-2xl text-[#1B3128]">{priceLabel}</span>
           )}
         </div>
-        <span className="text-xs text-[#52634A]">Request &amp; Verify</span>
+        <span className="text-xs text-[#A4834C] font-medium">{t.booking.requestVerify}</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs text-[#52634A] mb-1.5">
-            {requireCheckOut ? 'Check-in' : 'Preferred Date'}
+          <label className="block text-xs text-[#4F6047] mb-1.5">
+            {requireCheckOut ? t.booking.checkIn : t.booking.preferredDate}
           </label>
           <div className="relative">
-            <Calendar className="w-3.5 h-3.5 text-[#52634A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Calendar className="w-3.5 h-3.5 text-[#4F6047] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="date"
               required
               value={checkIn}
               onChange={(e) => setCheckIn(e.target.value)}
-              className="w-full pl-9 pr-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] tabular-nums focus:outline-none focus:border-[#243D32]"
+              className="w-full pl-9 pr-3 py-2.5 bg-white/80 border border-[#D9CCB8] text-sm text-[#222420] tabular-nums focus:outline-none focus:border-[#1B3128]"
             />
           </div>
         </div>
 
         {requireCheckOut && (
           <div>
-            <label className="block text-xs text-[#52634A] mb-1.5">Check-out</label>
+            <label className="block text-xs text-[#4F6047] mb-1.5">{t.booking.checkOut}</label>
             <div className="relative">
-              <Calendar className="w-3.5 h-3.5 text-[#52634A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Calendar className="w-3.5 h-3.5 text-[#4F6047] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="date"
                 required
                 value={checkOut}
                 onChange={(e) => setCheckOut(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] tabular-nums focus:outline-none focus:border-[#243D32]"
+                className="w-full pl-9 pr-3 py-2.5 bg-white/80 border border-[#D9CCB8] text-sm text-[#222420] tabular-nums focus:outline-none focus:border-[#1B3128]"
               />
             </div>
           </div>
         )}
 
         <div className={requireCheckOut ? 'sm:col-span-2' : ''}>
-          <label className="block text-xs text-[#52634A] mb-1.5">Guests / Party Size</label>
+          <label className="block text-xs text-[#4F6047] mb-1.5">{t.booking.partySize}</label>
           <div className="relative">
-            <Users className="w-3.5 h-3.5 text-[#52634A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Users className="w-3.5 h-3.5 text-[#4F6047] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <select
               value={guests}
               onChange={(e) => setGuests(Number(e.target.value))}
-              className="w-full pl-9 pr-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] tabular-nums focus:outline-none focus:border-[#243D32]"
+              className="w-full pl-9 pr-3 py-2.5 bg-white/80 border border-[#D9CCB8] text-sm text-[#222420] tabular-nums focus:outline-none focus:border-[#1B3128]"
             >
               {Array.from({ length: maxGuests }, (_, idx) => idx + 1).map((num) => (
                 <option key={num} value={num}>
-                  {num} {num === 1 ? 'Guest' : 'Guests'}
+                  {num} {num === 1 ? t.booking.guestSingular : t.booking.guestPlural}
                 </option>
               ))}
             </select>
@@ -212,53 +216,62 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs text-[#52634A] mb-1.5">Full Name</label>
+          <label className="block text-xs text-[#4F6047] mb-1.5">{t.booking.fullName}</label>
           <input
             type="text"
             required
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
-            placeholder="Your full name"
-            className="w-full px-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] focus:outline-none focus:border-[#243D32]"
+            placeholder={t.booking.fullNamePlaceholder}
+            className="w-full px-3 py-2.5 bg-white/80 border border-[#D9CCB8] text-sm text-[#222420] focus:outline-none focus:border-[#1B3128]"
           />
         </div>
         <div>
-          <label className="block text-xs text-[#52634A] mb-1.5">Email Address</label>
+          <label className="block text-xs text-[#4F6047] mb-1.5">{t.booking.emailAddress}</label>
           <input
             type="email"
             required
             value={guestEmail}
             onChange={(e) => setGuestEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full px-3 py-2.5 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] focus:outline-none focus:border-[#243D32]"
+            className="w-full px-3 py-2.5 bg-white/80 border border-[#D9CCB8] text-sm text-[#222420] focus:outline-none focus:border-[#1B3128]"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs text-[#52634A] mb-1.5">Notes for Local Host (Optional)</label>
+        <label className="block text-xs text-[#4F6047] mb-1.5">{t.booking.notesLabel}</label>
         <textarea
           rows={2}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Dietary preferences, pickup timing, or viewing questions..."
-          className="w-full px-3 py-2 bg-white/70 border border-[#D9CCB8] text-sm text-[#292B27] focus:outline-none focus:border-[#243D32]"
+          placeholder={t.booking.notesPlaceholder}
+          className="w-full px-3 py-2 bg-white/80 border border-[#D9CCB8] text-sm text-[#222420] focus:outline-none focus:border-[#1B3128]"
         />
       </div>
 
       {totalEstimate > 0 && (
-        <div className="pt-2 border-t border-[#D9CCB8] flex items-center justify-between text-sm">
-          <span className="text-[#52634A] tabular-nums">
-            ${unitPrice} × {nightsOrUnits} {requireCheckOut ? (nightsOrUnits === 1 ? 'night' : 'nights') : itemType === 'experience' ? (nightsOrUnits === 1 ? 'guest' : 'guests') : 'day'}
+        <div className="pt-2 border-t border-[#A4834C]/25 flex items-center justify-between text-sm">
+          <span className="text-[#4F6047] tabular-nums">
+            ${unitPrice} × {nightsOrUnits}{' '}
+            {requireCheckOut
+              ? nightsOrUnits === 1
+                ? t.booking.nightSingular
+                : t.booking.nightPlural
+              : itemType === 'experience'
+                ? nightsOrUnits === 1
+                  ? t.booking.guestSingular
+                  : t.booking.guestPlural
+                : t.booking.daySingular}
           </span>
-          <span className="font-semibold text-[#243D32] tabular-nums">
-            Est. ${totalEstimate.toLocaleString()}
+          <span className="font-semibold text-[#1B3128] tabular-nums">
+            {t.booking.estPrefix} ${totalEstimate.toLocaleString()}
           </span>
         </div>
       )}
 
       {error && (
-        <div role="alert" className="p-3 bg-[#B66F52]/10 border border-[#B66F52] text-xs text-[#292B27]">
+        <div role="alert" className="p-3 bg-[#B66F52]/10 border border-[#B66F52] text-xs text-[#222420]">
           {error}
         </div>
       )}
@@ -266,13 +279,13 @@ export const BookingRequestPanel: React.FC<BookingRequestPanelProps> = ({
       <button
         type="submit"
         disabled={submitting}
-        className="w-full py-3 px-4 bg-[#243D32] text-[#F4F0E6] text-sm font-medium rounded-sm hover:bg-[#52634A] disabled:opacity-60 transition-colors cursor-pointer"
+        className="w-full py-3 px-4 bg-[#1B3128] text-[#FAF7F0] text-sm font-medium rounded-sm hover:bg-[#A4834C] disabled:opacity-60 transition-colors cursor-pointer"
       >
         {submitting ? t.actions.submitting : ctaLabel || t.actions.submitBooking}
       </button>
 
-      <p className="flex items-center gap-1.5 text-xs text-[#52634A]">
-        <CheckCircle2 className="w-3.5 h-3.5 text-[#52634A] shrink-0" />
+      <p className="flex items-center gap-1.5 text-xs text-[#4F6047]">
+        <CheckCircle2 className="w-3.5 h-3.5 text-[#A4834C] shrink-0" />
         <span>{t.actions.noChargeNote}</span>
       </p>
     </form>

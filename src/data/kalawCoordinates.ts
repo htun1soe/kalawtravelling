@@ -1,0 +1,271 @@
+export type GoalBucket = 'sunrise' | 'trekking' | 'heritage' | 'staysDining';
+
+export interface KalawWaypoint {
+  id: string;
+  kind: 'hub' | 'destination' | 'stay' | 'restaurant' | 'property';
+  goalBucket: GoalBucket | 'hub';
+  lat: number;
+  lng: number;
+  nameEn: string;
+  nameMy: string;
+  areaEn: string;
+  areaMy: string;
+  elevation?: string;
+}
+
+export const KALAW_CENTER = { lat: 20.6326, lng: 96.5628 };
+
+export const KALAW_WAYPOINTS: KalawWaypoint[] = [
+  // Central Hubs
+  {
+    id: 'hub-clock-tower',
+    kind: 'hub',
+    goalBucket: 'hub',
+    lat: 20.6326,
+    lng: 96.5628,
+    nameEn: 'Kalaw Clock Tower (Town Center)',
+    nameMy: 'ကလော နာရီစင် (မြို့လယ်)',
+    areaEn: 'Union Highway, Central Kalaw',
+    areaMy: 'ပြည်ထောင်စုလမ်းမ၊ မြို့လယ်',
+    elevation: '1,320 m',
+  },
+  {
+    id: 'hub-heho-approach',
+    kind: 'hub',
+    goalBucket: 'hub',
+    lat: 20.747,
+    lng: 96.792,
+    nameEn: 'Heho Airport Approach (HEH)',
+    nameMy: 'ဟဲဟိုးလေဆိပ် (HEH)',
+    areaEn: '50 min East of Kalaw',
+    areaMy: 'ကလောအရှေ့ဘက် မိနစ် ၅၀ ခရီး',
+    elevation: '1,175 m',
+  },
+
+  // Destinations (matching INITIAL_DESTINATIONS exact coordinates)
+  {
+    id: 'dest-1',
+    kind: 'destination',
+    goalBucket: 'sunrise',
+    lat: 20.6384,
+    lng: 96.5648,
+    nameEn: 'Thein Taung Monastery Ridge',
+    nameMy: 'သိမ်တောင် ဘုန်းကြီးကျောင်း',
+    areaEn: 'North Ridge, Kalaw',
+    areaMy: 'မြောက်ဘက်တောင်ကြော',
+    elevation: '1,385 m',
+  },
+  {
+    id: 'dest-2',
+    kind: 'destination',
+    goalBucket: 'trekking',
+    lat: 20.5912,
+    lng: 96.6024,
+    nameEn: 'Myin Ma Hti Pine Corridor',
+    nameMy: 'မြင်းမထိ ထင်းရှူးတောလမ်း',
+    areaEn: 'South-East Kalaw Hills',
+    areaMy: 'အရှေ့တောင်တောင်တန်း',
+    elevation: '1,420 m',
+  },
+  {
+    id: 'dest-3',
+    kind: 'destination',
+    goalBucket: 'heritage',
+    lat: 20.6311,
+    lng: 96.5612,
+    nameEn: 'Kalaw Heritage Railway Quarter',
+    nameMy: 'ကလော ဘူတာရပ်ကွက်',
+    areaEn: 'Central Town & Station Road',
+    areaMy: 'ဘူတာလမ်း၊ မြို့လယ်',
+    elevation: '1,320 m',
+  },
+  {
+    id: 'dest-4',
+    kind: 'destination',
+    goalBucket: 'heritage',
+    lat: 20.6194,
+    lng: 96.5789,
+    nameEn: 'Hnee Paya Bamboo Sanctuary',
+    nameMy: 'နှီးဘုရား ဝါးယက်ရုပ်ပွားတော်',
+    areaEn: 'Myin Ka Village Road',
+    areaMy: 'မြင်းကရွာလမ်း',
+    elevation: '1,340 m',
+  },
+  {
+    id: 'dest-5',
+    kind: 'destination',
+    goalBucket: 'sunrise',
+    lat: 20.654,
+    lng: 96.5122,
+    nameEn: 'Ywa Pu Tea Terraces & Crest',
+    nameMy: 'ရွာပု လက်ဖက်တောင်ကြော',
+    areaEn: 'Western Escarpment, 9 km',
+    areaMy: 'အနောက်ဘက် ၉ ကီလိုမီတာ',
+    elevation: '1,510 m',
+  },
+  {
+    id: 'dest-6',
+    kind: 'destination',
+    goalBucket: 'trekking',
+    lat: 20.6845,
+    lng: 96.549,
+    nameEn: 'Palaung Highland Forest Reserve',
+    nameMy: 'ပလောင် တောင်ပေါ်သစ်တော',
+    areaEn: 'Northern Watershed',
+    areaMy: 'မြောက်ဘက် ရေဝေရေလဲ',
+    elevation: '1,560 m',
+  },
+
+  // Stays
+  {
+    id: 'stay-1',
+    kind: 'stay',
+    goalBucket: 'staysDining',
+    lat: 20.6368,
+    lng: 96.5579,
+    nameEn: 'The Kalaw Pine Heritage Lodge',
+    nameMy: 'ကလော ထင်းရှူး ရှေးဟောင်းတည်းခိုအိမ်',
+    areaEn: 'Upper Pine Ridge, Kalaw',
+    areaMy: 'အထက်ထင်းရှူးတောင်ကြော',
+  },
+  {
+    id: 'stay-2',
+    kind: 'stay',
+    goalBucket: 'staysDining',
+    lat: 20.6435,
+    lng: 96.5395,
+    nameEn: 'Misty Ridge Stone Pavilion',
+    nameMy: 'မြူတောင်ကြော ကျောက်အိမ်တော်',
+    areaEn: 'Western Escarpment',
+    areaMy: 'အနောက်ဘက်တောင်စွန်း',
+  },
+  {
+    id: 'stay-3',
+    kind: 'stay',
+    goalBucket: 'staysDining',
+    lat: 20.6304,
+    lng: 96.5618,
+    nameEn: 'Hill Station Garden Guesthouse',
+    nameMy: 'ဘူတာလမ်း ဥယျာဉ်တည်းခိုခန်း',
+    areaEn: 'Station Road Quarter',
+    areaMy: 'ဘူတာလမ်းရပ်ကွက်',
+  },
+  {
+    id: 'stay-4',
+    kind: 'stay',
+    goalBucket: 'staysDining',
+    lat: 20.648,
+    lng: 96.5245,
+    nameEn: 'Ywa Pu Cedar Sanctuary',
+    nameMy: 'ရွာပု ဆီဒါတောအုပ် အိမ်ငယ်များ',
+    areaEn: 'Ywa Pu Valley, 6 km West',
+    areaMy: 'ရွာပုတောင်ကြား',
+  },
+  {
+    id: 'stay-5',
+    kind: 'stay',
+    goalBucket: 'staysDining',
+    lat: 20.6168,
+    lng: 96.5822,
+    nameEn: 'Daw Mya’s Tea Village Homestay',
+    nameMy: 'ဒေါ်မြ၏ လက်ဖက်ရွာ Homestay',
+    areaEn: 'Myin Ka Hamlet',
+    areaMy: 'မြင်းကကျေးရွာ',
+  },
+
+  // Restaurants
+  {
+    id: 'rest-1',
+    kind: 'restaurant',
+    goalBucket: 'staysDining',
+    lat: 20.6331,
+    lng: 96.5635,
+    nameEn: 'Shan Hearth & Morning Teahouse',
+    nameMy: 'ရှမ်းမီးဖို လက်ဖက်ရည်ဆိုင်',
+    areaEn: 'Union Highway, Near Clock Tower',
+    areaMy: 'ပြည်ထောင်စုလမ်းမကြီး၊ နာရီစင်အနီး',
+  },
+  {
+    id: 'rest-2',
+    kind: 'restaurant',
+    goalBucket: 'staysDining',
+    lat: 20.6374,
+    lng: 96.5591,
+    nameEn: 'The Pine Veranda Table',
+    nameMy: 'ထင်းရှူးဝရန်တာ စားသောက်ဆိုင်',
+    areaEn: 'Upper Pine Ridge',
+    areaMy: 'အထက်ထင်းရှူးတောင်ကြော',
+  },
+  {
+    id: 'rest-3',
+    kind: 'restaurant',
+    goalBucket: 'staysDining',
+    lat: 20.6316,
+    lng: 96.5608,
+    nameEn: 'Station Road Roastery & Bakery',
+    nameMy: 'ဘူတာလမ်း ကော်ဖီနှင့် မုန့်ဖုတ်ဆိုင်',
+    areaEn: 'Station Road',
+    areaMy: 'ဘူတာလမ်း',
+  },
+  {
+    id: 'rest-4',
+    kind: 'restaurant',
+    goalBucket: 'staysDining',
+    lat: 20.6341,
+    lng: 96.5652,
+    nameEn: 'Everest Highland Nepali Kitchen',
+    nameMy: 'ဧဝရတ် ဂေါ်ရခါး စားသောက်ဆိုင်',
+    areaEn: 'Market Lane',
+    areaMy: 'ဈေးလမ်းသွယ်',
+  },
+
+  // Real Estate Properties
+  {
+    id: 'prop-1',
+    kind: 'property',
+    goalBucket: 'staysDining',
+    lat: 20.6392,
+    lng: 96.5562,
+    nameEn: 'Pine Ridge Timber & Stone Residence',
+    nameMy: 'ထင်းရှူးတောင်ကြော ကျွန်းသစ်နေအိမ်',
+    areaEn: 'Quarter 3, Upper Pine Ridge',
+    areaMy: 'ရပ်ကွက် (၃)၊ အထက်ထင်းရှူး',
+  },
+  {
+    id: 'prop-2',
+    kind: 'property',
+    goalBucket: 'staysDining',
+    lat: 20.6285,
+    lng: 96.5665,
+    nameEn: 'Colonial Veranda Heritage Bungalow',
+    nameMy: 'ကိုလိုနီဝရန်တာ ဘန်ဂလို',
+    areaEn: 'Church Hill Lane, Kalaw',
+    areaMy: 'ချာ့ချ်ဟေးလ်လမ်း',
+  },
+  {
+    id: 'prop-3',
+    kind: 'property',
+    goalBucket: 'staysDining',
+    lat: 20.6462,
+    lng: 96.5305,
+    nameEn: 'Ywa Pu Elevated Ridge Acreage',
+    nameMy: 'ရွာပု တောင်ကြောမြေ (၁.၈၅ ဧက)',
+    areaEn: 'Western Escarpment, 4.5 km',
+    areaMy: 'အနောက်ဘက် ၄.၅ ကီလိုမီတာ',
+  },
+  {
+    id: 'prop-4',
+    kind: 'property',
+    goalBucket: 'staysDining',
+    lat: 20.6315,
+    lng: 96.5619,
+    nameEn: 'Station Quarter Boutique Hospitality Corner',
+    nameMy: 'ဘူတာရပ်ကွက် ထောင့်ကွက် ဟိုတယ်နေရာ',
+    areaEn: 'Station Road, Central Kalaw',
+    areaMy: 'ဘူတာလမ်း၊ မြို့လယ်',
+  },
+];
+
+export function getWaypointById(id: string): KalawWaypoint | undefined {
+  return KALAW_WAYPOINTS.find((w) => w.id === id);
+}

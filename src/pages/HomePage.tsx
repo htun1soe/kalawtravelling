@@ -1,10 +1,12 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Calendar, Compass, Images, MapPin, Search, Star, Users } from 'lucide-react';
+import { ArrowRight, Calendar, Compass, Images, MapPin, Navigation, Search, Star, Users } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { CardMediaCarousel, resolveMediaList } from '../components/CardMediaCarousel';
 import { EditorialImage } from '../components/EditorialImage';
 import { FavoriteButton } from '../components/FavoriteButton';
+import { PlaceReviewsSection } from '../components/PlaceReviewsSection';
+import { PlacesNavigationMap } from '../components/PlacesNavigationMap';
 import { PropertyCard } from '../components/PropertyCard';
 import { ScrollReveal, ScrollStaggerItem } from '../components/ScrollReveal';
 import { useApp } from '../context/AppContext';
@@ -100,9 +102,11 @@ export const HomePage: React.FC = () => {
     HERO_HIGHLIGHTS.find((h) => h.id === activeSpotlight) || HERO_HIGHLIGHTS[0];
   const currentHighlightCopy = t.hero.spotlights[currentHighlight.id];
 
-  // Interactive section filters
+  // Interactive section filters & places navigator state
   const [destFilter, setDestFilter] = useState<'All' | DestinationCategory>('All');
   const [stayFilter, setStayFilter] = useState<'All' | StayCategory>('All');
+  const [showHomeMap, setShowHomeMap] = useState(false);
+  const [homeNavDestId, setHomeNavDestId] = useState('dest-1');
 
   const filteredDestinations = useMemo(() => {
     const list =
@@ -140,11 +144,11 @@ export const HomePage: React.FC = () => {
   const secondaryArticles = articles.slice(1, 4);
 
   return (
-    <div className="bg-[#F4F0E6] text-[#292B27]">
+      <div className="bg-[#F6F2E9] text-[#222420]">
       {/* B. IMMERSIVE HERO SECTION WITH FEATURED KALAW GALLERY */}
       <section
         ref={heroRef}
-        className="relative min-h-[820px] flex flex-col justify-end overflow-hidden bg-[#243D32]"
+        className="relative min-h-[820px] flex flex-col justify-end overflow-hidden bg-[#1B3128]"
       >
         <motion.img
           key={currentHighlight.backdrop}
@@ -154,42 +158,42 @@ export const HomePage: React.FC = () => {
           style={{ y: heroParallaxY, scale: heroParallaxScale }}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 will-change-transform"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#292B27]/92 via-[#292B27]/68 to-[#292B27]/45" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#292B27]/90 via-transparent to-[#292B27]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#181C18]/92 via-[#1B241E]/68 to-[#181C18]/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#181C18]/90 via-transparent to-[#181C18]/40" />
 
         <div className="relative z-10 max-w-[1360px] w-full mx-auto px-6 md:px-10 pt-28 pb-10 md:pb-12 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end">
             {/* Left Column: Editorial Headline, CTAs & Signature Highlights Selector */}
             <div className="lg:col-span-7 space-y-6">
-              <p className="text-xs uppercase tracking-[0.22em] text-[#D9CCB8] font-medium">
+              <p className="text-xs uppercase tracking-[0.22em] text-[#C7AA74] font-medium">
                 {t.hero.eyebrow}
               </p>
-              <h1 className="font-serif text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.06] font-medium text-[#F4F0E6] headline-balance max-w-2xl">
+              <h1 className="font-serif text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.12] font-medium text-[#FAF7F0] headline-balance max-w-2xl">
                 {t.hero.headline}
               </h1>
-              <p className="text-base md:text-lg text-[#F4F0E6]/88 leading-relaxed max-w-xl">
+              <p className="text-base md:text-lg text-[#FAF7F0]/88 leading-relaxed max-w-xl">
                 {t.hero.subtitle}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-1">
                 <Link
                   to="/explore"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#F4F0E6] text-[#243D32] text-sm font-medium rounded-sm hover:bg-[#D9CCB8] transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#FAF7F0] text-[#1B3128] text-sm font-medium rounded-sm hover:bg-[#C7AA74] transition-colors whitespace-nowrap"
                 >
                   <span>{t.hero.exploreCta}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
                   to="/plan-trip"
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-[#F4F0E6]/60 text-[#F4F0E6] text-sm font-medium rounded-sm hover:bg-[#F4F0E6]/10 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-[#C7AA74]/70 text-[#FAF7F0] text-sm font-medium rounded-sm hover:bg-[#C7AA74]/15 transition-colors whitespace-nowrap"
                 >
-                  <Compass className="w-4 h-4" />
+                  <Compass className="w-4 h-4 text-[#C7AA74]" />
                   <span>{t.hero.planCta}</span>
                 </Link>
               </div>
 
               {/* Interactive Signature Highlights Switcher */}
-              <div className="pt-4 border-t border-[#F4F0E6]/20 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="pt-4 border-t border-[#C7AA74]/30 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {HERO_HIGHLIGHTS.map((item) => {
                   const active = item.id === currentHighlight.id;
                   const copy = t.hero.spotlights[item.id];
@@ -200,14 +204,14 @@ export const HomePage: React.FC = () => {
                       onClick={() => setActiveSpotlight(item.id)}
                       className={`text-left py-2.5 px-3 border transition-colors cursor-pointer ${
                         active
-                          ? 'bg-[#F4F0E6]/15 border-[#D9CCB8] text-[#F4F0E6]'
-                          : 'bg-transparent border-[#F4F0E6]/15 text-[#F4F0E6]/70 hover:text-[#F4F0E6] hover:border-[#F4F0E6]/40'
+                          ? 'bg-[#FAF7F0]/15 border-[#C7AA74] text-[#FAF7F0]'
+                          : 'bg-transparent border-[#FAF7F0]/20 text-[#FAF7F0]/75 hover:text-[#FAF7F0] hover:border-[#C7AA74]/50'
                       }`}
                     >
-                      <span className="block text-[11px] tabular-nums text-[#D9CCB8]">
+                      <span className="block text-[11px] tabular-nums text-[#C7AA74]">
                         {item.index}.
                       </span>
-                      <span className="block text-xs font-medium mt-0.5 whitespace-nowrap truncate">
+                      <span className="block text-xs font-medium mt-0.5 leading-snug">
                         {copy.label}
                       </span>
                     </button>
@@ -246,9 +250,9 @@ export const HomePage: React.FC = () => {
                     }
                   }
                 }}
-                className="group block bg-[#292B27]/80 border border-[#F4F0E6]/25 overflow-hidden cursor-pointer"
+                className="group block bg-[#1B201C]/85 border border-[#C7AA74]/40 overflow-hidden cursor-pointer"
               >
-                <div className="aspect-[16/10] overflow-hidden bg-[#243D32] relative">
+                <div className="aspect-[16/10] overflow-hidden bg-[#1B3128] relative">
                   <img
                     src={currentHighlight.featureImage}
                     alt={currentHighlightCopy.title}
@@ -271,25 +275,25 @@ export const HomePage: React.FC = () => {
                         currentHighlightCopy.meta
                       );
                     }}
-                    className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#292B27]/85 hover:bg-[#243D32] text-[#F4F0E6] text-[11px] font-medium border border-[#F4F0E6]/25 cursor-pointer"
+                    className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#1B201C]/85 hover:bg-[#1B3128] text-[#FAF7F0] text-[11px] font-medium border border-[#C7AA74]/40 cursor-pointer"
                   >
-                    <Images className="w-3 h-3" />
+                    <Images className="w-3 h-3 text-[#C7AA74]" />
                     <span>{t.actions.viewInGallery}</span>
                   </button>
                 </div>
                 <div className="p-4 flex items-end justify-between gap-4">
                   <div className="space-y-1 min-w-0">
-                    <p className="text-[11px] uppercase tracking-wider text-[#D9CCB8]">
+                    <p className="text-[11px] uppercase tracking-wider text-[#C7AA74]">
                       {currentHighlight.index} · {currentHighlightCopy.meta}
                     </p>
-                    <h2 className="font-serif text-xl md:text-2xl text-[#F4F0E6] group-hover:text-[#D9CCB8] transition-colors truncate">
+                    <h2 className="font-serif text-xl md:text-2xl text-[#FAF7F0] group-hover:text-[#C7AA74] transition-colors leading-relaxed">
                       {currentHighlightCopy.title}
                     </h2>
-                    <p className="text-xs text-[#F4F0E6]/75 line-clamp-2">
+                    <p className="text-xs text-[#FAF7F0]/80 leading-relaxed">
                       {currentHighlightCopy.caption}
                     </p>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[#D9CCB8] shrink-0 mb-1" />
+                  <ArrowRight className="w-4 h-4 text-[#C7AA74] shrink-0 mb-1" />
                 </div>
               </div>
 
@@ -328,7 +332,7 @@ export const HomePage: React.FC = () => {
           {/* Full-Width Travel Search Interface */}
           <form
             onSubmit={handleHeroSearch}
-            className="bg-[#F4F0E6] text-[#292B27] border border-[#D9CCB8] p-3 md:p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-end"
+            className="bg-[#FAF7F0] text-[#222420] luxury-frame p-3 md:p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-end"
           >
             <div className="md:col-span-4 px-2">
               <label className="block text-[11px] uppercase tracking-wider text-[#52634A] mb-1">
@@ -410,13 +414,13 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* C. DISCOVER KALAW — ASYMMETRICAL EDITORIAL SHOWCASE */}
-      <section className="max-w-[1360px] mx-auto px-6 md:px-10 py-20 md:py-28 border-b border-[#D9CCB8]">
+      <section className="max-w-[1360px] mx-auto px-6 md:px-10 py-20 md:py-28 border-b border-[#A4834C]/30">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <ScrollReveal className="lg:col-span-5 space-y-6">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#A4834C] font-medium">
               {t.home.discoverEyebrow}
             </p>
-            <h2 className="font-serif text-4xl md:text-5xl leading-[1.08] text-[#243D32] headline-balance">
+            <h2 className="font-serif text-4xl md:text-5xl leading-[1.15] text-[#1B3128] headline-balance">
               {t.home.discoverTitle}
             </h2>
             <p className="text-base text-[#292B27]/85 leading-relaxed">
@@ -477,27 +481,47 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* D. EXPLORE PLACES */}
-      <section className="max-w-[1360px] mx-auto px-6 md:px-10 py-20 md:py-24 border-b border-[#D9CCB8]">
+      <section className="max-w-[1360px] mx-auto px-6 md:px-10 py-20 md:py-24 border-b border-[#A4834C]/30">
         <ScrollReveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div className="space-y-2 max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#B66F52] font-medium">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#A4834C] font-medium">
               {t.home.placesEyebrow}
             </p>
-            <h2 className="font-serif text-3xl md:text-4xl text-[#243D32]">
+            <h2 className="font-serif text-3xl md:text-4xl text-[#1B3128]">
               {t.home.placesTitle}
             </h2>
           </div>
-          <Link
-            to="/destinations"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#243D32] hover:text-[#B66F52] transition-colors whitespace-nowrap shrink-0"
-          >
-            <span>{t.home.viewAllDest}</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowHomeMap((v) => !v)}
+              className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-sm border transition-colors cursor-pointer whitespace-nowrap ${
+                showHomeMap
+                  ? 'bg-[#1B3128] text-[#FAF7F0] border-[#1B3128]'
+                  : 'border-[#A4834C] text-[#1B3128] hover:bg-[#A4834C]/15'
+              }`}
+            >
+              <Navigation className="w-3.5 h-3.5 text-[#A4834C]" />
+              <span>{t.navigationMap.eyebrow}</span>
+            </button>
+            <Link
+              to="/destinations"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#1B3128] hover:text-[#A4834C] transition-colors whitespace-nowrap"
+            >
+              <span>{t.home.viewAllDest}</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </ScrollReveal>
 
+        {showHomeMap && (
+          <div className="mb-12">
+            <PlacesNavigationMap initialDestinationId={homeNavDestId} />
+          </div>
+        )}
+
         {/* Category filter tabs */}
-        <div className="flex flex-wrap items-center gap-2 mb-10 border-b border-[#D9CCB8] pb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-10 border-b border-[#A4834C]/25 pb-4">
           {DEST_CATEGORIES.map((category) => (
             <button
               key={category}
@@ -505,8 +529,8 @@ export const HomePage: React.FC = () => {
               onClick={() => setDestFilter(category)}
               className={`px-3.5 py-2 text-xs font-medium rounded-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 destFilter === category
-                  ? 'bg-[#243D32] text-[#F4F0E6]'
-                  : 'text-[#292B27]/80 hover:bg-[#D9CCB8]/50'
+                  ? 'bg-[#1B3128] text-[#FAF7F0]'
+                  : 'text-[#222420]/80 hover:bg-[#D9CCB8]/50'
               }`}
             >
               {t.categories[category] || category}
@@ -517,7 +541,7 @@ export const HomePage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
           {filteredDestinations.map((dest, idx) => (
             <ScrollStaggerItem key={dest.id} index={idx} className="flex flex-col">
-              <article className="group flex flex-col flex-1">
+              <article className="group flex flex-col flex-1 bg-[#FAF7F0] border border-[#A4834C]/25 p-4 transition-colors hover:border-[#A4834C]/55">
                 <CardMediaCarousel
                   title={dest.name}
                   subtitle={`${t.categories[dest.category] || dest.category} · ${dest.location}`}
@@ -528,33 +552,46 @@ export const HomePage: React.FC = () => {
                   topRightOverlay={<FavoriteButton itemId={dest.id} compact />}
                 />
                 <div className="pt-4 space-y-2 flex-1 flex flex-col">
-                  <div className="flex items-center gap-2 text-xs text-[#52634A]">
+                  <div className="flex items-center gap-2 text-xs text-[#4F6047]">
                     <span>{t.categories[dest.category] || dest.category}</span>
                     <span aria-hidden="true">·</span>
                     <span>{dest.location}</span>
                     <span aria-hidden="true">·</span>
                     <span className="tabular-nums">{dest.elevation}</span>
                   </div>
-                  <h3 className="font-serif text-2xl text-[#243D32]">
+                  <h3 className="font-serif text-2xl text-[#1B3128]">
                     <button
                       type="button"
                       onClick={() => openItemModal({ kind: 'destination', data: dest })}
-                      className="text-left group-hover:text-[#B66F52] transition-colors cursor-pointer"
+                      className="text-left group-hover:text-[#A4834C] transition-colors cursor-pointer"
                     >
                       {dest.name}
                     </button>
                   </h3>
-                  <p className="text-sm text-[#292B27]/80 leading-relaxed flex-1">
+                  <p className="text-sm text-[#222420]/80 leading-relaxed flex-1">
                     {dest.shortDescription}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => openItemModal({ kind: 'destination', data: dest })}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#243D32] pt-2 hover:text-[#B66F52] transition-colors cursor-pointer self-start"
-                  >
-                    <span>{t.home.readGuide}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="pt-3 border-t border-[#A4834C]/20 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openItemModal({ kind: 'destination', data: dest })}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1B3128] hover:text-[#A4834C] transition-colors cursor-pointer"
+                    >
+                      <span>{t.home.readGuide}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHomeNavDestId(dest.id);
+                        setShowHomeMap(true);
+                      }}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-[#A4834C] hover:text-[#1B3128] cursor-pointer whitespace-nowrap"
+                    >
+                      <Navigation className="w-3 h-3" />
+                      <span>{t.actions.navigateHere}</span>
+                    </button>
+                  </div>
                 </div>
               </article>
             </ScrollStaggerItem>
@@ -698,7 +735,8 @@ export const HomePage: React.FC = () => {
                   <div className="sm:col-span-7 flex flex-col justify-between space-y-2">
                     <div className="space-y-1.5">
                       <p className="text-xs text-[#52634A]">
-                        {t.categories[exp.category] || exp.category} · {exp.duration} · {exp.difficulty}
+                        {t.categories[exp.category] || exp.category} · {exp.duration} ·{' '}
+                        {t.categories[exp.difficulty] || exp.difficulty}
                       </p>
                       <h3 className="font-serif text-xl text-[#243D32]">
                         <button
@@ -804,7 +842,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* H. TRANSPORTATION & RENTALS + I. REAL ESTATE MARKETPLACE */}
-      <section className="bg-[#292B27] text-[#F4F0E6]">
+      <section className="bg-[#1B221D] text-[#FAF7F0]">
         <div className="max-w-[1360px] mx-auto px-6 md:px-10 py-20 md:py-24 space-y-20">
           {/* Transportation & Rentals Strip */}
           <div className="space-y-8">
@@ -986,7 +1024,7 @@ export const HomePage: React.FC = () => {
                         {article.title}
                       </button>
                     </h3>
-                    <p className="text-xs text-[#292B27]/75 leading-relaxed line-clamp-2">
+                    <p className="text-xs text-[#222420]/75 leading-relaxed">
                       {article.excerpt}
                     </p>
                   </div>
@@ -995,6 +1033,16 @@ export const HomePage: React.FC = () => {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* K. TRAVELER REVIEWS & GOAL GUIDANCE */}
+      <section
+        id="traveler-reviews"
+        className="max-w-[1360px] mx-auto px-6 md:px-10 py-20 md:py-24 border-t border-[#A4834C]/30"
+      >
+        <ScrollReveal>
+          <PlaceReviewsSection />
+        </ScrollReveal>
       </section>
     </div>
   );

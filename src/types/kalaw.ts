@@ -222,3 +222,29 @@ export interface AuthResponse {
   user: UserAccount;
   token: string;
 }
+
+export type TravelGoalTag =
+  | 'sunrise'
+  | 'trekking'
+  | 'heritage'
+  | 'photography'
+  | 'calmRest'
+  | 'culinary';
+
+export interface PlaceReview {
+  id: string;
+  placeId: string;
+  placeKind: 'destination' | 'stay' | 'experience' | 'restaurant';
+  placeName: string;
+  goal: TravelGoalTag;
+  authorName: string;
+  authorOrigin: string;
+  visitedSeason: string;
+  rating: number;
+  headline: string;
+  story: string;
+  goalTip: string;
+  helpfulCount: number;
+  createdAt: string;
+}
+
