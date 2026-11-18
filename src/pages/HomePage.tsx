@@ -88,6 +88,7 @@ export const HomePage: React.FC = () => {
     articles,
     openItemModal,
     openGallery,
+    startVisitNavigation,
     t,
   } = useApp();
 
@@ -571,7 +572,7 @@ export const HomePage: React.FC = () => {
                   <p className="text-sm text-[#222420]/80 leading-relaxed flex-1">
                     {dest.shortDescription}
                   </p>
-                  <div className="pt-3 border-t border-[#A4834C]/20 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-[#A4834C]/20 flex flex-wrap items-center justify-between gap-2">
                     <button
                       type="button"
                       onClick={() => openItemModal({ kind: 'destination', data: dest })}
@@ -580,17 +581,26 @@ export const HomePage: React.FC = () => {
                       <span>{t.home.readGuide}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHomeNavDestId(dest.id);
-                        setShowHomeMap(true);
-                      }}
-                      className="inline-flex items-center gap-1 text-[11px] font-medium text-[#A4834C] hover:text-[#1B3128] cursor-pointer whitespace-nowrap"
-                    >
-                      <Navigation className="w-3 h-3" />
-                      <span>{t.actions.navigateHere}</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHomeNavDestId(dest.id);
+                          setShowHomeMap(true);
+                        }}
+                        className="inline-flex items-center gap-1 px-2 py-1 border border-[#D9CCB8] text-[11px] font-medium text-[#4F6047] hover:border-[#A4834C] hover:text-[#1B3128] rounded-sm cursor-pointer whitespace-nowrap"
+                      >
+                        <span>{t.actions.navigateHere}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => startVisitNavigation(dest.id)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#1B3128] text-[#FAF7F0] hover:bg-[#A4834C] text-[11px] font-medium rounded-sm transition-colors cursor-pointer whitespace-nowrap"
+                      >
+                        <Navigation className="w-3 h-3 text-[#C7AA74]" />
+                        <span>{t.actions.visitPlace}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </article>

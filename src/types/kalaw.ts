@@ -248,3 +248,51 @@ export interface PlaceReview {
   createdAt: string;
 }
 
+export interface AssistantPreferences {
+  days: number;
+  pace: 'relaxed' | 'balanced' | 'active';
+  budget: 'budget' | 'moderate' | 'luxury';
+  companion: 'solo' | 'couple' | 'family' | 'friends';
+  season: string;
+  interests: TravelGoalTag[];
+}
+
+export interface AssistantItineraryStop {
+  day: number;
+  itemId: string;
+  type: 'destination' | 'stay' | 'experience' | 'restaurant' | 'rental';
+  title: string;
+  location: string;
+  timeSlot: string;
+  reason: string;
+}
+
+export interface AssistantRecommendation {
+  itemId: string;
+  kind: 'destination' | 'stay' | 'experience' | 'restaurant' | 'rental' | 'property';
+  title: string;
+  note: string;
+}
+
+export interface AssistantSeasonalNote {
+  title: string;
+  timing: string;
+  note: string;
+}
+
+export interface AssistantChatResponse {
+  reply: string;
+  suggestedItinerary?: AssistantItineraryStop[];
+  recommendedItems?: AssistantRecommendation[];
+  seasonalHighlights?: AssistantSeasonalNote[];
+}
+
+export interface AssistantMessage {
+  id: string;
+  role: 'user' | 'model';
+  text: string;
+  structured?: AssistantChatResponse;
+  createdAt: string;
+}
+
+

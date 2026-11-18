@@ -29,7 +29,7 @@ import { PlacesNavigationMap } from './PlacesNavigationMap';
 import type { MediaItem, ModalItem } from '../types/kalaw';
 
 export const ItemDetailModal: React.FC = () => {
-  const { activeModal, closeItemModal, openGallery, addToTripPlan, t } = useApp();
+  const { activeModal, closeItemModal, openGallery, addToTripPlan, startVisitNavigation, t } = useApp();
   const [mediaIdx, setMediaIdx] = useState(0);
   const [addedToPlan, setAddedToPlan] = useState(false);
   const [modalTab, setModalTab] = useState<'dossier' | 'directions' | 'reviews'>('dossier');
@@ -291,13 +291,23 @@ export const ItemDetailModal: React.FC = () => {
             </div>
 
             {hasWaypoint && (
-              <Link
-                to={`/destinations?navigate=${activeModal.data.id}#places-navigator`}
-                onClick={closeItemModal}
-                className="text-xs font-medium text-[#A4834C] hover:text-[#1B3128] pb-2 transition-colors"
-              >
-                {t.modal.openFullNavigator} →
-              </Link>
+              <div className="flex items-center gap-3 pb-2">
+                <button
+                  type="button"
+                  onClick={() => startVisitNavigation(activeModal.data.id)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#A4834C] hover:bg-[#1B3128] text-[#FAF7F0] text-xs font-medium rounded-sm transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  <Navigation className="w-3.5 h-3.5" />
+                  <span>{t.navigationMap.visitAction}</span>
+                </button>
+                <Link
+                  to={`/destinations?navigate=${activeModal.data.id}#places-navigator`}
+                  onClick={closeItemModal}
+                  className="text-xs font-medium text-[#A4834C] hover:text-[#1B3128] transition-colors whitespace-nowrap"
+                >
+                  {t.modal.openFullNavigator} →
+                </Link>
+              </div>
             )}
           </div>
         )}

@@ -1,22 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  AdvancedMarker,
-  InfoWindow,
-  Map as GoogleMap,
-  Pin,
-  useMap,
-  useMapsLibrary,
-} from '@vis.gl/react-google-maps';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
   Bike,
   Car,
   Compass,
+  ExternalLink,
   Footprints,
+  Layers,
   LocateFixed,
-  MapPin,
   Navigation,
   Plus,
   Route as RouteIcon,
+  X,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import {
@@ -29,6 +25,7 @@ import {
 
 export type GoalFilter = 'all' | GoalBucket;
 export type TravelModeKey = 'WALKING' | 'TWO_WHEELER' | 'DRIVING';
+type TileStyle = 'osm' | 'topo';
 
 interface RouteStepInfo {
   instruction: string;
@@ -40,6 +37,7 @@ interface ComputedRouteSummary {
   durationText: string;
   steps: RouteStepInfo[];
   usedFallbackMode: boolean;
+  isDirectEstimate?: boolean;
 }
 
 interface PlacesNavigationMapProps {
@@ -54,196 +52,71 @@ function formatDistanceMeters(meters: number): string {
   return `${(meters / 1000).toFixed(1)} km`;
 }
 
-function formatDurationMillis(ms: number): string {
-  if (!Number.isFinite(ms) || ms <= 0) return '—';
-  const totalMinutes = Math.max(1, Math.round(ms / 60000));
+function formatDurationSeconds(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds <= 0) return '—';
+  const totalMinutes = Math.max(1, Math.round(seconds / 60));
   if (totalMinutes < 60) return `${totalMinutes} min`;
   const hrs = Math.floor(totalMinutes / 60);
   const mins = totalMinutes % 60;
   return mins > 0 ? `${hrs} hr ${mins} min` : `${hrs} hr`;
 }
 
-function isQuotaError(err: unknown): boolean {
-  const msg =
-    typeof err === 'string'
-      ? err
-      : err instanceof Error
-        ? err.message
-        : JSON.stringify(err ?? '');
-  return (
-    msg.includes('OVER_QUERY_LIMIT') ||
-    msg.includes('RESOURCE_EXHAUSTED') ||
-    msg.includes('QuotaExceededError') ||
-    msg.includes('OverQuotaMapError') ||
-    msg.includes('429')
-  );
+function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const R = 6371000;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const sinLat = Math.sin(dLat / 2);
+  const sinLng = Math.sin(dLng / 2);
+  const h =
+    sinLat * sinLat + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * sinLng * sinLng;
+  return 2 * R * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
-interface RouteControllerProps {
-  origin: { lat: number; lng: number } | null;
-  destination: { lat: number; lng: number } | null;
-  travelMode: TravelModeKey;
-  onSummaryChange: (summary: ComputedRouteSummary | null) => void;
-  onLoadingChange: (loading: boolean) => void;
-  onErrorChange: (error: string | null) => void;
-  routeErrorMessage: string;
+function formatOsrmInstruction(step: {
+  name?: string;
+  maneuver?: { type?: string; modifier?: string };
+}): string {
+  const type = step.maneuver?.type || 'continue';
+  const mod = step.maneuver?.modifier ? step.maneuver.modifier.replace(/_/g, ' ') : '';
+  const road = step.name && step.name.trim().length > 0 ? step.name.trim() : 'mountain road';
+
+  if (type === 'depart') {
+    return mod ? `Head ${mod} on ${road}` : `Depart via ${road}`;
+  }
+  if (type === 'arrive') {
+    return `Arrive at destination (${road})`;
+  }
+  if (type === 'turn') {
+    return mod ? `Turn ${mod} onto ${road}` : `Turn onto ${road}`;
+  }
+  if (type === 'roundabout' || type === 'rotary') {
+    return `Take the roundabout onto ${road}`;
+  }
+  if (type === 'fork') {
+    return mod ? `Keep ${mod} at the fork onto ${road}` : `Continue at fork onto ${road}`;
+  }
+  if (type === 'end of road') {
+    return mod ? `At end of road, turn ${mod} onto ${road}` : `Continue onto ${road}`;
+  }
+  return mod ? `Continue ${mod} on ${road}` : `Follow ${road}`;
 }
 
-interface MapPolyline {
-  setMap: (map: unknown) => void;
+function buildMarkerIcon(fill: string, stroke: string, scale = 1): L.DivIcon {
+  const width = Math.round(28 * scale);
+  const height = Math.round(36 * scale);
+  return L.divIcon({
+    className: 'kalaw-osm-marker',
+    iconSize: [width, height],
+    iconAnchor: [Math.round(width / 2), height],
+    html: `
+      <svg width="${width}" height="${height}" viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(27,49,40,0.35)); cursor: pointer;">
+        <path d="M14 1.5C7.1 1.5 1.5 7.1 1.5 14C1.5 23.3 14 34.5 14 34.5C14 34.5 26.5 23.3 26.5 14C26.5 7.1 20.9 1.5 14 1.5Z" fill="${fill}" stroke="${stroke}" stroke-width="2"/>
+        <circle cx="14" cy="13.5" r="4.5" fill="${stroke}"/>
+      </svg>
+    `,
+  });
 }
-
-const RouteController: React.FC<RouteControllerProps> = ({
-  origin,
-  destination,
-  travelMode,
-  onSummaryChange,
-  onLoadingChange,
-  onErrorChange,
-  routeErrorMessage,
-}) => {
-  const map = useMap();
-  const routesLib = useMapsLibrary('routes');
-  const polylinesRef = useRef<MapPolyline[]>([]);
-
-  const clearPolylines = useCallback(() => {
-    polylinesRef.current.forEach((line) => line.setMap(null));
-    polylinesRef.current = [];
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      clearPolylines();
-    };
-  }, [clearPolylines]);
-
-  useEffect(() => {
-    if (!map || !routesLib || !origin || !destination) return;
-    if (
-      Math.abs(origin.lat - destination.lat) < 0.0001 &&
-      Math.abs(origin.lng - destination.lng) < 0.0001
-    ) {
-      clearPolylines();
-      onSummaryChange({
-        distanceText: '0 m',
-        durationText: '1 min',
-        steps: [],
-        usedFallbackMode: false,
-      });
-      onErrorChange(null);
-      return;
-    }
-
-    let cancelled = false;
-    onLoadingChange(true);
-    onErrorChange(null);
-
-    const runCompute = async (modeToUse: TravelModeKey, isFallback: boolean) => {
-      try {
-        const RouteClass = (routesLib as unknown as {
-          Route: {
-            computeRoutes: (req: Record<string, unknown>) => Promise<{
-              routes?: Array<{
-                distanceMeters?: number;
-                durationMillis?: number;
-                viewport?: unknown;
-                legs?: Array<{
-                  steps?: Array<{
-                    distanceMeters?: number;
-                    navigationInstruction?: { instructions?: string };
-                  }>;
-                }>;
-                createPolylines: (opts?: Record<string, unknown>) => MapPolyline[];
-              }>;
-            }>;
-          };
-        }).Route;
-
-        const { routes } = await RouteClass.computeRoutes({
-          origin,
-          destination,
-          travelMode: modeToUse,
-          fields: ['path', 'distanceMeters', 'durationMillis', 'viewport', 'legs'],
-        });
-
-        if (cancelled) return;
-        const primaryRoute = routes?.[0];
-        if (!primaryRoute) {
-          if (modeToUse === 'TWO_WHEELER' && !isFallback) {
-            await runCompute('DRIVING', true);
-            return;
-          }
-          clearPolylines();
-          onSummaryChange(null);
-          onErrorChange(routeErrorMessage);
-          onLoadingChange(false);
-          return;
-        }
-
-        clearPolylines();
-        const createdPolylines = primaryRoute.createPolylines({
-          strokeColor: '#1B3128',
-          strokeOpacity: 0.9,
-          strokeWeight: 5,
-        });
-        createdPolylines.forEach((line) => line.setMap(map));
-        polylinesRef.current = createdPolylines;
-
-        if (primaryRoute.viewport) {
-          map.fitBounds(primaryRoute.viewport);
-        }
-
-        const rawSteps = primaryRoute.legs?.[0]?.steps || [];
-        const steps: RouteStepInfo[] = rawSteps
-          .map((step) => ({
-            instruction: (step.navigationInstruction?.instructions || '').trim(),
-            distanceLabel: formatDistanceMeters(step.distanceMeters || 0),
-          }))
-          .filter((s) => s.instruction.length > 0);
-
-        onSummaryChange({
-          distanceText: formatDistanceMeters(primaryRoute.distanceMeters || 0),
-          durationText: formatDurationMillis(primaryRoute.durationMillis || 0),
-          steps,
-          usedFallbackMode: isFallback,
-        });
-        onLoadingChange(false);
-      } catch (err) {
-        if (cancelled) return;
-        if (isQuotaError(err)) {
-          window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
-        }
-        if (modeToUse === 'TWO_WHEELER' && !isFallback && !isQuotaError(err)) {
-          await runCompute('DRIVING', true);
-          return;
-        }
-        clearPolylines();
-        onSummaryChange(null);
-        onErrorChange(routeErrorMessage);
-        onLoadingChange(false);
-      }
-    };
-
-    runCompute(travelMode, false);
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    map,
-    routesLib,
-    origin,
-    destination,
-    travelMode,
-    clearPolylines,
-    onSummaryChange,
-    onLoadingChange,
-    onErrorChange,
-    routeErrorMessage,
-  ]);
-
-  return null;
-};
 
 export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
   initialDestinationId = 'dest-1',
@@ -259,7 +132,7 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
     properties,
     openItemModal,
     addToTripPlan,
-    mapsApiKey,
+    startVisitNavigation,
   } = useApp();
 
   const [goalFilter, setGoalFilter] = useState<GoalFilter>('all');
@@ -270,12 +143,18 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
 
   const [destId, setDestId] = useState<string>(initialDestinationId);
   const [travelMode, setTravelMode] = useState<TravelModeKey>('DRIVING');
+  const [tileStyle, setTileStyle] = useState<TileStyle>('osm');
   const [activePinId, setActivePinId] = useState<string | null>(null);
 
   const [routeSummary, setRouteSummary] = useState<ComputedRouteSummary | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
-  const [routeError, setRouteError] = useState<string | null>(null);
   const [addedPlanId, setAddedPlanId] = useState<string | null>(null);
+
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const routeLayerRef = useRef<L.LayerGroup | null>(null);
 
   useEffect(() => {
     if (initialDestinationId && getWaypointById(initialDestinationId)) {
@@ -303,12 +182,19 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
 
   const selectableDestinations = useMemo(() => {
     if (goalFilter === 'all') {
-      return KALAW_WAYPOINTS.filter((w) => w.kind === 'destination' || w.kind === 'stay' || w.kind === 'restaurant' || w.id === destId);
+      return KALAW_WAYPOINTS.filter(
+        (w) =>
+          w.kind === 'destination' ||
+          w.kind === 'stay' ||
+          w.kind === 'restaurant' ||
+          w.id === destId
+      );
     }
     return KALAW_WAYPOINTS.filter((w) => w.goalBucket === goalFilter || w.id === destId);
   }, [goalFilter, destId]);
 
-  const originWaypoint = originId === 'gps' ? null : getWaypointById(originId) || KALAW_WAYPOINTS[0];
+  const originWaypoint =
+    originId === 'gps' ? null : getWaypointById(originId) || KALAW_WAYPOINTS[0];
   const destWaypoint = getWaypointById(destId) || KALAW_WAYPOINTS[2];
 
   const originLatLng = useMemo(() => {
@@ -321,6 +207,248 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
     () => ({ lat: destWaypoint.lat, lng: destWaypoint.lng }),
     [destWaypoint]
   );
+
+  // Initialize Leaflet Map once
+  useEffect(() => {
+    if (!mapContainerRef.current || mapInstanceRef.current) return;
+
+    const map = L.map(mapContainerRef.current, {
+      center: [KALAW_CENTER.lat, KALAW_CENTER.lng],
+      zoom: 13,
+      zoomControl: true,
+    });
+
+    const markersLayer = L.layerGroup().addTo(map);
+    const routeLayer = L.layerGroup().addTo(map);
+
+    mapInstanceRef.current = map;
+    markersLayerRef.current = markersLayer;
+    routeLayerRef.current = routeLayer;
+
+    // Ensure proper sizing if rendered inside animated containers or modals
+    const resizeTimer = window.setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+
+    return () => {
+      window.clearTimeout(resizeTimer);
+      map.remove();
+      mapInstanceRef.current = null;
+      tileLayerRef.current = null;
+      markersLayerRef.current = null;
+      routeLayerRef.current = null;
+    };
+  }, []);
+
+  // Switch OpenStreetMap / OpenTopoMap tile layer
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+    }
+
+    const tileUrl =
+      tileStyle === 'topo'
+        ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    const attribution =
+      tileStyle === 'topo'
+        ? '&copy; OpenStreetMap contributors, &copy; OpenTopoMap'
+        : '&copy; OpenStreetMap contributors';
+
+    tileLayerRef.current = L.tileLayer(tileUrl, {
+      maxZoom: 18,
+      attribution,
+    }).addTo(map);
+  }, [tileStyle]);
+
+  // Render Waypoint Markers
+  useEffect(() => {
+    const markersLayer = markersLayerRef.current;
+    if (!markersLayer) return;
+    markersLayer.clearLayers();
+
+    if (originId === 'gps' && gpsCoords) {
+      const gpsMarker = L.marker([gpsCoords.lat, gpsCoords.lng], {
+        icon: buildMarkerIcon('#4F6047', '#FAF7F0', 1),
+        title: t.navigationMap.gpsOriginLabel,
+      });
+      gpsMarker.addTo(markersLayer);
+    }
+
+    visibleWaypoints.forEach((wp) => {
+      const isDest = wp.id === destId;
+      const isOrigin = wp.id === originId;
+      const fill = isDest ? '#A4834C' : isOrigin ? '#1B3128' : '#243D32';
+      const stroke = isDest ? '#1B3128' : '#FAF7F0';
+      const marker = L.marker([wp.lat, wp.lng], {
+        icon: buildMarkerIcon(fill, stroke, isDest ? 1.18 : 0.94),
+        title: getLabel(wp),
+        zIndexOffset: isDest ? 500 : isOrigin ? 300 : 100,
+      });
+      marker.on('click', () => {
+        setActivePinId(wp.id);
+      });
+      marker.addTo(markersLayer);
+    });
+  }, [visibleWaypoints, destId, originId, gpsCoords, getLabel, t.navigationMap.gpsOriginLabel]);
+
+  // Compute Route via FOSSGIS OSRM mode-specific servers (with clean highland fallback)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const routeLayer = routeLayerRef.current;
+    if (!map || !routeLayer) return;
+
+    if (
+      Math.abs(originLatLng.lat - destLatLng.lat) < 0.0001 &&
+      Math.abs(originLatLng.lng - destLatLng.lng) < 0.0001
+    ) {
+      routeLayer.clearLayers();
+      setRouteSummary({
+        distanceText: '0 m',
+        durationText: '1 min',
+        steps: [],
+        usedFallbackMode: false,
+      });
+      setRouteLoading(false);
+      map.setView([destLatLng.lat, destLatLng.lng], 15);
+      return;
+    }
+
+    const controller = new AbortController();
+    setRouteLoading(true);
+
+    const fossgisProfile =
+      travelMode === 'WALKING'
+        ? 'routed-foot'
+        : travelMode === 'TWO_WHEELER'
+          ? 'routed-bike'
+          : 'routed-car';
+
+    const coordsSegment = `${originLatLng.lng},${originLatLng.lat};${destLatLng.lng},${destLatLng.lat}`;
+    const url = `https://routing.openstreetmap.de/${fossgisProfile}/route/v1/driving/${coordsSegment}?overview=full&geometries=geojson&steps=true`;
+
+    const styleForMode =
+      travelMode === 'WALKING'
+        ? { color: '#B66F52', weight: 5, opacity: 0.95, dashArray: '3 9' }
+        : travelMode === 'TWO_WHEELER'
+          ? { color: '#A4834C', weight: 5, opacity: 0.95, dashArray: '10 6' }
+          : { color: '#1B3128', weight: 5.5, opacity: 0.92 };
+
+    fetch(url, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error('OSRM failed'))))
+      .then(
+        (data: {
+          code?: string;
+          routes?: Array<{
+            distance?: number;
+            duration?: number;
+            geometry?: { coordinates?: Array<[number, number]> };
+            legs?: Array<{
+              steps?: Array<{
+                distance?: number;
+                name?: string;
+                maneuver?: { type?: string; modifier?: string };
+              }>;
+            }>;
+          }>;
+        }) => {
+          if (controller.signal.aborted) return;
+          const primary = data.routes?.[0];
+          const coords = primary?.geometry?.coordinates;
+
+          if (!primary || !coords || coords.length < 2) {
+            throw new Error('No route geometry');
+          }
+
+          routeLayer.clearLayers();
+          const latLngs: L.LatLngExpression[] = coords.map(([lng, lat]) => [lat, lng]);
+
+          // Subtle cream under-halo so dashed/dotted walking & scooter routes stand out over streets
+          L.polyline(latLngs, {
+            color: '#FAF7F0',
+            weight: 8,
+            opacity: 0.85,
+          }).addTo(routeLayer);
+
+          const polyline = L.polyline(latLngs, styleForMode).addTo(routeLayer);
+
+          map.fitBounds(polyline.getBounds(), { padding: [46, 46], maxZoom: 15 });
+
+          const rawSteps = primary.legs?.[0]?.steps || [];
+          const steps: RouteStepInfo[] = rawSteps
+            .filter((s) => (s.distance || 0) > 10 || s.maneuver?.type === 'arrive')
+            .map((s) => ({
+              instruction: formatOsrmInstruction(s),
+              distanceLabel: formatDistanceMeters(s.distance || 0),
+            }));
+
+          // routed-bike speeds model ~12 km/h pedaling; calibrate TWO_WHEELER to ~24 km/h scooter speed
+          const rawDuration = primary.duration || 0;
+          const distanceMeters = primary.distance || 0;
+          const calibratedDuration =
+            travelMode === 'TWO_WHEELER'
+              ? Math.max(60, Math.round(rawDuration * 0.55))
+              : travelMode === 'WALKING'
+                ? Math.max(60, rawDuration || Math.round(distanceMeters / 1.2))
+                : Math.max(60, rawDuration);
+
+          setRouteSummary({
+            distanceText: formatDistanceMeters(distanceMeters),
+            durationText: formatDurationSeconds(calibratedDuration),
+            steps,
+            usedFallbackMode: false,
+          });
+          setRouteLoading(false);
+        }
+      )
+      .catch((err: unknown) => {
+        if (controller.signal.aborted || (err instanceof Error && err.name === 'AbortError')) {
+          return;
+        }
+        // Clean geographic highland corridor estimate when routing server is unavailable
+        routeLayer.clearLayers();
+        const directLine = L.polyline(
+          [
+            [originLatLng.lat, originLatLng.lng],
+            [destLatLng.lat, destLatLng.lng],
+          ],
+          {
+            ...styleForMode,
+            dashArray: travelMode === 'DRIVING' ? '8 8' : styleForMode.dashArray,
+          }
+        ).addTo(routeLayer);
+
+        map.fitBounds(directLine.getBounds(), { padding: [50, 50], maxZoom: 15 });
+
+        const straightMeters = haversineMeters(originLatLng, destLatLng);
+        const estimatedRoadMeters = Math.round(straightMeters * 1.35);
+        const speedMps =
+          travelMode === 'WALKING' ? 1.15 : travelMode === 'TWO_WHEELER' ? 7.2 : 9.5;
+        const estimatedSeconds = estimatedRoadMeters / speedMps;
+
+        setRouteSummary({
+          distanceText: `~${formatDistanceMeters(estimatedRoadMeters)}`,
+          durationText: `~${formatDurationSeconds(estimatedSeconds)}`,
+          steps: [
+            {
+              instruction: `Head toward ${getLabel(destWaypoint)} (${getArea(destWaypoint)})`,
+              distanceLabel: formatDistanceMeters(estimatedRoadMeters),
+            },
+          ],
+          usedFallbackMode: false,
+          isDirectEstimate: true,
+        });
+        setRouteLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [originLatLng, destLatLng, travelMode, destWaypoint, getLabel, getArea]);
 
   const handleUseGps = () => {
     if (!navigator.geolocation) {
@@ -374,6 +502,14 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
 
   const activePinWaypoint = activePinId ? getWaypointById(activePinId) : null;
 
+  const osmDirectionsEngine =
+    travelMode === 'WALKING'
+      ? 'fossgis_osrm_foot'
+      : travelMode === 'TWO_WHEELER'
+        ? 'fossgis_osrm_bike'
+        : 'fossgis_osrm_car';
+  const osmExternalUrl = `https://www.openstreetmap.org/directions?engine=${osmDirectionsEngine}&route=${originLatLng.lat}%2C${originLatLng.lng}%3B${destLatLng.lat}%2C${destLatLng.lng}`;
+
   const goalButtons: Array<{ key: GoalFilter; label: string }> = [
     { key: 'all', label: t.navigationMap.goals.all },
     { key: 'sunrise', label: t.navigationMap.goals.sunrise },
@@ -383,9 +519,21 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
   ];
 
   const travelModeButtons: Array<{ key: TravelModeKey; label: string; icon: React.ReactNode }> = [
-    { key: 'WALKING', label: t.navigationMap.modes.WALKING, icon: <Footprints className="w-3.5 h-3.5" /> },
-    { key: 'TWO_WHEELER', label: t.navigationMap.modes.TWO_WHEELER, icon: <Bike className="w-3.5 h-3.5" /> },
-    { key: 'DRIVING', label: t.navigationMap.modes.DRIVING, icon: <Car className="w-3.5 h-3.5" /> },
+    {
+      key: 'WALKING',
+      label: t.navigationMap.modes.WALKING,
+      icon: <Footprints className="w-3.5 h-3.5" />,
+    },
+    {
+      key: 'TWO_WHEELER',
+      label: t.navigationMap.modes.TWO_WHEELER,
+      icon: <Bike className="w-3.5 h-3.5" />,
+    },
+    {
+      key: 'DRIVING',
+      label: t.navigationMap.modes.DRIVING,
+      icon: <Car className="w-3.5 h-3.5" />,
+    },
   ];
 
   return (
@@ -393,13 +541,13 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
       id="places-navigator"
       className={`bg-[#FAF7F0] luxury-frame ${compact ? 'p-4 md:p-5 space-y-4' : 'p-6 md:p-8 space-y-6'}`}
     >
-      {/* Header & Goal Presets */}
+      {/* Header & OpenStreetMap Layer Toggle */}
       {!compact && (
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-[#A4834C]/25 pb-5">
           <div className="space-y-2 max-w-2xl">
             <p className="text-xs uppercase tracking-[0.2em] text-[#A4834C] font-medium flex items-center gap-2">
               <Navigation className="w-3.5 h-3.5" />
-              <span>{t.navigationMap.eyebrow}</span>
+              <span>{t.navigationMap.eyebrow} · OpenStreetMap</span>
             </p>
             <h2 className="font-serif text-3xl md:text-4xl text-[#1B3128]">
               {t.navigationMap.title}
@@ -407,6 +555,25 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
             <p className="text-sm text-[#222420]/75 leading-relaxed">
               {t.navigationMap.subtitle}
             </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setTileStyle((s) => (s === 'osm' ? 'topo' : 'osm'))}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-[#A4834C]/50 text-xs font-medium text-[#1B3128] hover:bg-[#1B3128] hover:text-[#FAF7F0] transition-colors rounded-sm cursor-pointer whitespace-nowrap"
+            >
+              <Layers className="w-3.5 h-3.5 text-[#A4834C]" />
+              <span>{tileStyle === 'osm' ? 'Terrain / Topo' : 'Street Map'}</span>
+            </button>
+            <a
+              href={osmExternalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-[#D9CCB8] text-xs font-medium text-[#4F6047] hover:text-[#1B3128] hover:border-[#A4834C] transition-colors rounded-sm whitespace-nowrap"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>OpenStreetMap</span>
+            </a>
           </div>
         </div>
       )}
@@ -434,9 +601,11 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
       )}
 
       {/* Main Split: Controls + Map */}
-      <div className={`grid grid-cols-1 ${compact ? 'lg:grid-cols-12' : 'lg:grid-cols-12'} gap-6 items-start`}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Controls & Turn-by-Turn Panel */}
-        <div className={`${compact ? 'lg:col-span-5' : 'lg:col-span-4'} space-y-4 bg-[#F6F2E9] border border-[#D9CCB8] p-4 md:p-5`}>
+        <div
+          className={`${compact ? 'lg:col-span-5' : 'lg:col-span-4'} space-y-4 bg-[#F6F2E9] border border-[#D9CCB8] p-4 md:p-5`}
+        >
           {/* Origin Picker */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -450,7 +619,9 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
                 className="inline-flex items-center gap-1 text-[11px] font-medium text-[#A4834C] hover:text-[#1B3128] transition-colors cursor-pointer"
               >
                 <LocateFixed className="w-3 h-3" />
-                <span>{locatingGps ? t.navigationMap.locatingGps : t.navigationMap.useCurrentLocation}</span>
+                <span>
+                  {locatingGps ? t.navigationMap.locatingGps : t.navigationMap.useCurrentLocation}
+                </span>
               </button>
             </div>
             <select
@@ -459,9 +630,7 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
               aria-label={t.navigationMap.originLabel}
               className="w-full px-3 py-2 bg-[#FAF7F0] border border-[#D9CCB8] text-xs text-[#222420] focus:outline-none focus:border-[#1B3128]"
             >
-              {gpsCoords && (
-                <option value="gps">{t.navigationMap.gpsOriginLabel}</option>
-              )}
+              {gpsCoords && <option value="gps">{t.navigationMap.gpsOriginLabel}</option>}
               <optgroup label={t.navigationMap.startingHubsGroup}>
                 {KALAW_WAYPOINTS.filter((w) => w.kind === 'hub').map((wp) => (
                   <option key={wp.id} value={wp.id}>
@@ -477,11 +646,13 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
                 ))}
               </optgroup>
               <optgroup label={t.navigationMap.staysDiningGroup}>
-                {KALAW_WAYPOINTS.filter((w) => w.kind === 'stay' || w.kind === 'restaurant').map((wp) => (
-                  <option key={wp.id} value={wp.id}>
-                    {getLabel(wp)}
-                  </option>
-                ))}
+                {KALAW_WAYPOINTS.filter((w) => w.kind === 'stay' || w.kind === 'restaurant').map(
+                  (wp) => (
+                    <option key={wp.id} value={wp.id}>
+                      {getLabel(wp)}
+                    </option>
+                  )
+                )}
               </optgroup>
             </select>
             {gpsError && <p className="text-[11px] text-[#B66F52]">{gpsError}</p>}
@@ -527,7 +698,7 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
                   }`}
                 >
                   {m.icon}
-                  <span className="truncate">{m.label}</span>
+                  <span>{m.label}</span>
                 </button>
               ))}
             </div>
@@ -548,18 +719,6 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
               </p>
             </div>
           </div>
-
-          {routeSummary?.usedFallbackMode && (
-            <p className="text-[11px] text-[#A4834C]">
-              {t.navigationMap.twoWheelerFallbackNote}
-            </p>
-          )}
-
-          {routeError && (
-            <p className="text-xs text-[#B66F52] bg-[#B66F52]/10 border border-[#B66F52]/30 p-2.5">
-              {routeError}
-            </p>
-          )}
 
           {/* Turn-by-Turn Directions */}
           <div className="space-y-2">
@@ -591,130 +750,139 @@ export const PlacesNavigationMap: React.FC<PlacesNavigationMapProps> = ({
           </div>
 
           {/* Direct Destination Action Buttons */}
-          {destWaypoint.kind !== 'hub' && (
-            <div className="pt-2 flex flex-wrap gap-2 border-t border-[#D9CCB8]">
-              {!compact && destWaypoint.kind !== 'property' && (
-                <button
-                  type="button"
-                  onClick={() => handleInspectWaypoint(destWaypoint)}
-                  className="flex-1 py-2 px-3 bg-[#1B3128] text-[#FAF7F0] text-xs font-medium rounded-sm hover:bg-[#4F6047] transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  {t.navigationMap.openDossier}
-                </button>
-              )}
-              {destWaypoint.kind !== 'property' && (
-                <button
-                  type="button"
-                  onClick={() => handleAddStop(destWaypoint)}
-                  className="flex-1 py-2 px-3 border border-[#A4834C] text-[#1B3128] text-xs font-medium rounded-sm hover:bg-[#A4834C]/15 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
-                >
-                  {addedPlanId === destWaypoint.id ? (
-                    <>
-                      <Compass className="w-3.5 h-3.5 text-[#A4834C]" />
-                      <span>{t.navigationMap.addedStop}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>{t.navigationMap.addStopToPlan}</span>
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-          )}
+          <div className="pt-2 space-y-2 border-t border-[#D9CCB8]">
+            <button
+              type="button"
+              onClick={() => startVisitNavigation(destWaypoint.id, { originId, travelMode })}
+              className="w-full py-2.5 px-4 bg-[#A4834C] hover:bg-[#1B3128] text-[#FAF7F0] text-xs font-semibold rounded-sm transition-colors inline-flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              <span>{t.navigationMap.visitAction}</span>
+            </button>
+
+            {destWaypoint.kind !== 'hub' && (
+              <div className="flex flex-wrap gap-2">
+                {!compact && destWaypoint.kind !== 'property' && (
+                  <button
+                    type="button"
+                    onClick={() => handleInspectWaypoint(destWaypoint)}
+                    className="flex-1 py-2 px-3 bg-[#1B3128] text-[#FAF7F0] text-xs font-medium rounded-sm hover:bg-[#4F6047] transition-colors cursor-pointer whitespace-nowrap"
+                  >
+                    {t.navigationMap.openDossier}
+                  </button>
+                )}
+                {destWaypoint.kind !== 'property' && (
+                  <button
+                    type="button"
+                    onClick={() => handleAddStop(destWaypoint)}
+                    className="flex-1 py-2 px-3 border border-[#A4834C] text-[#1B3128] text-xs font-medium rounded-sm hover:bg-[#A4834C]/15 transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    {addedPlanId === destWaypoint.id ? (
+                      <>
+                        <Compass className="w-3.5 h-3.5 text-[#A4834C]" />
+                        <span>{t.navigationMap.addedStop}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>{t.navigationMap.addStopToPlan}</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Interactive Google Map Canvas */}
+        {/* Interactive OpenStreetMap Canvas */}
         <div
           className={`${compact ? 'lg:col-span-7 h-[300px] lg:h-[360px]' : 'lg:col-span-8 h-[440px] lg:h-[540px]'} w-full border border-[#A4834C]/35 bg-[#EBE5D8] relative overflow-hidden`}
         >
-          {mapsApiKey ? (
-            <GoogleMap
-              defaultCenter={KALAW_CENTER}
-              defaultZoom={13}
-              mapId="DEMO_MAP_ID"
-              internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
-              gestureHandling="greedy"
-              className="w-full h-full"
-            >
-              <RouteController
-                origin={originLatLng}
-                destination={destLatLng}
-                travelMode={travelMode}
-                onSummaryChange={setRouteSummary}
-                onLoadingChange={setRouteLoading}
-                onErrorChange={setRouteError}
-                routeErrorMessage={t.navigationMap.routeError}
-              />
+          <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-              {originId === 'gps' && gpsCoords && (
-                <AdvancedMarker position={gpsCoords} title={t.navigationMap.gpsOriginLabel}>
-                  <Pin background="#4F6047" borderColor="#FAF7F0" glyphColor="#FAF7F0" />
-                </AdvancedMarker>
-              )}
+          {/* Live Travel Mode & Route Summary Card on Map Canvas */}
+          <div className="absolute top-3 right-3 z-[400] bg-[#FAF7F0]/95 backdrop-blur-xs border border-[#A4834C]/55 px-3 py-2 shadow-sm flex items-center gap-2.5 text-xs text-[#1B3128]">
+            <span
+              className="w-5 inline-block shrink-0"
+              style={{
+                borderTopWidth: '3px',
+                borderTopStyle:
+                  travelMode === 'WALKING'
+                    ? 'dotted'
+                    : travelMode === 'TWO_WHEELER'
+                      ? 'dashed'
+                      : 'solid',
+                borderTopColor:
+                  travelMode === 'WALKING'
+                    ? '#B66F52'
+                    : travelMode === 'TWO_WHEELER'
+                      ? '#A4834C'
+                      : '#1B3128',
+              }}
+            />
+            <span className="font-medium">{t.navigationMap.modes[travelMode]}</span>
+            <span className="text-[#A4834C]">·</span>
+            <span className="tabular-nums text-[#4F6047]">
+              {routeLoading
+                ? '...'
+                : `${routeSummary?.distanceText || '—'} · ${routeSummary?.durationText || '—'}`}
+            </span>
+          </div>
 
-              {visibleWaypoints.map((wp) => {
-                const isDest = wp.id === destId;
-                const isOrigin = wp.id === originId;
-                const bg = isDest ? '#A4834C' : isOrigin ? '#1B3128' : '#243D32';
-                const border = isDest ? '#1B3128' : '#FAF7F0';
-                return (
-                  <AdvancedMarker
-                    key={wp.id}
-                    position={{ lat: wp.lat, lng: wp.lng }}
-                    title={getLabel(wp)}
-                    onClick={() => setActivePinId(wp.id)}
-                  >
-                    <Pin background={bg} borderColor={border} glyphColor="#FAF7F0" scale={isDest ? 1.15 : 0.95} />
-                  </AdvancedMarker>
-                );
-              })}
-
-              {activePinWaypoint && (
-                <InfoWindow
-                  position={{ lat: activePinWaypoint.lat, lng: activePinWaypoint.lng }}
-                  onCloseClick={() => setActivePinId(null)}
+          {/* Selected Pin Info Drawer */}
+          {activePinWaypoint && (
+            <div className="absolute bottom-3 left-3 z-[400] max-w-[270px] bg-[#FAF7F0]/95 backdrop-blur-xs border border-[#A4834C]/55 p-3.5 shadow-lg space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-[11px] uppercase tracking-wider text-[#A4834C] font-semibold">
+                  {getArea(activePinWaypoint)}
+                  {activePinWaypoint.elevation ? ` · ${activePinWaypoint.elevation}` : ''}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActivePinId(null)}
+                  aria-label={t.actions.closeModal}
+                  className="text-[#4F6047] hover:text-[#1B3128] cursor-pointer"
                 >
-                  <div className="p-1 max-w-[230px] text-[#222420] space-y-1.5">
-                    <p className="text-[11px] uppercase tracking-wider text-[#A4834C] font-semibold">
-                      {getArea(activePinWaypoint)}
-                      {activePinWaypoint.elevation ? ` · ${activePinWaypoint.elevation}` : ''}
-                    </p>
-                    <p className="font-serif text-base font-semibold text-[#1B3128] leading-snug">
-                      {getLabel(activePinWaypoint)}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDestId(activePinWaypoint.id);
-                          setActivePinId(null);
-                        }}
-                        className="px-2 py-1 bg-[#1B3128] text-[#FAF7F0] text-[11px] rounded-sm cursor-pointer"
-                      >
-                        {t.actions.navigateHere}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOriginId(activePinWaypoint.id);
-                          setActivePinId(null);
-                        }}
-                        className="px-2 py-1 border border-[#D9CCB8] text-[#1B3128] text-[11px] rounded-sm cursor-pointer"
-                      >
-                        {t.navigationMap.originLabel}
-                      </button>
-                    </div>
-                  </div>
-                </InfoWindow>
-              )}
-            </GoogleMap>
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center space-y-3 bg-[#1B3128]/5">
-              <MapPin className="w-8 h-8 text-[#A4834C]" />
-              <p className="font-serif text-xl text-[#1B3128]">{getLabel(destWaypoint)}</p>
-              <p className="text-xs text-[#4F6047] max-w-md">{t.navigationMap.missingKeyNotice}</p>
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <p className="font-serif text-base font-semibold text-[#1B3128] leading-snug">
+                {getLabel(activePinWaypoint)}
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    startVisitNavigation(activePinWaypoint.id, { originId, travelMode });
+                    setActivePinId(null);
+                  }}
+                  className="px-2.5 py-1 bg-[#A4834C] text-[#FAF7F0] text-[11px] font-medium rounded-sm cursor-pointer inline-flex items-center gap-1"
+                >
+                  <Navigation className="w-3 h-3" />
+                  <span>{t.actions.visitPlace}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDestId(activePinWaypoint.id);
+                    setActivePinId(null);
+                  }}
+                  className="px-2.5 py-1 bg-[#1B3128] text-[#FAF7F0] text-[11px] rounded-sm cursor-pointer"
+                >
+                  {t.actions.navigateHere}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOriginId(activePinWaypoint.id);
+                    setActivePinId(null);
+                  }}
+                  className="px-2.5 py-1 border border-[#D9CCB8] text-[#1B3128] text-[11px] rounded-sm cursor-pointer"
+                >
+                  {t.navigationMap.originLabel}
+                </button>
+              </div>
             </div>
           )}
         </div>

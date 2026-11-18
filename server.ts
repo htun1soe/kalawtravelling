@@ -70,13 +70,6 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'kalaw-travel-api' });
 });
 
-// Google Maps Platform client configuration
-app.get('/api/maps-config', (_req, res) => {
-  res.json({
-    apiKey: process.env.VITE_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY || '',
-  });
-});
-
 // Unified catalog search & discovery
 app.get('/api/catalog', (_req, res) => {
   res.json({

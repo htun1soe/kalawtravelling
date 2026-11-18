@@ -134,6 +134,7 @@ export interface UIStrings {
     descriptionLabel: string;
     closeModal: string;
     navigateHere: string;
+    visitPlace: string;
   };
   modal: {
     fieldHighlights: string;
@@ -236,6 +237,22 @@ export interface UIStrings {
     quotaBannerTitle: string;
     quotaBannerLinkText: string;
     selectedStop: string;
+    visitAction: string;
+    liveNavTitle: string;
+    endTrip: string;
+    minimizeMap: string;
+    resumeMap: string;
+    followMe: string;
+    recenter: string;
+    previewTrip: string;
+    pausePreview: string;
+    gpsLive: string;
+    stepLabel: string;
+    ofLabel: string;
+    remainingLabel: string;
+    arrivedLabel: string;
+    prevStep: string;
+    nextStep: string;
   };
   reviews: {
     eyebrow: string;
@@ -304,6 +321,44 @@ export interface UIStrings {
     terms: string;
     privacy: string;
     admin: string;
+  };
+  assistant: {
+    launchLabel: string;
+    drawerTitle: string;
+    drawerSubtitle: string;
+    closeLabel: string;
+    tabChat: string;
+    tabSeasons: string;
+    togglePrefs: string;
+    daysLabel: string;
+    paceLabel: string;
+    budgetLabel: string;
+    companionLabel: string;
+    seasonLabel: string;
+    interestsLabel: string;
+    buildPlanBtn: string;
+    paces: { relaxed: string; balanced: string; active: string };
+    budgets: { budget: string; moderate: string; luxury: string };
+    companions: { solo: string; couple: string; family: string; friends: string };
+    seasons: string[];
+    welcomeMessage: string;
+    quickPrompts: string[];
+    inputPlaceholder: string;
+    sendLabel: string;
+    thinkingLabel: string;
+    suggestedPlanHeading: string;
+    addAllToPlan: string;
+    addedAllToPlan: string;
+    addSingleStop: string;
+    addedStop: string;
+    recommendedPlacesHeading: string;
+    inspectPlace: string;
+    seasonalNoteHeading: string;
+    eventsTitle: string;
+    trendsTitle: string;
+    askAboutThis: string;
+    dayPrefix: string;
+    resetChat: string;
   };
 }
 
@@ -506,6 +561,7 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       descriptionLabel: 'Description',
       closeModal: 'Close',
       navigateHere: 'Navigate Here',
+      visitPlace: 'Visit',
     },
     modal: {
       fieldHighlights: 'Field Highlights',
@@ -609,6 +665,22 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       quotaBannerTitle: 'Google Maps Platform demo quota reached — map display and route calculation may be temporarily limited.',
       quotaBannerLinkText: 'View Quota & Upgrade Guide',
       selectedStop: 'Selected Stop',
+      visitAction: 'Visit Now',
+      liveNavTitle: 'Live Trip Guidance',
+      endTrip: 'End Trip',
+      minimizeMap: 'Keep Mini Map',
+      resumeMap: 'Open Live Map',
+      followMe: 'Following Position',
+      recenter: 'Re-center',
+      previewTrip: 'Preview Route',
+      pausePreview: 'Pause',
+      gpsLive: 'Live GPS',
+      stepLabel: 'Step',
+      ofLabel: 'of',
+      remainingLabel: 'Remaining',
+      arrivedLabel: 'You have arrived',
+      prevStep: 'Prev',
+      nextStep: 'Next',
     },
     reviews: {
       eyebrow: 'Traveler Field Notes & Goal Guide',
@@ -679,6 +751,55 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       terms: 'Terms of Service',
       privacy: 'Privacy Notice',
       admin: 'Operations & Admin',
+    },
+    assistant: {
+      launchLabel: 'Kalaw Guide',
+      drawerTitle: 'Kalaw Travel Concierge',
+      drawerSubtitle: 'Personal itineraries, seasonal events & highland tips',
+      closeLabel: 'Minimize concierge',
+      tabChat: 'Ask & Plan',
+      tabSeasons: 'Seasons & Trends',
+      togglePrefs: 'Personalize Factors',
+      daysLabel: 'Trip Length',
+      paceLabel: 'Pace',
+      budgetLabel: 'Style',
+      companionLabel: 'Travelers',
+      seasonLabel: 'Target Month / Season',
+      interestsLabel: 'What Matters Most',
+      buildPlanBtn: 'Generate Tailored Plan',
+      paces: { relaxed: 'Relaxed', balanced: 'Balanced', active: 'Active' },
+      budgets: { budget: 'Simple', moderate: 'Boutique', luxury: 'Luxury' },
+      companions: { solo: 'Solo', couple: 'Couple', family: 'Family', friends: 'Friends' },
+      seasons: [
+        'Nov (Tazaungdaing & Clear Skies)',
+        'Dec–Feb (Mist & Cherry Blossoms)',
+        'Apr (Highland Thingyan)',
+        'Aug–Oct (Tea & Avocado Harvest)',
+      ],
+      welcomeMessage:
+        'Mingalaba. Ask anything about Kalaw—custom day-by-day plans tailored to your pace, upcoming seasonal festivals, or where travelers are spending mornings right now.',
+      quickPrompts: [
+        'Build a custom plan with my factors',
+        'Seasonal events & best months to visit Kalaw',
+        'What are the top trending spots and cafes right now?',
+        'Quiet morning viewpoints without steep hikes',
+      ],
+      inputPlaceholder: 'Ask about plans, weather, festivals, trails, or stays...',
+      sendLabel: 'Send',
+      thinkingLabel: 'Consulting highland notes...',
+      suggestedPlanHeading: 'Suggested Personalized Plan',
+      addAllToPlan: 'Add All Stops to Trip Plan',
+      addedAllToPlan: 'Added to Trip Plan',
+      addSingleStop: 'Add Stop',
+      addedStop: 'Added',
+      recommendedPlacesHeading: 'Suggested Places & Stays',
+      inspectPlace: 'Inspect',
+      seasonalNoteHeading: 'Seasonal & Trend Notes',
+      eventsTitle: 'Seasonal Events & Festivals Calendar',
+      trendsTitle: 'Trending Now in Kalaw',
+      askAboutThis: 'Ask guide about this',
+      dayPrefix: 'Day',
+      resetChat: 'New Chat',
     },
   },
   my: {
@@ -879,6 +1000,7 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       descriptionLabel: 'အသေးစိတ်ဖော်ပြချက်',
       closeModal: 'ပိတ်မည်',
       navigateHere: 'လမ်းကြောင်းရှာမည်',
+      visitPlace: 'သွားမည်',
     },
     modal: {
       fieldHighlights: 'အဓိက ထူးခြားချက်များ',
@@ -982,6 +1104,22 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       quotaBannerTitle: 'Google Maps Platform demo quota ပြည့်သွားပါသဖြင့် မြေပုံနှင့် လမ်းကြောင်းတွက်ချက်မှု ယာယီကန့်သတ်ထားပါသည်။',
       quotaBannerLinkText: 'Quota လမ်းညွှန် ကြည့်ရန်',
       selectedStop: 'ရွေးချယ်ထားသည့်နေရာ',
+      visitAction: 'စတင်သွားရောက်မည်',
+      liveNavTitle: 'တိုက်ရိုက် ခရီးစဉ်လမ်းညွှန်',
+      endTrip: 'ခရီးစဉ်ရပ်မည်',
+      minimizeMap: 'မြေပုံအသေးချထားမည်',
+      resumeMap: 'မြေပုံပြန်ဖွင့်မည်',
+      followMe: 'တည်နေရာလိုက်ပြနေသည်',
+      recenter: 'အလယ်ပြန်ညှိမည်',
+      previewTrip: 'လမ်းကြောင်းအစမ်းကြည့်',
+      pausePreview: 'ခေတ္တရပ်',
+      gpsLive: 'GPS တိုက်ရိုက်',
+      stepLabel: 'အဆင့်',
+      ofLabel: '/',
+      remainingLabel: 'ကျန်ရှိမှု',
+      arrivedLabel: 'ပန်းတိုင်သို့ ရောက်ရှိပါပြီ',
+      prevStep: 'ရှေ့',
+      nextStep: 'နောက်',
     },
     reviews: {
       eyebrow: 'ခရီးသွားအတွေ့အကြုံနှင့် ရည်မှန်းချက်လမ်းညွှန်',
@@ -1052,6 +1190,55 @@ export const TRANSLATIONS: Record<Language, UIStrings> = {
       terms: 'စည်းကမ်းချက်',
       privacy: 'ကိုယ်ရေးလုံခြုံမှု',
       admin: 'စီမံခန့်ခွဲမှု',
+    },
+    assistant: {
+      launchLabel: 'ကလောလမ်းညွှန် AI',
+      drawerTitle: 'ကလော ခရီးသွားအကြံပေး',
+      drawerSubtitle: 'သင့်စိတ်ကြိုက် ခရီးစဉ်ဆွဲပေးခြင်းနှင့် ရာသီအလိုက် ပွဲတော်သတင်းများ',
+      closeLabel: 'လမ်းညွှန်ပိတ်မည်',
+      tabChat: 'မေးမြန်း/အစီအစဉ်ဆွဲရန်',
+      tabSeasons: 'ရာသီပွဲတော်နှင့် ခေတ်စားမှု',
+      togglePrefs: 'နှစ်သက်ရာအချက်များ ရွေးမည်',
+      daysLabel: 'ခရီးစဉ်ရက်',
+      paceLabel: 'သွားလာမှုနှုန်း',
+      budgetLabel: 'အဆင့်အတန်း',
+      companionLabel: 'အဖွဲ့အမျိုးအစား',
+      seasonLabel: 'သွားရောက်လိုသည့် ရာသီ',
+      interestsLabel: 'အဓိက စိတ်ဝင်စားမှုများ',
+      buildPlanBtn: 'စိတ်ကြိုက်ခရီးစဉ် ဆွဲပေးပါ',
+      paces: { relaxed: 'အေးဆေး', balanced: 'ပုံမှန်', active: 'တက်ကြွ' },
+      budgets: { budget: 'သင့်တင့်', moderate: 'ကောင်းမွန်', luxury: 'ဇိမ်ခံ' },
+      companions: { solo: 'တစ်ဦးတည်း', couple: 'စုံတွဲ', family: 'မိသားစု', friends: 'သူငယ်ချင်း' },
+      seasons: [
+        'နိုဝင်ဘာ (တန်ဆောင်တိုင် မီးပုံးပျံ)',
+        'ဒီဇင်ဘာ–ဖေဖော်ဝါရီ (နှင်းမြူနှင့် ချယ်ရီပန်း)',
+        'ဧပြီ (တောင်ပေါ်သင်္ကြန်)',
+        'ဩဂုတ်–အောက်တိုဘာ (ထောပတ်သီးနှင့် လက်ဖက်)',
+      ],
+      welcomeMessage:
+        'မင်္ဂလာပါ။ သင်နှစ်သက်သည့် ရက်အရေအတွက်နှင့် ပုံစံအလိုက် ခရီးစဉ်ရေးဆွဲခြင်း၊ ရာသီအလိုက် ပွဲတော်များနှင့် ကလောတွင် ယခုခေတ်စားနေသည့် နေရာများကို မေးမြန်းနိုင်ပါသည်။',
+      quickPrompts: [
+        'ရွေးချယ်ထားသည့်အချက်များဖြင့် ခရီးစဉ်ဆွဲပေးပါ',
+        'ကလော ရာသီအလိုက်ပွဲတော်များနှင့် အကောင်းဆုံးလများ',
+        'ယခုကလောတွင် ရေပန်းစားနေသည့် နေရာနှင့် ကော်ဖီဆိုင်များ',
+        'တောင်အများကြီး မတက်ရဘဲ နံနက်ခင်းရှုခင်းကောင်းမည့်နေရာ',
+      ],
+      inputPlaceholder: 'ခရီးစဉ်၊ ရာသီဥတု၊ ပွဲတော် သို့မဟုတ် တည်းခိုရန် မေးမြန်းပါ...',
+      sendLabel: 'ပို့မည်',
+      thinkingLabel: 'ကလောလမ်းညွှန် ရှာဖွေနေသည်...',
+      suggestedPlanHeading: 'သင့်အတွက် အကြံပြုခရီးစဉ်',
+      addAllToPlan: 'ခရီးစဉ်အားလုံး ထည့်မည်',
+      addedAllToPlan: 'ထည့်သွင်းပြီး',
+      addSingleStop: 'ထည့်မည်',
+      addedStop: 'ထည့်ပြီး',
+      recommendedPlacesHeading: 'အကြံပြု နေရာနှင့် တည်းခိုခန်းများ',
+      inspectPlace: 'အသေးစိတ်',
+      seasonalNoteHeading: 'ရာသီနှင့် ခေတ်စားမှု မှတ်စု',
+      eventsTitle: 'ကလော ရာသီအလိုက် ပွဲတော်နှင့် ရာသီဥတုပြက္ခဒိန်',
+      trendsTitle: 'ကလောတွင် ယခုရေပန်းစားနေသည်များ',
+      askAboutThis: 'ဤအကြောင်း မေးမည်',
+      dayPrefix: 'နေ့',
+      resetChat: 'အစမှစမည်',
     },
   },
 };

@@ -8,7 +8,10 @@ import {
   INITIAL_STAYS,
 } from '../data/kalawData';
 import { INITIAL_REVIEWS } from '../data/kalawReviews';
+import type { KalawTrendItem, SeasonalEventItem } from '../data/kalawSeasonal';
 import type {
+  AssistantChatResponse,
+  AssistantPreferences,
   AuthResponse,
   BookingRequest,
   BookingStatus,
@@ -23,6 +26,8 @@ import type {
   TravelGoalTag,
   UserAccount,
 } from '../types/kalaw';
+
+export type { KalawTrendItem, SeasonalEventItem };
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) || '/api';
 
@@ -303,3 +308,23 @@ export async function markReviewHelpful(id: string): Promise<PlaceReview> {
     method: 'POST',
   });
 }
+
+export async function fetchSeasonalPulse(lang: 'en' | 'my'): Promise<{
+  events: SeasonalEventItem[];
+  trends: KalawTrendItem[];
+}> {
+  return requestJson(`/assistant/seasonal-pulse?lang=${encodeURIComponent(lang)}`);
+}
+
+export async function sendAssistantChatMessage(payload: {
+  messages: Array<{ role: 'user' | 'model'; text: string }>;
+  lang: 'en' | 'my';
+  preferences?: Partial<AssistantPreferences>;
+  currentTripPlan?: Array<{ day: number; title: string; timeSlot: string }>;
+}): Promise<AssistantChatResponse> {
+  return requestJson<AssistantChatResponse>('/assistant/chat', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+

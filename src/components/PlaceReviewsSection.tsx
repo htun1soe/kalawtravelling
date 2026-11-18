@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { getWaypointById } from '../data/kalawCoordinates';
 import type { ModalItem, PlaceReview, TravelGoalTag } from '../types/kalaw';
 
 interface PlaceReviewsSectionProps {
@@ -68,6 +69,7 @@ export const PlaceReviewsSection: React.FC<PlaceReviewsSectionProps> = ({
     closeItemModal,
     addPlaceReview,
     markHelpfulReview,
+    startVisitNavigation,
     user,
     t,
   } = useApp();
@@ -641,7 +643,7 @@ export const PlaceReviewsSection: React.FC<PlaceReviewsSectionProps> = ({
                   </div>
 
                   {!scopedPlaceId && (
-                    <div className="flex items-center justify-between gap-3 pt-1 text-[11px]">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px]">
                       {modalTarget ? (
                         <button
                           type="button"
@@ -653,14 +655,25 @@ export const PlaceReviewsSection: React.FC<PlaceReviewsSectionProps> = ({
                       ) : (
                         <span />
                       )}
-                      <Link
-                        to={`/destinations?navigate=${rev.placeId}#places-navigator`}
-                        onClick={closeItemModal}
-                        className="inline-flex items-center gap-1 font-medium text-[#4F6047] hover:text-[#1B3128] transition-colors"
-                      >
-                        <Navigation className="w-3 h-3 text-[#A4834C]" />
-                        <span>{t.reviews.directionsToPlace}</span>
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to={`/destinations?navigate=${rev.placeId}#places-navigator`}
+                          onClick={closeItemModal}
+                          className="inline-flex items-center gap-1 font-medium text-[#4F6047] hover:text-[#1B3128] transition-colors"
+                        >
+                          <span>{t.reviews.directionsToPlace}</span>
+                        </Link>
+                        {getWaypointById(rev.placeId) && (
+                          <button
+                            type="button"
+                            onClick={() => startVisitNavigation(rev.placeId)}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-[#1B3128] text-[#FAF7F0] hover:bg-[#A4834C] rounded-sm font-medium transition-colors cursor-pointer"
+                          >
+                            <Navigation className="w-3 h-3 text-[#C7AA74]" />
+                            <span>{t.actions.visitPlace}</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

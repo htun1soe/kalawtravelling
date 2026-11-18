@@ -45,13 +45,24 @@ export interface GalleryState {
   item?: ModalItem;
 }
 
+export type TravelModeKey = 'WALKING' | 'TWO_WHEELER' | 'DRIVING';
+
+export interface ActiveTripNav {
+  destinationId: string;
+  originId: string;
+  travelMode: TravelModeKey;
+  distanceText: string;
+  durationText: string;
+  currentInstruction: string;
+  stepIdx: number;
+  totalSteps: number;
+}
+
 interface AppContextValue {
   lang: Language;
   setLang: (lang: Language) => void;
   toggleLang: () => void;
   t: UIStrings;
-  mapsApiKey: string;
-  quotaExceeded: boolean;
   user: UserAccount | null;
   destinations: Destination[];
   stays: Stay[];
@@ -101,6 +112,16 @@ interface AppContextValue {
     item?: ModalItem
   ) => void;
   closeGallery: () => void;
+  activeTripNav: ActiveTripNav | null;
+  isLiveNavOpen: boolean;
+  startVisitNavigation: (
+    destinationId: string,
+    options?: { originId?: string; travelMode?: TravelModeKey }
+  ) => void;
+  updateActiveTripNav: (patch: Partial<ActiveTripNav>) => void;
+  openLiveNav: () => void;
+  minimizeLiveNav: () => void;
+  stopVisitNavigation: () => void;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -144,35 +165,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return 'en';
     }
   });
-
-  const [mapsApiKey, setMapsApiKey] = useState<string>(
-    () => (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined) || ''
-  );
-  const [quotaExceeded, setQuotaExceeded] = useState(false);
-
-  useEffect(() => {
-    const onQuotaExceeded = () => setQuotaExceeded(true);
-    window.addEventListener('gmp-quota-exceeded', onQuotaExceeded);
-    return () => window.removeEventListener('gmp-quota-exceeded', onQuotaExceeded);
-  }, []);
-
-  useEffect(() => {
-    if (mapsApiKey) return;
-    let active = true;
-    fetch('/api/maps-config')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: { apiKey?: string } | null) => {
-        if (active && data?.apiKey) {
-          setMapsApiKey(data.apiKey);
-        }
-      })
-      .catch(() => {
-        // Silent fallback if backend maps-config unavailable
-      });
-    return () => {
-      active = false;
-    };
-  }, [mapsApiKey]);
 
   const setLang = useCallback((nextLang: Language) => {
     setLangState(nextLang);
@@ -390,6 +382,44 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [rawActiveModal, setRawActiveModal] = useState<ModalItem | null>(null);
   const [rawGalleryState, setRawGalleryState] = useState<GalleryState | null>(null);
+  const [activeTripNav, setActiveTripNav] = useState<ActiveTripNav | null>(null);
+  const [isLiveNavOpen, setIsLiveNavOpen] = useState(false);
+
+  const startVisitNavigation = useCallback(
+    (destinationId: string, options?: { originId?: string; travelMode?: TravelModeKey }) => {
+      setRawActiveModal(null);
+      setRawGalleryState(null);
+      setActiveTripNav((prev) => ({
+        destinationId,
+        originId: options?.originId || prev?.originId || 'hub-clock-tower',
+        travelMode: options?.travelMode || prev?.travelMode || 'DRIVING',
+        distanceText: '...',
+        durationText: '...',
+        currentInstruction: '',
+        stepIdx: 0,
+        totalSteps: 0,
+      }));
+      setIsLiveNavOpen(true);
+    },
+    []
+  );
+
+  const updateActiveTripNav = useCallback((patch: Partial<ActiveTripNav>) => {
+    setActiveTripNav((prev) => (prev ? { ...prev, ...patch } : prev));
+  }, []);
+
+  const openLiveNav = useCallback(() => {
+    setIsLiveNavOpen(true);
+  }, []);
+
+  const minimizeLiveNav = useCallback(() => {
+    setIsLiveNavOpen(false);
+  }, []);
+
+  const stopVisitNavigation = useCallback(() => {
+    setIsLiveNavOpen(false);
+    setActiveTripNav(null);
+  }, []);
 
   const activeModal = useMemo<ModalItem | null>(() => {
     if (!rawActiveModal) return null;
@@ -515,8 +545,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setLang,
         toggleLang,
         t,
-        mapsApiKey,
-        quotaExceeded,
         user,
         destinations,
         stays,
@@ -548,6 +576,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         galleryState,
         openGallery,
         closeGallery,
+        activeTripNav,
+        isLiveNavOpen,
+        startVisitNavigation,
+        updateActiveTripNav,
+        openLiveNav,
+        minimizeLiveNav,
+        stopVisitNavigation,
       }}
     >
       {children}
